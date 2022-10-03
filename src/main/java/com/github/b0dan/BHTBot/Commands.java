@@ -31,7 +31,7 @@ public class Commands implements BotInterface {
 
 	private Map<String, String> allMembers = new HashMap<String, String>(); //A HashMap containing all the members' display names with their discord tag as a key.
 
-	//A command that displays all available commands by typing `~commandsHelp` (case-sensitive).
+	//A command that displays all available commands by typing `~commandsHelp` (not case-sensitive).
 	public void displayCommands(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			mEvent.deleteMessage(); //Deletes the last message (the command).
@@ -48,7 +48,7 @@ public class Commands implements BotInterface {
 				.addInlineField("~setOnLeavePing *0*", "Disables the `onLeave` ping.")
 				.addInlineField("~setOnLeavePing *1*", "Enables the `onLeave` ping.")
 				.addField("~sourceCode", "Sends a link to the source code.")
-				.setFooter("All commands are case-sensitive!");
+				.setFooter("The commands are not case-sensitive!");
 			mEvent.getChannel().sendMessage(commands);
 
 			System.out.println("Command (~commandsHelp) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends a system message about who issued the command.
@@ -57,7 +57,7 @@ public class Commands implements BotInterface {
 		}
 	}
 
-	//A command to manually update the members' HashMap by typing `~updateMembers` (case-sensitive).
+	//A command to manually update the members' HashMap by typing `~updateMembers` (not case-sensitive).
 	public void updateMembers(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			Server server = dApi.getServerById(mEvent.getServerTextChannel().get().getServer().getId()).get(); //Gets the server.
@@ -78,7 +78,7 @@ public class Commands implements BotInterface {
 		}
 	}
 
-	//A command to print out the member's HashMap by typing `~getAllMembers` (case-sensitive). 
+	//A command to print out the member's HashMap by typing `~getAllMembers` (not case-sensitive). 
 	public void getAllMembers(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			mEvent.deleteMessage(); //Deletes the last message (the command).
@@ -99,7 +99,7 @@ public class Commands implements BotInterface {
 		}
 	}
 
-	//A command to set what the `onLeave` role will be by typing `~setOnLeaveRole` (case-sensitive).
+	//A command to set what the `onLeave` role will be by typing `~setOnLeaveRole` (not case-sensitive).
 	public void setOnLeaveRole(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			//Gets the number after the `~setOnLeaveRole` command and changes the role value if that role exists, also reacts on the message.
@@ -127,7 +127,7 @@ public class Commands implements BotInterface {
 		}
 	}
 
-	//A command to enable or disable the `onLeave` ping by typing `~setOnLeavePing` (case-sensitive).
+	//A command to enable or disable the `onLeave` ping by typing `~setOnLeavePing` (not case-sensitive).
 	public void setOnLeavePing(MessageCreateEvent mEvent) {
 		try {
 			//Gets the number after the `~setOnLeavePing` command, gives an error if it isn't 0 or 1 or changes the ping value if it is, also reacts on the message.
@@ -242,7 +242,7 @@ public class Commands implements BotInterface {
 		}
 	}
 
-	//A command that displays all the contract related commands by typing `~contractsHelp`(case-sensitive).
+	//A command that displays all the contract related commands by typing `~contractsHelp`(not case-sensitive).
 	public void contractsHelp(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			mEvent.deleteMessage(); //Deletes the last message (the command).
@@ -264,7 +264,7 @@ public class Commands implements BotInterface {
 				.addInlineField("~addRole *[Role ID]*", "Allows the users who have the role with the specified ID to use contract related commands.")
 				.addInlineField("~removeRole *[Role ID]*", "Disallows the users who have the role with the specified ID to use contract related commands.")
 				.addField("~idHelp", "Information on how to get the Channel/Role ID.")
-				.setFooter("All commands are case-sensitive!");
+				.setFooter("The commands are not case-sensitive!");
 			mEvent.getChannel().sendMessage(contractsCommands);
 
 			System.out.println("Command (~contractsHelp) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends a system message about who issued the command.
@@ -273,7 +273,7 @@ public class Commands implements BotInterface {
 		}
 	}
 
-	//A command that displays all active contracts by typing `~showContracts` (case-sensitive).
+	//A command that displays all active contracts by typing `~showContracts` (not case-sensitive).
 	public void showContracts(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			mEvent.deleteMessage(); //Deletes the last message (the command).
@@ -313,7 +313,7 @@ public class Commands implements BotInterface {
 		}
 	}
 
-	//A command to manually add a contract to the 'Contracts' SQL database by typing `~addContract` (case-sensitive).
+	//A command to manually add a contract to the 'Contracts' SQL database by typing `~addContract` (not case-sensitive).
 	public void manuallyAddContractToDatabase(MessageCreateEvent mEvent) {
 		try {
 			//Checks if the name after the `~addContract` command resembles an actual name.
@@ -372,7 +372,7 @@ public class Commands implements BotInterface {
 		}
 	}
 
-	//A command to manually update a contract from the 'Contracts' SQL database by typing `~updateContract` (case-sensitive).
+	//A command to manually update a contract from the 'Contracts' SQL database by typing `~updateContract` (not case-sensitive).
 	public void updateContractInDatabase(MessageCreateEvent mEvent) {
 		try {
 			String[] commandValues = mEvent.getMessage().getContent().split(" ", 3); //Splits the command in 3 parts(command, id, name).
@@ -442,7 +442,7 @@ public class Commands implements BotInterface {
 		}
 	} 
 
-	//A command to manually remove a contract from the 'Contracts' SQL database by typing `~removeContract` (case-sensitive).
+	//A command to manually remove a contract from the 'Contracts' SQL database by typing `~removeContract` (not case-sensitive).
 	public void removeContractFromDatabase(MessageCreateEvent mEvent) {
 		try {
 			//Opens up a connection to the 'BHT' SQL database (Contracts).
@@ -488,7 +488,7 @@ public class Commands implements BotInterface {
 		}
 	}
 
-	//A command that displays all the channels where contract related commands can be used by typing `~showChannels` (case-sensitive).
+	//A command that displays all the channels where contract related commands can be used by typing `~showChannels` (not case-sensitive).
 	public void showChannels(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			mEvent.deleteMessage(); //Deletes the last message (the command).
@@ -528,7 +528,7 @@ public class Commands implements BotInterface {
 		}
 	}
 
-	//A command that adds the channel with the specified ID to a database of channels in which the use of certain commands is allowed by typing `~addChannel` (case-sensitive).
+	//A command that adds the channel with the specified ID to a database of channels in which the use of certain commands is allowed by typing `~addChannel` (not case-sensitive).
 	public void addChannel(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			//Opens up a connection to the 'BHT' SQL database (Channels).
@@ -599,7 +599,7 @@ public class Commands implements BotInterface {
 		}
 	}
 
-	//A command that removes the channel with the specified ID from a database of channels in which the use of certain commands is allowed by typing `~removeChannel` (case-sensitive).
+	//A command that removes the channel with the specified ID from a database of channels in which the use of certain commands is allowed by typing `~removeChannel` (not case-sensitive).
 	public void removeChannel(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			//Opens up a connection to the 'BHT' SQL database (Channels).
@@ -645,7 +645,7 @@ public class Commands implements BotInterface {
 		}
 	}
 
-	//A command that displays all the roles who can use contract related commands by typing `~showRoles` (case-sensitive).
+	//A command that displays all the roles who can use contract related commands by typing `~showRoles` (not case-sensitive).
 	public void showRoles(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			mEvent.deleteMessage(); //Deletes the last message (the command).
@@ -685,7 +685,7 @@ public class Commands implements BotInterface {
 		}
 	}
 
-	//A commands that adds the role with the specified ID to a database of roles which allow the use of certain commands by typing `~addRole` (case-sensitive).
+	//A commands that adds the role with the specified ID to a database of roles which allow the use of certain commands by typing `~addRole` (not case-sensitive).
 	public void addRole(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			//Opens up a connection to the 'BHT' SQL database (Roles).
@@ -756,7 +756,7 @@ public class Commands implements BotInterface {
 		}
 	}
 
-	//A commands that removes the role with the specified ID from a database of roles which allow the use of certain commands by typing `~removeRole` (case-sensitive).
+	//A commands that removes the role with the specified ID from a database of roles which allow the use of certain commands by typing `~removeRole` (not case-sensitive).
 	public void removeRole(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			//Opens up a connection to the 'BHT' SQL database (Roles).
@@ -802,7 +802,7 @@ public class Commands implements BotInterface {
 		}
 	}
 
-	//A command that teaches you how to use the `~rpsPlay` command by typing `~rpsHelp` (case-sensitive).
+	//A command that teaches you how to use the `~rpsPlay` command by typing `~rpsHelp` (not case-sensitive).
 	public void rockPaperScissorsHelp(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			mEvent.deleteMessage(); //Deletes the last message (the command).
@@ -815,7 +815,7 @@ public class Commands implements BotInterface {
 				.addField("Rules", "Here's what beats what if for whatever reason you don't know how the game works:\n**1.** Paper beats rock;\n**2.** Rock beats scissors;\n**3.** Scissors beats paper.")
 				.addInlineField("~rpsPlay *[option]*", "Plays a game of \"Rock, Paper or Scissors\" against the bot.")
 				.addInlineField("~rpsHighscores", "Shows the Top 10 users with the highest score.")
-				.setFooter("All commands are case-sensitive!");
+				.setFooter("The commands are not case-sensitive!");
 			mEvent.getChannel().sendMessage(rpsCommands);
 
 			System.out.println("Command (~rpsHelp) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends a system message about who issued the command.
@@ -824,7 +824,7 @@ public class Commands implements BotInterface {
 		}
 	}
 
-	//A command to play "Rock, Paper or Scissors" with the bot by typing `~rpsPlay` (case-sensitive).
+	//A command to play "Rock, Paper or Scissors" with the bot by typing `~rpsPlay` (not case-sensitive).
 	public void rockPaperScissorsGame(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			Random rand = new Random(); //Creates an instance from the 'Random' class.
@@ -913,7 +913,7 @@ public class Commands implements BotInterface {
 		}
 	}
 
-	//A command that displays the top 10 users with the highest score in "Rock, Paper or Scissors" by typing `~rpsHighscores` (case-sensitive).
+	//A command that displays the top 10 users with the highest score in "Rock, Paper or Scissors" by typing `~rpsHighscores` (not case-sensitive).
 	public void rockPaperScissorsHighscores(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			mEvent.deleteMessage(); //Deletes the last message (the command).
@@ -962,7 +962,7 @@ public class Commands implements BotInterface {
 		}
 	}
 
-	//A command that displays all the information on how to get the Channel/Role ID by typing `~idHelp`(case-sensitive).
+	//A command that displays all the information on how to get the Channel/Role ID by typing `~idHelp`(not case-sensitive).
 	public void idHelp(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			mEvent.deleteMessage(); //Deletes the last message (the command).
@@ -983,7 +983,7 @@ public class Commands implements BotInterface {
 		}
 	}
 
-	//Sends a link to the source code page on GitHub.
+	//Sends a link to the source code page on GitHub by typing `~sourceCode` (not case-sensitive).
 	public void sourceCode(MessageCreateEvent mEvent) {
 		try {
 			mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("🤖");
