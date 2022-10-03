@@ -44,6 +44,7 @@ public class Commands implements BotInterface {
 				.addField("~commandsHelp", "Displays all available commands.")
 				.addField("~rpsHelp", "Displays all the info needed to use the `~rpsPlay` (rock, paper, scissors) command.")
 				.addField("~contractsHelp", "Displays all contract related commands.")
+				.addField("~setOnLeaveRole *[Role ID]*", "Sets which role to be pinged when someone leaves the server.")
 				.addInlineField("~setOnLeavePing *0*", "Disables the `onLeave` ping.")
 				.addInlineField("~setOnLeavePing *1*", "Enables the `onLeave` ping.")
 				.addField("~sourceCode", "Sends a link to the source code.")
