@@ -26,6 +26,7 @@ import org.javacord.api.event.server.member.ServerMemberLeaveEvent;
 import org.javacord.api.event.user.UserChangeNicknameEvent;
 
 public class Commands implements BotInterface {
+	private long role = 0; //The role value for the 'onLeaveRole' from the `~setOnLeaveRole` command.
 	private int ping = 1; //The ping value for the 'onLeaveMessage' from the `~setOnLeavePing` command: 0 = disabled, 1 = enabled (default).
 
 	private Map<String, String> allMembers = new HashMap<String, String>(); //A HashMap containing all the members' display names with their discord tag as a key.
