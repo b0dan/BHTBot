@@ -28,9 +28,9 @@ public class Main {
        			if(server.getId() == 262781891705307137L) {
        				if(event.getMessageContent().equalsIgnoreCase("~commandsHelp")) {
            				cmd.displayCommands(api, event);
-           			} else if(event.getMessageContent().equalsIgnoreCase("~updateMembers") && event.getMessageAuthor().isBotOwner()) {
+           			} else if(event.getMessageContent().equals("~updateMembers") && event.getMessageAuthor().isBotOwner()) {
            				cmd.updateMembers(api, event);
-           			} else if(event.getMessageContent().equalsIgnoreCase("~getAllMembers") && event.getMessageAuthor().isBotOwner()) {
+           			} else if(event.getMessageContent().equals("~getAllMembers") && event.getMessageAuthor().isBotOwner()) {
            				cmd.getAllMembers(api, event);
            			} else if(event.getMessageContent().equalsIgnoreCase("~rpsHelp")) {
            				cmd.rockPaperScissorsHelp(api, event);
