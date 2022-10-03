@@ -26,31 +26,31 @@ public class Main {
        			Server server = api.getServerById(event.getServerTextChannel().get().getServer().getId()).get(); //Gets the server.
 
        			if(server.getId() == 262781891705307137L) {
-       				if(event.getMessageContent().equals("~commandsHelp")) {
+       				if(event.getMessageContent().equalsIgnoreCase("~commandsHelp")) {
            				cmd.displayCommands(api, event);
-           			} else if(event.getMessageContent().equals("~updateMembers") && event.getMessageAuthor().isBotOwner()) {
+           			} else if(event.getMessageContent().equalsIgnoreCase("~updateMembers") && event.getMessageAuthor().isBotOwner()) {
            				cmd.updateMembers(api, event);
-           			} else if(event.getMessageContent().equals("~getAllMembers") && event.getMessageAuthor().isBotOwner()) {
+           			} else if(event.getMessageContent().equalsIgnoreCase("~getAllMembers") && event.getMessageAuthor().isBotOwner()) {
            				cmd.getAllMembers(api, event);
-           			} else if(event.getMessageContent().equals("~rpsHelp")) {
+           			} else if(event.getMessageContent().equalsIgnoreCase("~rpsHelp")) {
            				cmd.rockPaperScissorsHelp(api, event);
-           			} else if(event.getMessageContent().equals("~idHelp")) {
+           			} else if(event.getMessageContent().equalsIgnoreCase("~idHelp")) {
            				cmd.idHelp(api, event);
-           			} else if(event.getMessageContent().substring(0, 8).equals("~rpsPlay")) {
+           			} else if(event.getMessageContent().substring(0, 8).equalsIgnoreCase("~rpsPlay")) {
            				cmd.rockPaperScissorsGame(api, event);
-           			} else if(event.getMessageContent().equals("~rpsHighscores")) {
+           			} else if(event.getMessageContent().equalsIgnoreCase("~rpsHighscores")) {
            				cmd.rockPaperScissorsHighscores(api, event);
-           			} else if(event.getMessageContent().equals("~contractsHelp")) {
+           			} else if(event.getMessageContent().equalsIgnoreCase("~contractsHelp")) {
            				cmd.contractsHelp(api, event);
-           			} else if(event.getMessageContent().equals("~showContracts")) {
+           			} else if(event.getMessageContent().equalsIgnoreCase("~showContracts")) {
            				cmd.showContracts(api, event);
-           			} else if(event.getMessageContent().equals("~showChannels")) {
+           			} else if(event.getMessageContent().equalsIgnoreCase("~showChannels")) {
            				cmd.showChannels(api, event);
-           			} else if(event.getMessageContent().equals("~showRoles")) {
+           			} else if(event.getMessageContent().equalsIgnoreCase("~showRoles")) {
            				cmd.showRoles(api, event);
-           			} else if(event.getMessageContent().equals("~sourceCode")) {
+           			} else if(event.getMessageContent().equalsIgnoreCase("~sourceCode")) {
            				cmd.sourceCode(event);
-           			} else if(event.getMessageContent().substring(0, 8).equals("~addRole")) {
+           			} else if(event.getMessageContent().substring(0, 8).equalsIgnoreCase("~addRole")) {
            				if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner() || api.getRoleById(343680704502300672L).get().hasUser(event.getMessageAuthor().asUser().get()))) {
            					cmd.addRole(api, event);
            				} else {
@@ -66,7 +66,7 @@ public class Main {
            						.replyTo(event.getMessageId())
     							.send(event.getChannel());
            				}
-           			} else if(event.getMessageContent().substring(0, 11).equals("~removeRole")) {
+           			} else if(event.getMessageContent().substring(0, 11).equalsIgnoreCase("~removeRole")) {
            				if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner() || api.getRoleById(343680704502300672L).get().hasUser(event.getMessageAuthor().asUser().get()))) {
            					cmd.removeRole(api, event);
            				} else {
@@ -82,7 +82,7 @@ public class Main {
            						.replyTo(event.getMessageId())
     							.send(event.getChannel());
            				}
-           			} else if(event.getMessageContent().substring(0, 11).equals("~addChannel")) {
+           			} else if(event.getMessageContent().substring(0, 11).equalsIgnoreCase("~addChannel")) {
            				if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner() || api.getRoleById(343680704502300672L).get().hasUser(event.getMessageAuthor().asUser().get()))) {
            					cmd.addChannel(api, event);
            				} else {
@@ -98,7 +98,7 @@ public class Main {
            						.replyTo(event.getMessageId())
     							.send(event.getChannel());
            				}
-           			} else if(event.getMessageContent().substring(0, 12).equals("~addContract")) {
+           			} else if(event.getMessageContent().substring(0, 12).equalsIgnoreCase("~addContract")) {
            				//Opens up a connection to the 'BHT' SQL database (Channels, Roles).
         	        	Class.forName("com.mysql.cj.jdbc.Driver");
         	        	Connection connection = DriverManager.getConnection("...");
@@ -182,7 +182,7 @@ public class Main {
 							statement.close();
 							connection.close();
         	        	}
-           			} else if(event.getMessageContent().substring(0, 14).equals("~removeChannel")) {
+           			} else if(event.getMessageContent().substring(0, 14).equalsIgnoreCase("~removeChannel")) {
            				if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner() || api.getRoleById(343680704502300672L).get().hasUser(event.getMessageAuthor().asUser().get()))) {
            					cmd.removeChannel(api, event);
            				} else {
@@ -198,7 +198,7 @@ public class Main {
            						.replyTo(event.getMessageId())
     							.send(event.getChannel());
            				}
-           			} else if(event.getMessageContent().substring(0, 15).equals("~updateContract")) {
+           			} else if(event.getMessageContent().substring(0, 15).equalsIgnoreCase("~updateContract")) {
            				//Opens up a connection to the 'BHT' SQL database (Channels, Roles).
         	        	Class.forName("com.mysql.cj.jdbc.Driver");
         	        	Connection connection = DriverManager.getConnection("...");
@@ -366,7 +366,11 @@ public class Main {
 							statement.close();
 							connection.close();
         	        	}
-           			} else if(event.getMessageContent().substring(0, 15).equals("~setOnLeavePing")) {
+           			} else if(event.getMessageContent().substring(0, 15).equalsIgnoreCase("~setOnLeaveRole")) {
+           				if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner())) {
+           					cmd.setOnLeaveRole(api, event);
+           				}
+           			} else if(event.getMessageContent().substring(0, 15).equalsIgnoreCase("~setOnLeavePing")) {
            				if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner())) {
            					if(event.getChannel().equals(api.getServerById(event.getServerTextChannel().get().getServer().getId()).get().getSystemChannel().get())) {
            						cmd.setOnLeavePing(event);
