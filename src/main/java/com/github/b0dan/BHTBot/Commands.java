@@ -27,7 +27,7 @@ import org.javacord.api.event.user.UserChangeNicknameEvent;
 
 public class Commands implements BotInterface {
 	private long role = 0; //The role value for the 'onLeaveRole' from the `~setOnLeaveRole` command.
-	private int ping = 1; //The ping value for the 'onLeaveMessage' from the `~setOnLeavePing` command: 0 = disabled, 1 = enabled (default).
+	private int pingable = 1; //The ping value for the 'onLeaveMessage' from the `~setOnLeavePing` command: 0 = disabled, 1 = enabled (default).
 
 	private Map<String, String> allMembers = new HashMap<String, String>(); //A HashMap containing all the members' display names with their discord tag as a key.
 
@@ -115,9 +115,9 @@ public class Commands implements BotInterface {
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
 				new MessageBuilder().append("Wrong input! The number should be either 0 or 1.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} else {
-				ping = Integer.valueOf(mEvent.getMessageContent().substring(16, mEvent.getMessageContent().length()));
+				pingable = Integer.valueOf(mEvent.getMessageContent().substring(16, mEvent.getMessageContent().length()));
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👍");
-				System.out.println("Command (~setOnLeavePing) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + ping + "."); //Sends a system message about who issued the command.
+				System.out.println("Command (~setOnLeavePing) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + pingable + "."); //Sends a system message about who issued the command.
 			}
 		} catch(NumberFormatException | StringIndexOutOfBoundsException e1) {
 			try {
@@ -172,7 +172,7 @@ public class Commands implements BotInterface {
 				.append(". Looks like loyalty wasn't one of their virtues. Hunt that sssnake down! ");
 
 			//Checks if the ping value is 1 and notifies the `onLeave` role if yes, then sends the message.
-			if(ping == 1) {
+			if(pingable == 1) {
 				onLeaveMessage
 					.append(server.getRoleById(991057294982799450L).get().getMentionTag())
 					.setAllowedMentions(allowedMentions);
