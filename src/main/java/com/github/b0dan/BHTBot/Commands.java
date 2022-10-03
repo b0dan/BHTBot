@@ -97,6 +97,15 @@ public class Commands implements BotInterface {
 		}
 	}
 
+	//A command to set what the `onLeave` role will be by typing `~setOnLeaveRole` (case-sensitive).
+	public void setOnLeaveRole(MessageCreateEvent mEvent) {
+		try {
+			
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	//A command to enable or disable the `onLeave` ping by typing `~setOnLeavePing` (case-sensitive).
 	public void setOnLeavePing(MessageCreateEvent mEvent) {
 		try {
