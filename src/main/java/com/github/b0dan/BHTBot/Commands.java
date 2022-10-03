@@ -100,9 +100,28 @@ public class Commands implements BotInterface {
 	}
 
 	//A command to set what the `onLeave` role will be by typing `~setOnLeaveRole` (case-sensitive).
-	public void setOnLeaveRole(MessageCreateEvent mEvent) {
+	public void setOnLeaveRole(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
-			
+			//Gets the number after the `~setOnLeaveRole` command and changes the role value if that role exists, also reacts on the message.
+			if(dApi.getRoles().contains(dApi.getRoleById(Long.valueOf(mEvent.getMessageContent().substring(16, mEvent.getMessageContent().length()))).get())) {
+				roleID = Long.valueOf(mEvent.getMessageContent().substring(16, mEvent.getMessageContent().length()));
+				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👍");
+				System.out.println("Command (~setOnLeaveRole) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + roleID + "."); //Sends a system message about who issued the command.
+			}
+		} catch(NumberFormatException | StringIndexOutOfBoundsException e1) {
+			try {
+				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
+				new MessageBuilder().append("Wrong input! The ID must be a digit of type `Long`. Use `~idHelp` for more information on how to get the ID.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+			} catch(Exception e0_0) {
+				e0_0.printStackTrace();
+			}
+		} catch(NoSuchElementException e) {
+			try {
+				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
+				new MessageBuilder().append("Error! The Role ID doesn't exist.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+			} catch(Exception e0_1) {
+				e0_1.printStackTrace();
+			}
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -162,7 +181,7 @@ public class Commands implements BotInterface {
 	public void updateMembersOnLeave(DiscordApi dApi, ServerMemberLeaveEvent lEvent) {
 		try {
 			Server server = dApi.getServerById(lEvent.getServer().getId()).get(); //Gets the server.
-			AllowedMentions allowedMentions = new AllowedMentionsBuilder().addRole(991057294982799450L).setMentionRoles(true).build(); //Allows the `onLeave` role to be mentioned.
+			AllowedMentions allowedMentions = new AllowedMentionsBuilder().addRole(roleID).setMentionRoles(true).build(); //Allows the `onLeave` role to be mentioned.
 
 			//Sends a message and notifies the current members when someone leaves the server.
 			MessageBuilder onLeaveMessage = new MessageBuilder();
@@ -175,7 +194,7 @@ public class Commands implements BotInterface {
 			//Checks if the ping value is 1 and notifies the `onLeave` role if yes, then sends the message.
 			if(pingable == 1) {
 				onLeaveMessage
-					.append(server.getRoleById(991057294982799450L).get().getMentionTag())
+					.append(server.getRoleById(roleID).get().getMentionTag())
 					.setAllowedMentions(allowedMentions);
 			}
 			onLeaveMessage.send((TextChannel)server.getSystemChannel().get());
