@@ -43,8 +43,8 @@ public class Commands implements BotInterface {
 				.addField("~commandsHelp", "Displays all available commands.")
 				.addField("~rpsHelp", "Displays all the info needed to use the `~rpsPlay` (rock, paper, scissors) command.")
 				.addField("~contractsHelp", "Displays all contract related commands.")
-				.addInlineField("~setOnLeavePing *0*", "Disables the \"Floodgate\" ping.")
-				.addInlineField("~setOnLeavePing *1*", "Enables the \"Floodgate\" ping.")
+				.addInlineField("~setOnLeavePing *0*", "Disables the `onLeave` ping.")
+				.addInlineField("~setOnLeavePing *1*", "Enables the `onLeave` ping.")
 				.addField("~sourceCode", "Sends a link to the source code.")
 				.setFooter("All commands are case-sensitive!");
 			mEvent.getChannel().sendMessage(commands);
@@ -97,7 +97,7 @@ public class Commands implements BotInterface {
 		}
 	}
 
-	//A command to enable or disable the "Floodgate" ping by typing `~setOnLeavePing` (case-sensitive).
+	//A command to enable or disable the `onLeave` ping by typing `~setOnLeavePing` (case-sensitive).
 	public void setOnLeavePing(MessageCreateEvent mEvent) {
 		try {
 			//Gets the number after the `~setOnLeavePing` command, gives an error if it isn't 0 or 1 or changes the ping value if it is, also reacts on the message.
@@ -151,7 +151,7 @@ public class Commands implements BotInterface {
 	public void updateMembersOnLeave(DiscordApi dApi, ServerMemberLeaveEvent lEvent) {
 		try {
 			Server server = dApi.getServerById(lEvent.getServer().getId()).get(); //Gets the server.
-			AllowedMentions allowedMentions = new AllowedMentionsBuilder().addRole(991057294982799450L).setMentionRoles(true).build(); //Allows the role "Floodgate" to be mentioned.
+			AllowedMentions allowedMentions = new AllowedMentionsBuilder().addRole(991057294982799450L).setMentionRoles(true).build(); //Allows the `onLeave` role to be mentioned.
 
 			//Sends a message and notifies the current members when someone leaves the server.
 			MessageBuilder onLeaveMessage = new MessageBuilder();
@@ -161,7 +161,7 @@ public class Commands implements BotInterface {
 				.append("The Black Hand Triads", MessageDecoration.BOLD)
 				.append(". Looks like loyalty wasn't one of their virtues. Hunt that sssnake down! ");
 
-			//Checks if the ping value is 1 and notifies "Floodgate" if yes, then sends the message.
+			//Checks if the ping value is 1 and notifies the `onLeave` role if yes, then sends the message.
 			if(ping == 1) {
 				onLeaveMessage
 					.append(server.getRoleById(991057294982799450L).get().getMentionTag())
