@@ -230,7 +230,7 @@ public class Commands implements BotInterface {
 				.addField("~showChannels", "Shows a list of all the channels where contract related commands can be used.")
 				.addInlineField("~addChannel *[Channel ID]*", "Allows the use of contract related commands in the channel with the specified ID.")
 				.addInlineField("~removeChannel *[Channel ID]*", "Disallows the use of contract related commands in the channel with the specified ID.")
-				.addField("~showRoles", "Shows a list of all the roles who can use contrcat related commands.")
+				.addField("~showRoles", "Shows a list of all the roles who can use contract related commands.")
 				.addInlineField("~addRole *[Role ID]*", "Allows the users who have the role with the specified ID to use contract related commands.")
 				.addInlineField("~removeRole *[Role ID]*", "Disallows the users who have the role with the specified ID to use contract related commands.")
 				.addField("~idHelp", "Information on how to get the Channel/Role ID.")
