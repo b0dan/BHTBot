@@ -14,7 +14,7 @@ import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.server.Server;
 
 public class Main {
-	static final Logger logger = Logger.getLogger(Commands.class); //Creates an instance of the 'Logger' class.
+	private static final Logger logger = Logger.getLogger(Main.class); //Creates an instance of the 'Logger' class for 'Main.class'.
 
 	public static void main(String[] args) throws IOException {
 		DiscordApi api = new DiscordApiBuilder().setToken("...").setAllIntents().login().join(); //Creates an object from the Discord API.        
