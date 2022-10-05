@@ -410,11 +410,11 @@ public class Main {
            			}
        			}
        		} catch(StringIndexOutOfBoundsException e) {
-			Main.logger.error("Expected/Handled: " + e); //Sends an error log about an expected/handled error.
+			logger.error("Expected/Handled: " + e); //Sends an error log about an expected/handled error.
        		} catch(NoSuchElementException e) {
-			Main.logger.error("Expected/Handled: " + e); //Sends an error log about an expected/handled error.
+			logger.error("Expected/Handled: " + e); //Sends an error log about an expected/handled error.
        		} catch(Exception e) {
-       			Main.logger.fatal("", e); //Sends a fatal log about an unhandled error.
+       			logger.fatal("", e); //Sends a fatal log about an unhandled error.
        		}
         });
 
