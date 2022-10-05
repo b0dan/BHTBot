@@ -14,7 +14,6 @@ import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.lang.ArrayIndexOutOfBoundsException;
-import org.apache.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageBuilder;
@@ -56,7 +55,7 @@ public class Commands implements BotInterface {
 				.setFooter("The commands are not case-sensitive!");
 			mEvent.getChannel().sendMessage(commands);
 
-			System.out.println("Command (~commandsHelp) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends a system message about who issued the command.
+			Main.logger.info("Command (~commandsHelp) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -77,7 +76,8 @@ public class Commands implements BotInterface {
 			for(User user: server.getMembers()) {
 				allMembers.put(user.getDiscriminatedName(), user.getDisplayName(server));
 			}
-			System.out.println("Members updated by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends a system message about who issued the command.
+
+			Main.logger.warn("Members updated by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends a warn log about who issued the command.
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -97,7 +97,8 @@ public class Commands implements BotInterface {
 					System.out.println(entry);
 				}
 				System.out.println("Members: " + allMembers.size() + "\n");
-				System.out.println("Command (~getAllMembers) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends a system message about who issued the command.
+
+				Main.logger.warn("Command (~getAllMembers) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends a warn log about who issued the command.
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
