@@ -361,7 +361,6 @@ public class Commands implements BotInterface {
 	            			}
 	            			event.getMessage().get().delete();
 	            			showContracts(dApi, mEvent, cp, ccn, fcop, lcop, pressedBack);
-	            			System.out.println("Page (~showContracts) flipped by " + allMembers.get(event.getUser().get().getDiscriminatedName()) + " (" + event.getUser().get().getDiscriminatedName() + ")."); //Sends a system message about who "flipped a page".
 	        			}
 	            	}).removeAfter(30, TimeUnit.SECONDS);
 	        	}
@@ -375,7 +374,7 @@ public class Commands implements BotInterface {
 			statement.close();
 			connection.close();
 
-			System.out.println("Command (~showContracts) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends a system message about who issued the command.
+			System.out.println("Command/Page (~showContracts) called/flipped by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends a system message about who issued the command/flipped a page.
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
