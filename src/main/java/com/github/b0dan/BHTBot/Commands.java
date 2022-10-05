@@ -281,7 +281,7 @@ public class Commands implements BotInterface {
 
 			//Opens up a connection to the 'BHT' SQL database (Contracts).
         	Class.forName("com.mysql.cj.jdbc.Driver");
-        	Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/testBHT", "root", "root123");	//Connection connection = DriverManager.getConnection("jdbc:mysql://user323731367064240131_mysql/bht", "root", "xxX9KhljY+rl75wQ9VkNHa7au+mV3c0O");
+        	Connection connection = DriverManager.getConnection("...");
 
         	//Creates a 'SELECT' SQL statement.
         	Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
