@@ -369,7 +369,9 @@ public class Main {
            			} else if(event.getMessageContent().substring(0, 15).equalsIgnoreCase("~setOnLeaveRole")) {
            				if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner())) {
            					cmd.setOnLeaveRole(api, event);
-           				}
+           				} else {
+						//...
+					}
            			} else if(event.getMessageContent().substring(0, 15).equalsIgnoreCase("~setOnLeavePing")) {
            				if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner())) {
            					if(event.getChannel().equals(api.getServerById(event.getServerTextChannel().get().getServer().getId()).get().getSystemChannel().get())) {
