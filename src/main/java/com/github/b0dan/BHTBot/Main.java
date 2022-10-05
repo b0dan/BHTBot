@@ -43,7 +43,7 @@ public class Main {
            			} else if(event.getMessageContent().equalsIgnoreCase("~contractsHelp")) {
            				cmd.contractsHelp(api, event);
            			} else if(event.getMessageContent().equalsIgnoreCase("~showContracts")) {
-           				cmd.showContracts(api, event);
+           				cmd.showContracts(api, event, 1, 1);
            			} else if(event.getMessageContent().equalsIgnoreCase("~showChannels")) {
            				cmd.showChannels(api, event);
            			} else if(event.getMessageContent().equalsIgnoreCase("~showRoles")) {
