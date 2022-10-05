@@ -1,11 +1,14 @@
 package com.github.b0dan.BHTBot;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.event.server.member.ServerMemberJoinEvent;
 import org.javacord.api.event.server.member.ServerMemberLeaveEvent;
 import org.javacord.api.event.user.UserChangeNicknameEvent;
 
+@SuppressWarnings("unused")
 public interface BotInterface {
 	public void displayCommands(DiscordApi dApi, MessageCreateEvent mEvent);
 	public void updateMembers(DiscordApi dApi, MessageCreateEvent mEvent);
