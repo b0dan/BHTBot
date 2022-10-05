@@ -43,7 +43,7 @@ public class Main {
            			} else if(event.getMessageContent().equalsIgnoreCase("~contractsHelp")) {
            				cmd.contractsHelp(api, event);
            			} else if(event.getMessageContent().equalsIgnoreCase("~showContracts")) {
-           				cmd.showContracts(api, event, 1, 1);
+           				cmd.showContracts(api, event, 1, 1, 0, 0, false);
            			} else if(event.getMessageContent().equalsIgnoreCase("~showChannels")) {
            				cmd.showChannels(api, event);
            			} else if(event.getMessageContent().equalsIgnoreCase("~showRoles")) {
@@ -370,7 +370,15 @@ public class Main {
            				if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner())) {
            					cmd.setOnLeaveRole(api, event);
            				} else {
-						//...
+						event.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
+           					new MessageBuilder()
+           						.append("You can only use the `~setOnLeavePing` command if you have at least one of the following roles: ")
+           						.append("'" + api.getRoleById(262784255816499201L).get().getName() + "'")
+           						.append(", ")
+           						.append("'" + api.getRoleById(262802994574131200L).get().getName() + "'")
+           						.append(".")
+           						.replyTo(event.getMessageId())
+           						.send(event.getChannel());
 					}
            			} else if(event.getMessageContent().substring(0, 15).equalsIgnoreCase("~setOnLeavePing")) {
            				if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner())) {
