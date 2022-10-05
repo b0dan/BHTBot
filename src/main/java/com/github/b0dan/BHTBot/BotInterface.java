@@ -18,7 +18,7 @@ public interface BotInterface {
 	public void updateMembersOnLeave(DiscordApi dApi, ServerMemberLeaveEvent lEvent);
 
 	public void contractsHelp(DiscordApi dApi, MessageCreateEvent mEvent);
-	public void showContracts(DiscordApi dApi, MessageCreateEvent mEvent);
+	public void showContracts(DiscordApi dApi, MessageCreateEvent mEvent, int cp, int ccn);
 	public void manuallyAddContractToDatabase(MessageCreateEvent mEvent);
 	public void updateContractInDatabase(MessageCreateEvent mEvent);
 	public void removeContractFromDatabase(MessageCreateEvent mEvent);
