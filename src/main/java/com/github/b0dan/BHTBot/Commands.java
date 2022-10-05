@@ -29,6 +29,7 @@ public class Commands implements BotInterface {
 	private long roleID = 336588534351790080L; //The role value for the 'onLeaveRole' from the `~setOnLeaveRole` command (default: Luminous Path -> 336588534351790080L).
 	private int pingable = 1; //The ping value for the 'onLeaveMessage' from the `~setOnLeavePing` command: 0 = disabled, 1 = enabled (default).
 
+	private List<Integer> firstPages = new ArrayList<Integer>(); //A list with all the "first pages" from the `~showContracts` command.
 	private Map<String, String> allMembers = new HashMap<String, String>(); //A HashMap containing all the members' display names with their discord tag as a key.
 
 	//A command that displays all available commands by typing `~commandsHelp` (not case-sensitive).
@@ -274,16 +275,16 @@ public class Commands implements BotInterface {
 	}
 
 	//A command that displays all active contracts by typing `~showContracts` (not case-sensitive).
-	public void showContracts(DiscordApi dApi, MessageCreateEvent mEvent) {
+	public void showContracts(DiscordApi dApi, MessageCreateEvent mEvent, int currentPage, int currentContractNumber, int firstContractOnPage, int lastContractOnPage, boolean pageBack) {
 		try {
 			mEvent.deleteMessage(); //Deletes the last message (the command).
 
 			//Opens up a connection to the 'BHT' SQL database (Contracts).
         	Class.forName("com.mysql.cj.jdbc.Driver");
-        	Connection connection = DriverManager.getConnection("...");
+        	Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/testBHT", "root", "root123");	//Connection connection = DriverManager.getConnection("jdbc:mysql://user323731367064240131_mysql/bht", "root", "xxX9KhljY+rl75wQ9VkNHa7au+mV3c0O");
 
         	//Creates a 'SELECT' SQL statement.
-        	Statement statement = connection.createStatement();
+        	Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
         	ResultSet resultSet = statement.executeQuery("SELECT * FROM Contracts");
 
         	//An embed with all active contracts.
@@ -294,13 +295,80 @@ public class Commands implements BotInterface {
 				.setColor(Color.RED)
 				.setFooter("Make sure to remove the contract you've completed by typing `~removeContract [ID]`!");
 
-			//Adds the actual contracts to the above mentioned embed.
-			int k = 1;
-			while(resultSet.next()) {
-				contracts.addField(String.valueOf(resultSet.getInt("contractId") + ". " + resultSet.getString("contractName")), "*Contract #" + k + "*");
-				k++;
+			//If there are any contracts, finds the total amount of pages needed to group the contracts. If not, notifies the user.
+			resultSet.last();
+			if(!(resultSet.getRow() <= 0)) {
+				final int totalContracts = resultSet.getRow();
+				int tempTotalPages = (totalContracts / 25) + 1;
+				if(totalContracts % 25 == 0) {
+					tempTotalPages = tempTotalPages - 1;
+				}
+				final int totalPages = tempTotalPages;
+
+				//Adds the contracts to the above mentioned embed.
+				if(totalPages == 1 || currentPage == 1) {
+					currentContractNumber = 1;
+					resultSet.beforeFirst();
+				} else if(pageBack == true) {
+					resultSet.absolute(firstPages.get(currentPage - 1) - 1);
+					currentContractNumber = resultSet.getRow() + 1;
+				} else if(totalPages > 1 && currentPage > 1) {
+					resultSet.absolute(currentContractNumber - 1);
+				}
+				boolean freshPage = true;
+				while(resultSet.next()) {
+					if(freshPage == true) {
+						firstContractOnPage = resultSet.getRow();
+						freshPage = false;
+						if(!firstPages.contains(firstContractOnPage)) {
+							firstPages.add(firstContractOnPage);
+						}
+					}
+	       			contracts.addField(String.valueOf(resultSet.getInt("contractId") + ". " + resultSet.getString("contractName")), "*Contract #" + (currentContractNumber) + "*");
+
+	       			currentContractNumber++;
+	       			if(resultSet.getRow() % 25 == 0 || resultSet.getRow() == totalContracts) {
+	       				lastContractOnPage = resultSet.getRow();
+	       				break;
+	       			}
+	        	}
+	        	mEvent.getChannel().sendMessage(contracts);
+
+	        	//Adds the reactions needed to "flip a page".
+	        	if(currentPage == 1 && totalPages > 1) {
+	        		mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("➡");
+	        	} else if(currentPage == totalPages && totalPages > 1) {
+	        		mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("⬅");
+	        	} else if(currentPage > 1 && currentPage < totalPages && totalPages > 1) {
+	        		mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("⬅");
+	        		mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("➡");
+	        	}
+
+	        	//Adds a listener that "flips a page" when the one who called the command reacts on the `~showContracts` message.
+	        	if(totalPages > 1) {
+	        		int ccn = currentContractNumber;
+	        		int fcop = firstContractOnPage;
+	        		int lcop = lastContractOnPage;
+	        		mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReactionAddListener(event -> {
+	        			if(event.getUserId() == mEvent.getMessageAuthor().getId()) {
+	        				int cp = currentPage;
+	        				boolean pressedBack = false;;
+	            			if((currentPage < totalPages) && event.getEmoji().equalsEmoji("➡")) {
+	            				cp = cp + 1;
+	            			} else if((currentPage > 1) && event.getEmoji().equalsEmoji("⬅")) {
+	            				pressedBack = true;
+	            				cp = cp - 1;
+	            			}
+	            			event.getMessage().get().delete();
+	            			showContracts(dApi, mEvent, cp, ccn, fcop, lcop, pressedBack);
+	            			System.out.println("Page (~showContracts) flipped by " + allMembers.get(event.getUser().get().getDiscriminatedName()) + " (" + event.getUser().get().getDiscriminatedName() + ")."); //Sends a system message about who "flipped a page".
+	        			}
+	            	}).removeAfter(30, TimeUnit.SECONDS);
+	        	}
+			} else {
+				contracts.addField("Empty", "There are no active contracts.");
+				mEvent.getChannel().sendMessage(contracts);
 			}
-			mEvent.getChannel().sendMessage(contracts);
 
 			//Closes the connections.
 			resultSet.close();
@@ -509,12 +577,18 @@ public class Commands implements BotInterface {
 			Statement statement = connection.createStatement();
         	ResultSet resultSet = statement.executeQuery("SELECT * FROM Channels");
 
-			//Adds the channels to the above mentioned embed.
-        	int k = 1;
-			while(resultSet.next()) {
-				channels.addField(k + ". " + String.valueOf(resultSet.getString("channelName")), "**ID: **" + String.valueOf(resultSet.getLong("channelId")));
-				k++;
-			}
+			//If there are any channels, adds them to the above mentioned embed. If not, notifies the user.
+        	resultSet.last();
+        	if(!(resultSet.getRow() <= 0)) {
+        		int k = 1;
+        		resultSet.beforeFirst();
+    			while(resultSet.next()) {
+    				channels.addField(k + ". " + String.valueOf(resultSet.getString("channelName")), "**ID: **" + String.valueOf(resultSet.getLong("channelId")));
+    				k++;
+    			}
+        	} else {
+        		channels.addField("Empty", "There are no white-listed channels.");
+        	}
 			mEvent.getChannel().sendMessage(channels);
 
 			//Closes the above connections.
@@ -666,12 +740,17 @@ public class Commands implements BotInterface {
 			Statement statement = connection.createStatement();
         	ResultSet resultSet = statement.executeQuery("SELECT * FROM Roles");
 
-			//Adds the roles to the above mentioned embed.
-        	int k = 1;
-			while(resultSet.next()) {
-				roles.addField(k + ". " + String.valueOf(resultSet.getString("roleName")), "**ID: **" + String.valueOf(resultSet.getLong("roleId")));
-				k++;
-			}
+			//If there are any white-listed roles, adds them to the above mentioned embed. If not, notifies the user.
+        	if(!(resultSet.getRow() <= 0)) {
+        		int k = 1;
+        		resultSet.beforeFirst();
+    			while(resultSet.next()) {
+    				roles.addField(k + ". " + String.valueOf(resultSet.getString("roleName")), "**ID: **" + String.valueOf(resultSet.getLong("roleId")));
+    				k++;
+    			}
+        	} else {
+        		roles.addField("Empty", "There are no white-listed roles.");
+        	}
 			mEvent.getChannel().sendMessage(roles);
 
 			//Closes the above connections.
