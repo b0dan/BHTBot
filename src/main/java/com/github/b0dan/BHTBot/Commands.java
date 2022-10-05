@@ -29,6 +29,8 @@ import org.javacord.api.event.server.member.ServerMemberLeaveEvent;
 import org.javacord.api.event.user.UserChangeNicknameEvent;
 
 public class Commands implements BotInterface {
+	private static final Logger logger = Logger.getLogger(Commands.class); //Creates an instance of the 'Logger' class for 'Commands.class'.
+
 	private long roleID = 336588534351790080L; //The role value for the 'onLeaveRole' from the `~setOnLeaveRole` command (default: Luminous Path -> 336588534351790080L).
 	private int pingable = 1; //The ping value for the 'onLeaveMessage' from the `~setOnLeavePing` command: 0 = disabled, 1 = enabled (default).
 
