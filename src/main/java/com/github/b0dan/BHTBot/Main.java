@@ -6,7 +6,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.NoSuchElementException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.ActivityType;
@@ -14,7 +15,7 @@ import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.server.Server;
 
 public class Main {
-	private static final Logger logger = Logger.getLogger(Main.class); //Creates an instance of the 'Logger' class for 'Main.class'.
+	private static final Logger logger = LogManager.getLogger(Main.class); //Creates an instance of the 'Logger' class for 'Main.class'.
 
 	public static void main(String[] args) throws IOException {
 		DiscordApi api = new DiscordApiBuilder().setToken("...").setAllIntents().login().join(); //Creates an object from the Discord API.        
