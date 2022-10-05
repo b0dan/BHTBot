@@ -57,7 +57,7 @@ public class Commands implements BotInterface {
 
 			Main.logger.info("Command (~commandsHelp) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 		} catch(Exception e) {
-			e.printStackTrace();
+			Main.logger.fatal("", e); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -79,7 +79,7 @@ public class Commands implements BotInterface {
 
 			Main.logger.warn("Members updated by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends a warn log about who issued the command.
 		} catch(Exception e) {
-			e.printStackTrace();
+			Main.logger.fatal("", e); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -101,7 +101,7 @@ public class Commands implements BotInterface {
 				Main.logger.warn("Command (~getAllMembers) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends a warn log about who issued the command.
 			}
 		} catch(Exception e) {
-			e.printStackTrace();
+			Main.logger.fatal("", e); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -112,24 +112,29 @@ public class Commands implements BotInterface {
 			if(dApi.getRoles().contains(dApi.getRoleById(Long.valueOf(mEvent.getMessageContent().substring(16, mEvent.getMessageContent().length()))).get())) {
 				roleID = Long.valueOf(mEvent.getMessageContent().substring(16, mEvent.getMessageContent().length()));
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👍");
-				System.out.println("Command (~setOnLeaveRole) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + roleID + "."); //Sends a system message about who issued the command.
+
+				Main.logger.info("Command (~setOnLeaveRole) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + roleID + "."); //Sends an info log about who issued the command.
 			}
 		} catch(NumberFormatException | StringIndexOutOfBoundsException e1) {
 			try {
+				Main.logger.error("Expected/Handled: " + e1); //Sends an error log about an expected/handled error.
+
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
 				new MessageBuilder().append("Wrong input! The ID must be a digit of type `Long`. Use `~idHelp` for more information on how to get the ID.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e0_0) {
-				e0_0.printStackTrace();
+				Main.logger.fatal("", e0_0); //Sends a fatal log about an unhandled error.
 			}
 		} catch(NoSuchElementException e) {
 			try {
+				Main.logger.error("Expected/Handled: " + e); //Sends an error log about an expected/handled error.
+
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
 				new MessageBuilder().append("Error! The Role ID doesn't exist.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e0_1) {
-				e0_1.printStackTrace();
+				Main.logger.fatal("", e0_1); //Sends a fatal log about an unhandled error.
 			}
 		} catch(Exception e) {
-			e.printStackTrace();
+			Main.logger.fatal("", e); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -143,17 +148,20 @@ public class Commands implements BotInterface {
 			} else {
 				pingable = Integer.valueOf(mEvent.getMessageContent().substring(16, mEvent.getMessageContent().length()));
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👍");
-				System.out.println("Command (~setOnLeavePing) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + pingable + "."); //Sends a system message about who issued the command.
+
+				Main.logger.info("Command (~setOnLeavePing) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + pingable + "."); //Sends an info log about who issued the command.
 			}
 		} catch(NumberFormatException | StringIndexOutOfBoundsException e1) {
 			try {
+				Main.logger.error("Expected/Handled: " + e1); //Sends an error log about an expected/handled error.
+
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
 				new MessageBuilder().append("Wrong input! The number should be either 0 or 1.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch (Exception e2) {
-				e2.printStackTrace();
+				Main.logger.fatal("", e2); //Sends a fatal log about an unhandled error.
 			}
 		} catch(Exception e1) {
-			e1.printStackTrace();
+			Main.logger.fatal("", e1); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -164,9 +172,10 @@ public class Commands implements BotInterface {
 
 			//Puts the user who joined the server in the members' HashMap.
 			allMembers.put(jEvent.getUser().getDiscriminatedName(), jEvent.getUser().getDisplayName(server));
-    		System.out.println("Members updated due to " + jEvent.getUser().getDiscriminatedName() + " joining the server."); //Sends a system message about what issued the listener.
+
+			Main.logger.info("Members updated due to " + jEvent.getUser().getDiscriminatedName() + " joining the server."); //Sends an info log about what issued the listener.
 		} catch(Exception e) {
-			e.printStackTrace();
+			Main.logger.fatal("", e); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -177,9 +186,10 @@ public class Commands implements BotInterface {
 
 			//Changes the name in the members' HashMap of the person that just had their nickname changed/updated.
 			allMembers.replace(nEvent.getUser().getDiscriminatedName(), nEvent.getUser().getDisplayName(server));
-			System.out.println("Members updated due to " + nEvent.getUser().getDiscriminatedName() + " having their nickname changed - value: " + allMembers.get(nEvent.getUser().getDiscriminatedName()) + "."); //Sends a system message about what issued the listener.
+
+			Main.logger.info("Members updated due to " + nEvent.getUser().getDiscriminatedName() + " having their nickname changed - value: " + allMembers.get(nEvent.getUser().getDiscriminatedName()) + "."); //Sends an info log about what issued the listener.
 		} catch(Exception e) {
-			e.printStackTrace();
+			Main.logger.fatal("", e); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -241,10 +251,12 @@ public class Commands implements BotInterface {
 	        }
 			//Removes the person who had left the server from the members' HashMap.
 			allMembers.remove(lEvent.getUser().getDiscriminatedName());
-			System.out.println("Members updated due to " + lEvent.getUser().getDiscriminatedName() + " leaving the server."); //Sends a system message about what issued the listener.
+
+			Main.logger.info("Members updated due to " + lEvent.getUser().getDiscriminatedName() + " leaving the server."); //Sends an info log about what issued the listener.
 		} catch(NullPointerException e) {
+			Main.logger.error("Expected/Handled: " + e); //Sends an error log about an expected/handled error.
 		} catch(Exception e) {
-			e.printStackTrace();
+			Main.logger.fatal("", e); //Sends a fatal log about an unhandled error.
 		}
 	}
 
