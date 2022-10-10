@@ -19,7 +19,7 @@ public class Main {
 
 	public static void main(String[] args) throws IOException {
 		DiscordApi api = new DiscordApiBuilder().setToken("...").setAllIntents().login().join(); //Creates an object from the Discord API.        
-		System.out.println(api.getServers() + "\nBHT Bot is online!\n");
+		System.out.println("\n" + api.getServers() + "\nBHT Bot is online!\n");
 		api.updateActivity(ActivityType.LISTENING, "~commandsHelp"); //Updates the activity to "Listening to ~commandsHelp".
 
        	Commands cmd = new Commands(); //Creates an object from the 'Commands' class.
