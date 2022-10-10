@@ -19,7 +19,7 @@ public class Main {
 
 	public static void main(String[] args) throws IOException {
 		DiscordApi api = new DiscordApiBuilder().setToken("...").setAllIntents().login().join(); //Creates an object from the Discord API.        
-		System.out.println("\n" + api.getServers() + "\nBHT Bot is online!\n");
+		System.out.println(api.getServers() + "\nBHT Bot is online!\n");
 		api.updateActivity(ActivityType.LISTENING, "~commandsHelp"); //Updates the activity to "Listening to ~commandsHelp".
 
        	Commands cmd = new Commands(); //Creates an object from the 'Commands' class.
@@ -411,11 +411,11 @@ public class Main {
            			}
        			}
        		} catch(StringIndexOutOfBoundsException e) {
-			logger.error("Expected/Handled: " + e); //Sends an error log about an expected/handled error.
+       			logger.error("Expected/Handled: " + e + " -> (" + e.getCause() + ")"); //Sends an error log about an expected/handled error.
        		} catch(NoSuchElementException e) {
-			logger.error("Expected/Handled: " + e); //Sends an error log about an expected/handled error.
+       			logger.error("Expected/Handled: " + e + " -> (" + e.getCause() + ")"); //Sends an error log about an expected/handled error.
        		} catch(Exception e) {
-       			logger.fatal("", e); //Sends a fatal log about an unhandled error.
+       			logger.fatal("", e + "-> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
        		}
         });
 
