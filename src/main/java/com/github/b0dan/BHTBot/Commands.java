@@ -61,7 +61,7 @@ public class Commands implements BotInterface {
 
 			logger.info("Command (~commandsHelp) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 		} catch(Exception e) {
-			logger.fatal("", e); //Sends a fatal log about an unhandled error.
+			logger.fatal("", e + "-> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -83,7 +83,7 @@ public class Commands implements BotInterface {
 
 			logger.warn("Members updated by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends a warn log about who issued the command.
 		} catch(Exception e) {
-			logger.fatal("", e); //Sends a fatal log about an unhandled error.
+			logger.fatal("", e + "-> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -105,7 +105,7 @@ public class Commands implements BotInterface {
 				logger.warn("Command (~getAllMembers) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends a warn log about who issued the command.
 			}
 		} catch(Exception e) {
-			logger.fatal("", e); //Sends a fatal log about an unhandled error.
+			logger.fatal("", e + "-> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -121,24 +121,24 @@ public class Commands implements BotInterface {
 			}
 		} catch(NumberFormatException | StringIndexOutOfBoundsException e1) {
 			try {
-				logger.error("Expected/Handled: " + e1); //Sends an error log about an expected/handled error.
+				logger.error("Expected/Handled: " + e1 + " -> (" + e1.getCause() + ")"); //Sends an error log about an expected/handled error.
 
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
 				new MessageBuilder().append("Wrong input! The ID must be a digit of type `Long`. Use `~idHelp` for more information on how to get the ID.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e0_0) {
-				logger.fatal("", e0_0); //Sends a fatal log about an unhandled error.
+				logger.fatal("", e0_0 + "-> (" + e0_0.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			}
 		} catch(NoSuchElementException e) {
 			try {
-				logger.error("Expected/Handled: " + e); //Sends an error log about an expected/handled error.
+				logger.error("Expected/Handled: " + e + " -> (" + e.getCause() + ")"); //Sends an error log about an expected/handled error.
 
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
 				new MessageBuilder().append("Error! The Role ID doesn't exist.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e0_1) {
-				logger.fatal("", e0_1); //Sends a fatal log about an unhandled error.
+				logger.fatal("", e0_1 + "-> (" + e0_1.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			}
 		} catch(Exception e) {
-			logger.fatal("", e); //Sends a fatal log about an unhandled error.
+			logger.fatal("", e + "-> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -157,15 +157,15 @@ public class Commands implements BotInterface {
 			}
 		} catch(NumberFormatException | StringIndexOutOfBoundsException e1) {
 			try {
-				logger.error("Expected/Handled: " + e1); //Sends an error log about an expected/handled error.
+				logger.error("Expected/Handled: " + e1 + " -> (" + e1.getCause() + ")"); //Sends an error log about an expected/handled error.
 
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
 				new MessageBuilder().append("Wrong input! The number should be either 0 or 1.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch (Exception e2) {
-				logger.fatal("", e2); //Sends a fatal log about an unhandled error.
+				logger.fatal("", e2 + "-> (" + e2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			}
 		} catch(Exception e1) {
-			logger.fatal("", e1); //Sends a fatal log about an unhandled error.
+			logger.fatal("", e1 + "-> (" + e1.getCause() + ")"); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -179,7 +179,7 @@ public class Commands implements BotInterface {
 
 			logger.info("Members updated due to " + jEvent.getUser().getDiscriminatedName() + " joining the server."); //Sends an info log about what issued the listener.
 		} catch(Exception e) {
-			logger.fatal("", e); //Sends a fatal log about an unhandled error.
+			logger.fatal("", e + "-> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -193,7 +193,7 @@ public class Commands implements BotInterface {
 
 			logger.info("Members updated due to " + nEvent.getUser().getDiscriminatedName() + " having their nickname changed - value: " + allMembers.get(nEvent.getUser().getDiscriminatedName()) + "."); //Sends an info log about what issued the listener.
 		} catch(Exception e) {
-			logger.fatal("", e); //Sends a fatal log about an unhandled error.
+			logger.fatal("", e + "-> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -258,9 +258,9 @@ public class Commands implements BotInterface {
 
 			logger.info("Members updated due to " + lEvent.getUser().getDiscriminatedName() + " leaving the server."); //Sends an info log about what issued the listener.
 		} catch(NullPointerException e) {
-			logger.error("Expected/Handled: " + e); //Sends an error log about an expected/handled error.
+			logger.error("Expected/Handled: " + e + " -> (" + e.getCause() + ")"); //Sends an error log about an expected/handled error.
 		} catch(Exception e) {
-			logger.fatal("", e); //Sends a fatal log about an unhandled error.
+			logger.fatal("", e + "-> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -291,7 +291,7 @@ public class Commands implements BotInterface {
 
 			logger.info("Command (~contractsHelp) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 		} catch(Exception e) {
-			logger.fatal("", e); //Sends a fatal log about an unhandled error.
+			logger.fatal("", e + "-> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -397,7 +397,7 @@ public class Commands implements BotInterface {
 
 			logger.info("Command/Page (~showContracts) called/flipped by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command/flipped a page.
 		} catch(Exception e) {
-			logger.fatal("", e); //Sends a fatal log about an unhandled error.
+			logger.fatal("", e + "-> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -450,17 +450,17 @@ public class Commands implements BotInterface {
 			}
 		} catch(StringIndexOutOfBoundsException e1_1) {
 			try {
-				logger.error("Expected/Handled: " + e1_1); //Sends an error log about an expected/handled error.
+				logger.error("Expected/Handled: " + e1_1 + " -> (" + e1_1.getCause() + ")"); //Sends an error log about an expected/handled error.
 
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
 				new MessageBuilder().append("Error! That is not a valid name.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e1_2) {
-				logger.fatal("", e1_2); //Sends a fatal log about an unhandled error.
+				logger.fatal("", e1_2 + "-> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			}
 		} catch(NullPointerException e) {
-			logger.error("Expected/Handled: " + e); //Sends an error log about an expected/handled error.
+			logger.error("Expected/Handled: " + e + " -> (" + e.getCause() + ")"); //Sends an error log about an expected/handled error.
 		} catch(Exception e) {
-			logger.fatal("", e); //Sends a fatal log about an unhandled error.
+			logger.fatal("", e + "-> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -517,26 +517,26 @@ public class Commands implements BotInterface {
 			}
 		} catch(ArrayIndexOutOfBoundsException e1_1) {
 			try {
-				logger.error("Expected/Handled: " + e1_1); //Sends an error log about an expected/handled error.
+				logger.error("Expected/Handled: " + e1_1 + " -> (" + e1_1.getCause() + ")"); //Sends an error log about an expected/handled error.
 
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
 				new MessageBuilder().append("Error! Please, follow the format: `~updateContract [ID] [Full Name]`.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e1_2) {
-				logger.fatal("", e1_2); //Sends a fatal log about an unhandled error.
+				logger.fatal("", e1_2 + "-> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			}
 		} catch(NumberFormatException e2_1) {
 			try {
-				logger.error("Expected/Handled: " + e2_1); //Sends an error log about an expected/handled error.
+				logger.error("Expected/Handled: " + e2_1 + " -> (" + e2_1.getCause() + ")"); //Sends an error log about an expected/handled error.
 
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
 				new MessageBuilder().append("Wrong input! The value after the `~updateContract` command must be a digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e2_2) {
-				logger.fatal("", e2_2); //Sends a fatal log about an unhandled error.
+				logger.fatal("", e2_2 + "-> (" + e2_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			}
 		} catch(NullPointerException e) {
-			logger.error("Expected/Handled: " + e); //Sends an error log about an expected/handled error.
+			logger.error("Expected/Handled: " + e + " -> (" + e.getCause() + ")"); //Sends an error log about an expected/handled error.
 		} catch(Exception e) {
-			logger.fatal("", e); //Sends a fatal log about an unhandled error.
+			logger.fatal("", e + "-> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 		}
 	} 
 
@@ -570,24 +570,24 @@ public class Commands implements BotInterface {
 			}
 		} catch(StringIndexOutOfBoundsException e0_1) {
 			try {
-				logger.error("Expected/Handled: " + e0_1); //Sends an error log about an expected/handled error.
+				logger.error("Expected/Handled: " + e0_1 + " -> (" + e0_1.getCause() + ")"); //Sends an error log about an expected/handled error.
 
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
 				new MessageBuilder().append("Wrong input! The value after the `~removeContract` command must be a digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e0_2) {
-				logger.fatal("", e0_2); //Sends a fatal log about an unhandled error.
+				logger.fatal("", e0_2 + "-> (" + e0_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			}
 		} catch(NumberFormatException e1_1) {
 			try {
-				logger.error("Expected/Handled: " + e1_1); //Sends an error log about an expected/handled error.
+				logger.error("Expected/Handled: " + e1_1 + " -> (" + e1_1.getCause() + ")"); //Sends an error log about an expected/handled error.
 
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
 				new MessageBuilder().append("Wrong input! The value after the `~removeContract` command must be a digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e1_2) {
-				logger.fatal("", e1_2); //Sends a fatal log about an unhandled error.
+				logger.fatal("", e1_2 + "-> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			}
 		} catch(Exception e) {
-			logger.fatal("", e); //Sends a fatal log about an unhandled error.
+			logger.fatal("", e + "-> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -633,7 +633,7 @@ public class Commands implements BotInterface {
 
 			logger.info("Command (~showChannels) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 		} catch(Exception e) {
-			logger.fatal("", e); //Sends a fatal log about an unhandled error.
+			logger.fatal("", e + "-> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -685,33 +685,33 @@ public class Commands implements BotInterface {
 			resultSet.close();
 		} catch(StringIndexOutOfBoundsException e0_1) {
 			try {
-				logger.error("Expected/Handled: " + e0_1); //Sends an error log about an expected/handled error.
+				logger.error("Expected/Handled: " + e0_1 + " -> (" + e0_1.getCause() + ")"); //Sends an error log about an expected/handled error.
 
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
 				new MessageBuilder().append("Wrong input! The value after the `~addChannel` command must be a long digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e0_2) {
-				logger.fatal("", e0_2); //Sends a fatal log about an unhandled error.
+				logger.fatal("", e0_2 + "-> (" + e0_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			}
 		} catch(NumberFormatException e1_1) {
 			try {
-				logger.error("Expected/Handled: " + e1_1); //Sends an error log about an expected/handled error.
+				logger.error("Expected/Handled: " + e1_1 + " -> (" + e1_1.getCause() + ")"); //Sends an error log about an expected/handled error.
 
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
 				new MessageBuilder().append("Wrong input! The value after the `~addChannel` command must be a long digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e1_2) {
-				logger.fatal("", e1_2); //Sends a fatal log about an unhandled error.
+				logger.fatal("", e1_2 + "-> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			}
 		} catch(NoSuchElementException e2_1) {
 			try {
-				logger.error("Expected/Handled: " + e2_1); //Sends an error log about an expected/handled error.
+				logger.error("Expected/Handled: " + e2_1 + " -> (" + e2_1.getCause() + ")"); //Sends an error log about an expected/handled error.
 
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
 				new MessageBuilder().append("Error! There is no channel with the specified ID in the server.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e2_2) {
-				logger.fatal("", e2_2); //Sends a fatal log about an unhandled error.
+				logger.fatal("", e2_2 + "-> (" + e2_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			}
 		} catch(Exception e) {
-			logger.fatal("", e); //Sends a fatal log about an unhandled error.
+			logger.fatal("", e + "-> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -745,24 +745,24 @@ public class Commands implements BotInterface {
 			}
 		} catch(StringIndexOutOfBoundsException e0_1) {
 			try {
-				logger.error("Expected/Handled: " + e0_1); //Sends an error log about an expected/handled error.
+				logger.error("Expected/Handled: " + e0_1 + " -> (" + e0_1.getCause() + ")"); //Sends an error log about an expected/handled error.
 
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
 				new MessageBuilder().append("Wrong input! The value after the `~removeChannel` command must be a long digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e0_2) {
-				logger.fatal("", e0_2); //Sends a fatal log about an unhandled error.
+				logger.fatal("", e0_2 + "-> (" + e0_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			}
 		} catch(NumberFormatException e1_1) {
 			try {
-				logger.error("Expected/Handled: " + e1_1); //Sends an error log about an expected/handled error.
+				logger.error("Expected/Handled: " + e1_1 + " -> (" + e1_1.getCause() + ")"); //Sends an error log about an expected/handled error.
 
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
 				new MessageBuilder().append("Wrong input! The value after the `~removeChannel` command must be a long digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e1_2) {
-				logger.fatal("", e1_2); //Sends a fatal log about an unhandled error.
+				logger.fatal("", e1_2 + "-> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			}
 		} catch(Exception e) {
-			logger.fatal("", e); //Sends a fatal log about an unhandled error.
+			logger.fatal("", e + "-> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -807,7 +807,7 @@ public class Commands implements BotInterface {
 
 			logger.info("Command (~showRoles) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 		} catch(Exception e) {
-			logger.fatal("", e); //Sends a fatal log about an unhandled error.
+			logger.fatal("", e + "-> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -859,33 +859,33 @@ public class Commands implements BotInterface {
 			resultSet.close();
 		} catch(StringIndexOutOfBoundsException e0_1) {
 			try {
-				logger.error("Expected/Handled: " + e0_1); //Sends an error log about an expected/handled error.
+				logger.error("Expected/Handled: " + e0_1 + " -> (" + e0_1.getCause() + ")"); //Sends an error log about an expected/handled error.
 
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
 				new MessageBuilder().append("Wrong input! The value after the `~addRole` command must be a long digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e0_2) {
-				logger.fatal("", e0_2); //Sends a fatal log about an unhandled error.
+				logger.fatal("", e0_2 + "-> (" + e0_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			}
 		} catch(NumberFormatException e1_1) {
 			try {
-				logger.error("Expected/Handled: " + e1_1); //Sends an error log about an expected/handled error.
+				logger.error("Expected/Handled: " + e1_1 + " -> (" + e1_1.getCause() + ")"); //Sends an error log about an expected/handled error.
 
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
 				new MessageBuilder().append("Wrong input! The value after the `~addRole` command must be a long digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e1_2) {
-				logger.fatal("", e1_2); //Sends a fatal log about an unhandled error.
+				logger.fatal("", e1_2 + "-> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			}
 		} catch(NoSuchElementException e2_1) {
 			try {
-				logger.error("Expected/Handled: " + e2_1); //Sends an error log about an expected/handled error.
+				logger.error("Expected/Handled: " + e2_1 + " -> (" + e2_1.getCause() + ")"); //Sends an error log about an expected/handled error.
 
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
 				new MessageBuilder().append("Error! There is no role with the specified ID in the server.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e2_2) {
-				logger.fatal("", e2_2); //Sends a fatal log about an unhandled error.
+				logger.fatal("", e2_2 + "-> (" + e2_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			}
 		} catch(Exception e) {
-			logger.fatal("", e); //Sends a fatal log about an unhandled error.
+			logger.fatal("", e + "-> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -919,24 +919,24 @@ public class Commands implements BotInterface {
 			}
 		} catch(StringIndexOutOfBoundsException e0_1) {
 			try {
-				logger.error("Expected/Handled: " + e0_1); //Sends an error log about an expected/handled error.
+				logger.error("Expected/Handled: " + e0_1 + " -> (" + e0_1.getCause() + ")"); //Sends an error log about an expected/handled error.
 
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
 				new MessageBuilder().append("Wrong input! The value after the `~removeRole` command must be a long digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e0_2) {
-				logger.fatal("", e0_2); //Sends a fatal log about an unhandled error.
+				logger.fatal("", e0_2 + "-> (" + e0_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			}
 		} catch(NumberFormatException e1_1) {
 			try {
-				logger.error("Expected/Handled: " + e1_1); //Sends an error log about an expected/handled error.
+				logger.error("Expected/Handled: " + e1_1 + " -> (" + e1_1.getCause() + ")"); //Sends an error log about an expected/handled error.
 
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
 				new MessageBuilder().append("Wrong input! The value after the `~removeRole` command must be a long digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e1_2) {
-				logger.fatal("", e1_2); //Sends a fatal log about an unhandled error.
+				logger.fatal("", e1_2 + "-> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			}
 		} catch(Exception e) {
-			logger.fatal("", e); //Sends a fatal log about an unhandled error.
+			logger.fatal("", e + "-> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -958,7 +958,7 @@ public class Commands implements BotInterface {
 
 			logger.info("Command (~rpsHelp) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 		} catch(Exception e) {
-			logger.fatal("", e); //Sends a fatal log about an unhandled error.
+			logger.fatal("", e + "-> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -1040,17 +1040,17 @@ public class Commands implements BotInterface {
 			}
 		} catch(StringIndexOutOfBoundsException e1_1) {
 			try {
-				logger.error("Expected/Handled: " + e1_1); //Sends an error log about an expected/handled error.
+				logger.error("Expected/Handled: " + e1_1 + " -> (" + e1_1.getCause() + ")"); //Sends an error log about an expected/handled error.
 
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
 				new MessageBuilder().append("Wrong input! Please choose either `Rock`, `Paper` or `Scissors`.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e1_2) {
-				logger.fatal("", e1_2); //Sends a fatal log about an unhandled error.
+				logger.fatal("", e1_2 + "-> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			}
 		} catch(NullPointerException e) {
-			logger.error("Expected/Handled: " + e); //Sends an error log about an expected/handled error.
+			logger.error("Expected/Handled: " + e + " -> (" + e.getCause() + ")"); //Sends an error log about an expected/handled error.
 		} catch(Exception e) {
-			logger.fatal("", e); //Sends a fatal log about an unhandled error.
+			logger.fatal("", e + "-> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -1099,7 +1099,7 @@ public class Commands implements BotInterface {
 
 			logger.info("Command (~rpsHighscores) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 		} catch(Exception e) {
-			logger.fatal("", e); //Sends a fatal log about an unhandled error.
+			logger.fatal("", e + "-> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -1120,7 +1120,7 @@ public class Commands implements BotInterface {
 
 			logger.info("Command (~idHelp) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 		} catch(Exception e) {
-			logger.fatal("", e); //Sends a fatal log about an unhandled error.
+			logger.fatal("", e + "-> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 		}
 	}
 
@@ -1132,7 +1132,7 @@ public class Commands implements BotInterface {
 
 			logger.info("Command (~sourceCode) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 		} catch(Exception e) {
-			logger.fatal("", e); //Sends a fatal log about an unhandled error.
+			logger.fatal("", e + "-> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 		}
 	}
 }
