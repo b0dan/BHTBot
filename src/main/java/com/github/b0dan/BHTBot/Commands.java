@@ -272,7 +272,7 @@ public class Commands implements BotInterface {
 			//An embed with all the contract related commands.
 			EmbedBuilder contractsCommands = new EmbedBuilder()
 				.setTitle("Contracts Commands")
-				.setThumbnail(dApi.getYourself().getAvatar())
+				.setThumbnail("https://i.imgur.com/HoOkwBs.png")
 				.setColor(Color.RED)
 				.addField("~showContracts", "Shows a list of all active contracts.")
 				.addField("~addContract *[Full Name]*", "Adds a new contract.")
@@ -312,7 +312,7 @@ public class Commands implements BotInterface {
 			EmbedBuilder contracts = new EmbedBuilder();
 			contracts
 				.setTitle("Active Contracts")
-				.setThumbnail(dApi.getYourself().getAvatar())
+				.setThumbnail("https://i.imgur.com/HoOkwBs.png")
 				.setColor(Color.RED)
 				.setFooter("Make sure to remove the contract you've completed by typing `~removeContract [ID]`!");
 
@@ -600,7 +600,7 @@ public class Commands implements BotInterface {
 			EmbedBuilder channels = new EmbedBuilder();
 			channels
 				.setTitle("Channels")
-				.setThumbnail(dApi.getYourself().getAvatar())
+				.setThumbnail("https://i.imgur.com/HoOkwBs.png")
 				.setColor(Color.RED)
 				.setFooter("These are the channels where contract related commands can be used.");
 
@@ -775,7 +775,7 @@ public class Commands implements BotInterface {
 			EmbedBuilder roles = new EmbedBuilder();
 			roles
 				.setTitle("Roles")
-				.setThumbnail(dApi.getYourself().getAvatar())
+				.setThumbnail("https://i.imgur.com/HoOkwBs.png")
 				.setColor(Color.RED)
 				.setFooter("These are the roles who can use contract related commands.");
 
