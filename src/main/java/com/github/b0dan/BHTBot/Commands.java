@@ -366,6 +366,7 @@ public class Commands implements BotInterface {
 	       			}
 	        	}
 	        	mEvent.getChannel().sendMessage(contracts);
+			long embedMessageId = mEvent.getChannel().getMessages(1).get().getNewestMessage().get().getId();
 
 	        	//Adds the reactions needed to "flip a page".
 	        	if(currentPage == 1 && totalPages > 1) {
@@ -397,11 +398,13 @@ public class Commands implements BotInterface {
 	        			}
 	            	}).removeAfter(30, TimeUnit.SECONDS).addRemoveHandler(() -> {
 					try {
-						mEvent.getChannel().getMessages(1).get().getOldestMessage().get().removeAllReactions();
-					} catch(Exception e0) {
-						logger.fatal("", e0 + " -> (" + e0.getCause() + ")"); //Sends a fatal log about an unhandled error.
-						e0.printStackTrace();
-					}
+							mEvent.getChannel().getMessageById(embedMessageId).get().removeAllReactions();
+	            		} catch(ExecutionException e0) {
+	            			logger.error("Expected/Handled: " + e0 + " -> (" + e0.getCause() + ")"); //Sends an error log about an expected/handled error.
+						} catch(Exception e1) {
+							logger.fatal("", e1 + " -> (" + e1.getCause() + ")"); //Sends a fatal log about an unhandled error.
+							e1.printStackTrace();
+						}
 	        	}
 			} else {
 				contracts.addField("Empty", "There are no active contracts.");
@@ -1105,7 +1108,7 @@ public class Commands implements BotInterface {
 		try {
 			mEvent.deleteMessage(); //Deletes the last message (the command).
 
-			//Opens up a connection to the 'BHT' SQL database (Contracts).
+			//Opens up a connection to the 'BHT' SQL database (Highscores).
         	Class.forName("com.mysql.cj.jdbc.Driver");
         	Connection connection = DriverManager.getConnection("...");
 
