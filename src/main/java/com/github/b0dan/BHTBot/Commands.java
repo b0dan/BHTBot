@@ -377,7 +377,7 @@ public class Commands implements BotInterface {
 	        		mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("➡");
 	        	}
 
-	        	//Adds a listener that "flips a page" when the one who called the command reacts on the `~showContracts` message.
+	        	//Adds a listener that "flips a page" when the one who called the command reacts on the `~showContracts` message. Also, removes all reactions after 30 seconds.
 	        	if(totalPages > 1) {
 	        		int ccn = currentContractNumber;
 	        		int fcop = firstContractOnPage;
@@ -395,7 +395,13 @@ public class Commands implements BotInterface {
 	            			event.getMessage().get().delete();
 	            			showContracts(dApi, mEvent, cp, ccn, fcop, lcop, pressedBack);
 	        			}
-	            	}).removeAfter(30, TimeUnit.SECONDS);
+	            	}).removeAfter(30, TimeUnit.SECONDS).addRemoveHandler(() -> {
+					try {
+						mEvent.getChannel().getMessages(1).get().getOldestMessage().get().removeAllReactions();
+					} catch(Exception e0) {
+						logger.fatal("", e0 + " -> (" + e0.getCause() + ")"); //Sends a fatal log about an unhandled error.
+						e0.printStackTrace();
+					}
 	        	}
 			} else {
 				contracts.addField("Empty", "There are no active contracts.");
