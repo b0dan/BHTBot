@@ -415,7 +415,8 @@ public class Main {
        		} catch(NoSuchElementException e) {
        			logger.error("Expected/Handled: " + e + " -> (" + e.getCause() + ")"); //Sends an error log about an expected/handled error.
        		} catch(Exception e) {
-       			logger.fatal("", e + "-> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+       			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			e.printStackTrace();
        		}
         });
 
