@@ -357,7 +357,7 @@ public class Commands implements BotInterface {
 							firstPages.add(firstContractOnPage);
 						}
 					}
-	       			contracts.addField(String.valueOf(resultSet.getInt("contractId") + ". " + resultSet.getString("contractName")), "*Contract #" + (currentContractNumber) + "*");
+	       			contracts.addField(currentContractNumber + ". " + resultSet.getString("contractName"), "**Contract ID:** " + resultSet.getInt("contractId"));
 
 	       			currentContractNumber++;
 	       			if(resultSet.getRow() % 25 == 0 || resultSet.getRow() == totalContracts) {
