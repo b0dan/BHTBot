@@ -16,7 +16,7 @@ public interface BotInterface {
 	public void setOnLeaveRole(DiscordApi dApi, MessageCreateEvent mEvent);
 	public void setOnLeavePing(MessageCreateEvent mEvent);
 
-	public void updateMembersOnJoin(DiscordApi dApi, ServerMemberJoinEvent jEvent);
+	public void updateMembersOnJoinAndWelcome(DiscordApi dApi, ServerMemberJoinEvent jEvent);
 	public void updateMembersOnNicknameChanged(DiscordApi dApi, UserChangeNicknameEvent nEvent);
 	public void updateMembersOnLeave(DiscordApi dApi, ServerMemberLeaveEvent lEvent);
 
