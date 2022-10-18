@@ -11,7 +11,7 @@ import org.javacord.api.event.user.UserChangeNicknameEvent;
 @SuppressWarnings("unused")
 public interface BotInterface {
 	public void displayCommands(DiscordApi dApi, MessageCreateEvent mEvent);
-	public void updateMembers(DiscordApi dApi, MessageCreateEvent mEvent);
+	public void manuallyUpdateMembers(DiscordApi dApi, MessageCreateEvent mEvent);
 	public void getAllMembers(DiscordApi dApi, MessageCreateEvent mEvent);
 	public void setOnLeaveRole(DiscordApi dApi, MessageCreateEvent mEvent);
 	public void setOnLeavePing(MessageCreateEvent mEvent);
