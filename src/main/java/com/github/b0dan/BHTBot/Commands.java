@@ -178,7 +178,7 @@ public class Commands implements BotInterface {
 	}
 
 	//A listener that automatically updates the members' HashMap when someone joins the server.
-	public void updateMembersOnJoin(DiscordApi dApi, ServerMemberJoinEvent jEvent) {
+	public void updateMembersOnJoinAndWelcome(DiscordApi dApi, ServerMemberJoinEvent jEvent) {
 		try {
 			Server server = dApi.getServerById(jEvent.getServer().getId()).get(); //Gets the server.
 
