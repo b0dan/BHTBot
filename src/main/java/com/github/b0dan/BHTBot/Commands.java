@@ -67,7 +67,7 @@ public class Commands implements BotInterface {
 	}
 
 	//A command to manually update the members' HashMap by typing `~updateMembers` (not case-sensitive).
-	public void updateMembers(DiscordApi dApi, MessageCreateEvent mEvent) {
+	public void manuallyUpdateMembers(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			Server server = dApi.getServerById(mEvent.getServerTextChannel().get().getServer().getId()).get(); //Gets the server.
 			mEvent.deleteMessage(); //Deletes the last message (the command).
