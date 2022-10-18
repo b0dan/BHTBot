@@ -33,7 +33,7 @@ public class Main {
        					if(event.getMessageContent().equalsIgnoreCase("~commandsHelp")) {
            					cmd.displayCommands(api, event);
 					} else if(event.getMessageContent().equals("~updateMembers") && event.getMessageAuthor().isBotOwner()) {
-           					cmd.updateMembers(api, event);
+           					cmd.manuallyUpdateMembers(api, event);
            				} else if(event.getMessageContent().equals("~getAllMembers") && event.getMessageAuthor().isBotOwner()) {
            					cmd.getAllMembers(api, event);
            				} else if(event.getMessageContent().equalsIgnoreCase("~rpsHelp")) {
