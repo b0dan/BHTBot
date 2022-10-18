@@ -425,7 +425,7 @@ public class Main {
    			Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
 
    			if(server.getId() == 262781891705307137L) {
-   				cmd.updateMembersOnJoin(api, event);
+   				cmd.updateMembersOnJoinAndWelcome(api, event);
    			}
        	});
 
