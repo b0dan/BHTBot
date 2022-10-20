@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.lang.ArrayIndexOutOfBoundsException;
 import org.apache.logging.log4j.LogManager;
@@ -177,30 +178,52 @@ public class Commands implements BotInterface {
 		}
 	}
 
-	//A listener that automatically updates the members' HashMap when someone joins the server.
+	//A listener that automatically updates the members' HashMap when someone joins the server and welcomes the new member.
 	public void updateMembersOnJoinAndWelcome(DiscordApi dApi, ServerMemberJoinEvent jEvent) {
 		try {
 			Server server = dApi.getServerById(jEvent.getServer().getId()).get(); //Gets the server.
 
-			//Puts the user who joined the server in the members' HashMap.
-			allMembers.put(jEvent.getUser().getDiscriminatedName(), jEvent.getUser().getDisplayName(server));
+			//Puts the user who joined the server in the newUsers List.
+			String newUser = jEvent.getUser().getDiscriminatedName();
+			List<String> newUsers = new ArrayList<String>();
+				newUsers.add(newUser);
+
+			allMembers.put(newUser, jEvent.getUser().getDisplayName(server)); //Puts the user who joined the server in the members' HashMap
+
+			//Sends a welcoming message to the user that just joined.
+			MessageBuilder welcomeMessage = new MessageBuilder();
+			welcomeMessage
+				.append("Welcome to ")
+				.append("The Black Hand Triads", MessageDecoration.BOLD)
+				.append(", " + jEvent.getUser().getMentionTag() + "! Please provide us the following info so we can validate you:\n\n")
+				.append("In-Game Name:\nCurrent Rank:\nName of the person that tested you:", MessageDecoration.CODE_LONG)
+				.append("\nAfter that, just wait until you get validated by one of our high-ranking members.")
+				.send((TextChannel)server.getSystemChannel().get());
 
 			logger.info("Members updated due to " + jEvent.getUser().getDiscriminatedName() + " joining the server."); //Sends an info log about what issued the listener.
-		} catch(Exception e) {
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
-			e.printStackTrace();
-		}
-	}
 
-	//A listener that automatically updates the members' HashMap when someone has their nickname changed.
-	public void updateMembersOnNicknameChanged(DiscordApi dApi, UserChangeNicknameEvent nEvent) {
-		try {
-			Server server = dApi.getServerById(nEvent.getServer().getId()).get(); //Gets the server.
+			//Gets triggered when someone joins the server and have a 'White Lotus' role given. When done, welcomes them to the server.
+			jEvent.getUser().addUserRoleAddListener(event -> {
+				if(newUsers.contains(event.getUser().getDiscriminatedName())) {
+					MessageBuilder validationMessage = new MessageBuilder();
+					if(event.getRole().getId() == 262782166847586305L) { //White Lotus (262782166847586305L).
+						validationMessage
+							.append("Welcome, " + server.getMemberByDiscriminatedName(event.getUser().getDiscriminatedName()).get().getMentionTag() + ". You have been validated!\n")
+							.append("Be sure to read " + dApi.getServerTextChannelById(1031668061293518879L).get().getMentionTag() + " before anything else!"); //#rules_and_triad_behavior (1031668061293518879L).
+					} else {
+						validationMessage
+							.append("Welcome, " + server.getMemberByDiscriminatedName(event.getUser().getDiscriminatedName()).get().getMentionTag() + ". You have been validated!");
+					}
+					validationMessage.send((TextChannel)server.getSystemChannel().get());
 
-			//Changes the name in the members' HashMap of the person that just had their nickname changed/updated.
-			allMembers.replace(nEvent.getUser().getDiscriminatedName(), nEvent.getUser().getDisplayName(server));
-
-			logger.info("Members updated due to " + nEvent.getUser().getDiscriminatedName() + " having their nickname changed - value: " + allMembers.get(nEvent.getUser().getDiscriminatedName()) + "."); //Sends an info log about what issued the listener.
+					newUsers.remove(event.getUser().getDiscriminatedName());
+					logger.info(event.getUser().getDiscriminatedName() + " has been welcomed to the server."); //Sends an info log about what issued the listener.
+				}
+			}).removeAfter(3, TimeUnit.DAYS).addRemoveHandler(() -> {
+				if(newUsers.contains(jEvent.getUser().getDiscriminatedName())) {
+					newUsers.remove(jEvent.getUser().getDiscriminatedName());
+				}
+			});
 		} catch(Exception e) {
 			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
