@@ -6,6 +6,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.event.server.member.ServerMemberJoinEvent;
 import org.javacord.api.event.server.member.ServerMemberLeaveEvent;
+import org.javacord.api.event.server.role.UserRoleAddEvent;
 import org.javacord.api.event.user.UserChangeNicknameEvent;
 
 @SuppressWarnings("unused")
