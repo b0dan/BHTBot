@@ -208,16 +208,16 @@ public class Commands implements BotInterface {
 					MessageBuilder validationMessage = new MessageBuilder();
 					if(event.getRole().getId() == 262782166847586305L) { //White Lotus (262782166847586305L).
 						validationMessage
-							.append("Welcome, " + server.getMemberByDiscriminatedName(event.getUser().getDiscriminatedName()).get().getMentionTag() + ". You have been validated!\n")
+							.append("Welcome, " + server.getMemberByDiscriminatedName(event.getUser().getDiscriminatedName()).get().getMentionTag() + "! You have been validated.\n")
 							.append("Be sure to read " + dApi.getServerTextChannelById(1031668061293518879L).get().getMentionTag() + " before anything else!"); //#rules_and_triad_behavior (1031668061293518879L).
 					} else {
 						validationMessage
-							.append("Welcome, " + server.getMemberByDiscriminatedName(event.getUser().getDiscriminatedName()).get().getMentionTag() + ". You have been validated!");
+							.append("Welcome, " + server.getMemberByDiscriminatedName(event.getUser().getDiscriminatedName()).get().getMentionTag() + "! You have been validated.");
 					}
 					validationMessage.send((TextChannel)server.getSystemChannel().get());
 
 					newUsers.remove(event.getUser().getDiscriminatedName());
-					logger.info(event.getUser().getDiscriminatedName() + " has been welcomed to the server."); //Sends an info log about what issued the listener.
+					logger.info(event.getUser().getDiscriminatedName() + " has been validated."); //Sends an info log about what issued the listener.
 				}
 			}).removeAfter(3, TimeUnit.DAYS).addRemoveHandler(() -> {
 				if(newUsers.contains(jEvent.getUser().getDiscriminatedName())) {
