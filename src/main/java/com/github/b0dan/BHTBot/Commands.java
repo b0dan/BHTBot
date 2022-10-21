@@ -83,7 +83,7 @@ public class Commands implements BotInterface {
 				allMembers.put(user.getDiscriminatedName(), user.getDisplayName(server));
 			}
 
-			logger.warn("Members updated by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends a warn log about who issued the command.
+			logger.info("Members updated by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 		} catch(Exception e) {
 			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
@@ -97,7 +97,7 @@ public class Commands implements BotInterface {
 
 			//If the server is empty, prints a corresponding message. If not, it prints out all the members in the server.
 			if(allMembers.isEmpty()) {
-				System.out.println("The server has no members.\n");
+				logger.warn("The server has no members."); //Sends a warn log about the server being empty.
 			} else {
 				System.out.println();
 				for(Map.Entry<String, String> entry: allMembers.entrySet()) {
@@ -105,7 +105,7 @@ public class Commands implements BotInterface {
 				}
 				System.out.println("Members: " + allMembers.size() + "\n");
 
-				logger.warn("Command (~getAllMembers) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends a warn log about who issued the command.
+				logger.info("Command (~getAllMembers) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 			}
 		} catch(Exception e) {
 			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
@@ -271,14 +271,14 @@ public class Commands implements BotInterface {
 					preparedStatement.setString(1, allMembers.get(lEvent.getUser().getDiscriminatedName()));
 					int affectedRows = preparedStatement.executeUpdate();
 					if(affectedRows > 0) {
-						System.out.println(allMembers.get(lEvent.getUser().getDiscriminatedName()) + " has been successfuly added to the database.");
+						logger.info(allMembers.get(lEvent.getUser().getDiscriminatedName()) + " has been successfuly added to the database."); //Sends an info log about a successful insertion into the database.
 						server.getSystemChannel().get().getMessages(1).get().getNewestMessage().get().addReaction("🐍"); //Reacts with a snake emoji to the leaving message if the person was successfully added to the 'Contracts' SQL database.
 
 						//Closes the connections.
 						preparedStatement.close();
 						connection.close();
 					} else {
-						System.out.println(allMembers.get(lEvent.getUser().getDiscriminatedName()) + " can not be added to the database!");
+						logger.warn(allMembers.get(lEvent.getUser().getDiscriminatedName()) + " can not be added to the database."); //Sends a warn log about an unsuccessful insertion into the database.
 					}
 				} else {
 					resultSet.close();
