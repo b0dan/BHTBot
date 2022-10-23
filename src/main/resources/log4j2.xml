@@ -3,12 +3,23 @@
 	<Appenders>
 		<Console name = "Console" target = "SYSTEM_OUT">
 			<PatternLayout pattern = "%d{dd/MMM/yyyy, HH:mm:ss.SSS} [%logger{36}]  %-5level ---  %msg%n"/>
+			<Filters>
+				<ThresholdFilter level = "warn" onMatch = "DENY" onMismatch = "NEUTRAL"/>
+				<ThresholdFilter level = "error" onMatch = "DENY" onMismatch = "NEUTRAL"/>
+				<ThresholdFilter level = "fatal" onMatch = "DENY" onMismatch = "NEUTRAL"/>
+				<ThresholdFilter level = "info" onMatch = "ACCEPT" onMismatch = "DENY"/>
+			</Filters>
 		</Console>
+
+		<File name = "ErrorLogFile" fileName = "logs/errors.log">
+			<PatternLayout pattern = "%d{dd/MMM/yyyy, HH:mm:ss.SSS} [%logger{36}]  %-5level ---  %msg%n"/>
+		</File>
 	</Appenders>
 
 	<Loggers>
 		<Root level = "info">
-			<AppenderRef ref = "Console"/>
+			<AppenderRef ref = "Console" level = "info"/>
+			<AppenderRef ref = "ErrorLogFile" level = "error"/>
 		</Root>
 	</Loggers>
 </Configuration>
