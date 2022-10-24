@@ -4,7 +4,6 @@
 		<Console name = "Console" target = "SYSTEM_OUT">
 			<PatternLayout pattern = "%d{dd/MMM/yyyy, HH:mm:ss.SSS} [%logger{36}]  %-5level ---  %msg%n"/>
 			<Filters>
-				<ThresholdFilter level = "warn" onMatch = "DENY" onMismatch = "NEUTRAL"/>
 				<ThresholdFilter level = "error" onMatch = "DENY" onMismatch = "NEUTRAL"/>
 				<ThresholdFilter level = "fatal" onMatch = "DENY" onMismatch = "NEUTRAL"/>
 				<ThresholdFilter level = "info" onMatch = "ACCEPT" onMismatch = "DENY"/>
