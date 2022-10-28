@@ -32,9 +32,9 @@ public class Main {
        				if(server.getId() == 262781891705307137L) {
        					if(event.getMessageContent().equalsIgnoreCase("~commandsHelp")) {
            					cmd.displayCommands(api, event);
-					} else if(event.getMessageContent().equals("~updateMembers") && event.getMessageAuthor().isBotOwner()) {
+					} else if(event.getMessageContent().equals("~updateMembers") && event.getMessageAuthor().isBotOwner() && event.getChannel().equals(api.getServerById(event.getServerTextChannel().get().getServer().getId()).get().getSystemChannel().get())) {
            					cmd.manuallyUpdateMembers(api, event);
-           				} else if(event.getMessageContent().equals("~getAllMembers") && event.getMessageAuthor().isBotOwner()) {
+           				} else if(event.getMessageContent().equals("~getAllMembers") && event.getMessageAuthor().isBotOwner() && event.getChannel().equals(api.getServerById(event.getServerTextChannel().get().getServer().getId()).get().getSystemChannel().get())) {
            					cmd.getAllMembers(api, event);
            				} else if(event.getMessageContent().equalsIgnoreCase("~rpsHelp")) {
            					cmd.rockPaperScissorsHelp(api, event);
