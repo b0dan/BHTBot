@@ -31,7 +31,7 @@ import org.javacord.api.event.server.member.ServerMemberJoinEvent;
 import org.javacord.api.event.server.member.ServerMemberLeaveEvent;
 import org.javacord.api.event.user.UserChangeNicknameEvent;
 
-public class Commands implements BotInterface {
+public class Commands {
 	private static final Logger logger = LogManager.getLogger(Commands.class); //Creates an instance of the 'Logger' class for 'Commands.class'.
 
 	private long roleID = 336588534351790080L; //The role value for the 'onLeaveRole' from the `~setOnLeaveRole` command (default: Luminous Path -> 336588534351790080L).
@@ -1039,6 +1039,16 @@ public class Commands implements BotInterface {
 				logger.warn("Fatal error occured!");
 				logger.fatal("", e1_2 + " -> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e1_2.printStackTrace();
+			}
+		} catch(NoSuchElementException e2_1) {
+			try {
+				logger.error("Expected/Handled: " + e2_1 + " -> (" + e2_1.getCause() + ")"); //Sends an error log about an expected/handled error.
+
+				new MessageBuilder().append("Contract related commands are no longer available to the role with the following ID: `" + mEvent.getMessage().getContent().substring(12) + "`.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+			} catch(Exception e0_3) {
+				logger.warn("Fatal error occured!");
+				logger.fatal("", e0_3 + " -> (" + e0_3.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				e0_3.printStackTrace();
 			}
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
