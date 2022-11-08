@@ -32,7 +32,7 @@ public class Main {
        				if(server.getId() == 262781891705307137L) {
        					if(event.getMessageContent().equalsIgnoreCase("~commandsHelp")) {
            					cmd.displayCommands(api, event);
-					} else if(event.getMessageContent().equals("~updateMembers") && event.getMessageAuthor().isBotOwner() && event.getChannel().equals(api.getServerById(event.getServerTextChannel().get().getServer().getId()).get().getSystemChannel().get())) {
+					} else if(event.getMessageContent().equals("~updateMembers") && (event.getMessageAuthor().isBotOwner() || event.getMessageAuthor().isServerAdmin()) && event.getChannel().equals(api.getServerById(event.getServerTextChannel().get().getServer().getId()).get().getSystemChannel().get())) {
            					cmd.manuallyUpdateMembers(api, event);
            				} else if(event.getMessageContent().equals("~getAllMembers") && event.getMessageAuthor().isBotOwner() && event.getChannel().equals(api.getServerById(event.getServerTextChannel().get().getServer().getId()).get().getSystemChannel().get())) {
            					cmd.getAllMembers(api, event);
@@ -421,7 +421,7 @@ public class Main {
        			}
 		});
 
-   		//Gets triggered when someone joins the server and updates the members' HashMap.
+   		//Gets triggered when someone joins the server and updates the members' Multimap.
    		api.addServerMemberJoinListener(event -> {
    			Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
 
@@ -430,7 +430,7 @@ public class Main {
    			}
        		});
 
-        	//Gets triggered when someone has their nickname changed and updates the members' HashMap.
+        	//Gets triggered when someone has their nickname changed and updates the members' Multimap.
        		api.addUserChangeNicknameListener(event -> {
         		Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
 
@@ -439,7 +439,7 @@ public class Main {
    			}
        		});
 
-       		//Gets triggered when someone leaves the server and then notifies the current members about it and updates the members' HashMap.
+       		//Gets triggered when someone leaves the server and then notifies the current members about it and updates the members' Multimap.
         	api.addServerMemberLeaveListener(event -> {
         		Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
 
@@ -447,5 +447,23 @@ public class Main {
    				cmd.updateMembersOnLeave(api, event);
    			}
         	});
+
+		//Gets triggered when someone is given the 'Guest' role and updates the members' Multimap.
+		api.addUserRoleAddListener(event -> {
+        		Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
+
+        		if(server.getId() == 262781891705307137L) {
+				cmd.updateMembersOnGuestRoleAdded(api, event);
+			}
+		});
+
+		//Gets triggered when someone has the 'Guest' role removed and updates the members' Multimap.
+		api.addUserRoleRemoveListener(event -> {
+			Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
+
+			if(server.getId() == 262781891705307137L) {
+				cmd.updateMembersOnGuestRoleRemoved(api, event);
+			}
+		});
 	}
 }
