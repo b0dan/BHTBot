@@ -244,7 +244,7 @@ public class Commands {
 						validationMessage
 							.append("Welcome, " + server.getMemberByDiscriminatedName(event.getUser().getDiscriminatedName()).get().getMentionTag() + "! You have been validated.");
 
-						//Add the "GUEST" value in the members' Multimap, if the role given is a 'Guest'.
+						//Add the "GUEST" value in the members' Multimap if the role given is a 'Guest'.
 						if(event.getRole().equals(guestRole) && !allMembers.containsEntry(newUser, "GUEST")) {
 							allMembers.put(newUser, "GUEST");
 						}
@@ -314,19 +314,19 @@ public class Commands {
 			if(!allMembers.containsEntry(lEvent.getUser().getDiscriminatedName(), "GUEST")) {
 				if(Iterables.get(allMembers.get(lEvent.getUser().getDiscriminatedName()), 0).matches("^[A-Z](?=.{2,19}$)[A-Za-z.]+(?:\\h+[A-Z][A-Za-z.]+)+$")) {
 					//Opens up a connection to the 'BHT' SQL database (Contracts).
-		        	Class.forName("com.mysql.cj.jdbc.Driver");
-		        	Connection connection = DriverManager.getConnection("...");
+		        		Class.forName("com.mysql.cj.jdbc.Driver");
+		        		Connection connection = DriverManager.getConnection("...");
 	
 					//Adds the person who had left the server to the 'BHT' SQL database (Contracts) if he's not there already.
 					PreparedStatement preparedStatement0 = connection.prepareStatement("SELECT COUNT(contractName) FROM Contracts WHERE contractName = ?");
 					preparedStatement0.setString(1, Iterables.get(allMembers.get(lEvent.getUser().getDiscriminatedName()), 0));
 					ResultSet resultSet = preparedStatement0.executeQuery();
 					resultSet.next();
-		        	if(resultSet.getInt(1) == 0) {
-		        		resultSet.close();
-		        		preparedStatement0.close();
+		        		if(resultSet.getInt(1) == 0) {
+		        			resultSet.close();
+		        			preparedStatement0.close();
 	
-		        		PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO Contracts(contractName) VALUES(?)");
+		        			PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO Contracts(contractName) VALUES(?)");
 						preparedStatement.setString(1, Iterables.get(allMembers.get(lEvent.getUser().getDiscriminatedName()), 0));
 						int affectedRows = preparedStatement.executeUpdate();
 						if(affectedRows > 0) {
@@ -430,14 +430,14 @@ public class Commands {
 			mEvent.deleteMessage(); //Deletes the last message (the command).
 
 			//Opens up a connection to the 'BHT' SQL database (Contracts).
-        	Class.forName("com.mysql.cj.jdbc.Driver");
-        	Connection connection = DriverManager.getConnection("...");
+        		Class.forName("com.mysql.cj.jdbc.Driver");
+        		Connection connection = DriverManager.getConnection("...");
 
-        	//Creates a 'SELECT' SQL statement.
-        	Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-        	ResultSet resultSet = statement.executeQuery("SELECT * FROM Contracts");
+        		//Creates a 'SELECT' SQL statement.
+        		Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        		ResultSet resultSet = statement.executeQuery("SELECT * FROM Contracts");
 
-        	//An embed with all active contracts.
+        		//An embed with all active contracts.
 			EmbedBuilder contracts = new EmbedBuilder();
 			contracts
 				.setTitle("Active Contracts")
@@ -476,55 +476,55 @@ public class Commands {
 					}
 					contracts.addField(currentContractNumber + ". " + resultSet.getString("contractName"), "**Contract ID:** " + resultSet.getInt("contractId"));
 
-	       			currentContractNumber++;
-	       			if(resultSet.getRow() % 25 == 0 || resultSet.getRow() == totalContracts) {
-	       				lastContractOnPage = resultSet.getRow();
-	       				break;
-	       			}
-	        	}
-	        	mEvent.getChannel().sendMessage(contracts);
-	        	long embedMessageId = mEvent.getChannel().getMessages(1).get().getNewestMessage().get().getId();
+	       				currentContractNumber++;
+	       				if(resultSet.getRow() % 25 == 0 || resultSet.getRow() == totalContracts) {
+	       					lastContractOnPage = resultSet.getRow();
+	       					break;
+	       				}
+	        		}
+	        		mEvent.getChannel().sendMessage(contracts);
+	        		long embedMessageId = mEvent.getChannel().getMessages(1).get().getNewestMessage().get().getId();
 
-	        	//Adds the reactions needed to "flip a page".
-	        	if(currentPage == 1 && totalPages > 1) {
-	        		mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("➡");
-	        	} else if(currentPage == totalPages && totalPages > 1) {
-	        		mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("⬅");
-	        	} else if(currentPage > 1 && currentPage < totalPages && totalPages > 1) {
-	        		mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("⬅");
-	        		mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("➡");
-	        	}
+	        		//Adds the reactions needed to "flip a page".
+	        		if(currentPage == 1 && totalPages > 1) {
+	        			mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("➡");
+	        		} else if(currentPage == totalPages && totalPages > 1) {
+	        			mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("⬅");
+	        		} else if(currentPage > 1 && currentPage < totalPages && totalPages > 1) {
+	        			mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("⬅");
+	        			mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("➡");
+	        		}
 
-	        	//Adds a listener that "flips a page" when the one who called the command reacts on the `~showContracts` message. Also, removes all reactions after 30 seconds.
-	        	if(totalPages > 1) {
-	        		int ccn = currentContractNumber;
-	        		int fcop = firstContractOnPage;
-	        		int lcop = lastContractOnPage;
-	        		mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReactionAddListener(event -> {
-	        			if(event.getUserId() == mEvent.getMessageAuthor().getId()) {
-	        				int cp = currentPage;
-	        				boolean pressedBack = false;
-	            			if((currentPage < totalPages) && event.getEmoji().equalsEmoji("➡")) {
-	            				cp = cp + 1;
-	            			} else if((currentPage > 1) && event.getEmoji().equalsEmoji("⬅")) {
-	            				pressedBack = true;
-	            				cp = cp - 1;
-	            			}
-	            			event.getMessage().get().delete();
-	            			showContracts(dApi, mEvent, cp, ccn, fcop, lcop, pressedBack);
-	        			}
-	            	}).removeAfter(30, TimeUnit.SECONDS).addRemoveHandler(() -> {
-	            		try {
+	        		//Adds a listener that "flips a page" when the one who called the command reacts on the `~showContracts` message. Also, removes all reactions after 30 seconds.
+	        		if(totalPages > 1) {
+	        			int ccn = currentContractNumber;
+	        			int fcop = firstContractOnPage;
+	        			int lcop = lastContractOnPage;
+	        			mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReactionAddListener(event -> {
+	        				if(event.getUserId() == mEvent.getMessageAuthor().getId()) {
+	        					int cp = currentPage;
+	        					boolean pressedBack = false;
+	            					if((currentPage < totalPages) && event.getEmoji().equalsEmoji("➡")) {
+	            						cp = cp + 1;
+	            					} else if((currentPage > 1) && event.getEmoji().equalsEmoji("⬅")) {
+	            						pressedBack = true;
+	            						cp = cp - 1;
+	            					}
+	            					event.getMessage().get().delete();
+	            					showContracts(dApi, mEvent, cp, ccn, fcop, lcop, pressedBack);
+	        				}
+	            			}).removeAfter(30, TimeUnit.SECONDS).addRemoveHandler(() -> {
+	            				try {
 							mEvent.getChannel().getMessageById(embedMessageId).get().removeAllReactions();
-	            		} catch(ExecutionException e0) {
-	            			logger.error("Expected/Handled: " + e0 + " -> (" + e0.getCause() + ")"); //Sends an error log about an expected/handled error.
+	            				} catch(ExecutionException e0) {
+	            					logger.error("Expected/Handled: " + e0 + " -> (" + e0.getCause() + ")"); //Sends an error log about an expected/handled error.
 						} catch(Exception e1) {
 							logger.warn("Fatal error occured!");
 							logger.fatal("", e1 + " -> (" + e1.getCause() + ")"); //Sends a fatal log about an unhandled error.
 							e1.printStackTrace();
 						}
-	            	});
-	        	}
+	            			});
+	        		}
 			} else {
 				contracts.addField("Empty", "There are no active contracts.");
 				mEvent.getChannel().sendMessage(contracts);
@@ -613,7 +613,7 @@ public class Commands {
 	//A command to manually update a contract from the 'Contracts' SQL database by typing `~updateContract` (not case-sensitive).
 	public void updateContractInDatabase(MessageCreateEvent mEvent) {
 		try {
-			String[] commandValues = mEvent.getMessage().getContent().split(" ", 3); //Splits the command in 3 parts(command, id, name).
+			String[] commandValues = mEvent.getMessage().getContent().split(" ", 3); //Splits the command in 3 parts(command - id - name).
 
 			Integer.parseInt(commandValues[1]);
 			if(commandValues[2].matches("^[A-Z](?=.{2,19}$)[A-Za-z.]+(?:\\h+[A-Z][A-Za-z.]+)+$")) {
@@ -696,8 +696,8 @@ public class Commands {
 	public void removeContractFromDatabase(MessageCreateEvent mEvent) {
 		try {
 			//Opens up a connection to the 'BHT' SQL database (Contracts).
-        	Class.forName("com.mysql.cj.jdbc.Driver");
-        	Connection connection = DriverManager.getConnection("...");
+        		Class.forName("com.mysql.cj.jdbc.Driver");
+        		Connection connection = DriverManager.getConnection("...");
 
 			//Removes the contract with the ID after the `~removeContract` command from the 'Contracts' SQL database.
 			PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM Contracts WHERE contractId = ?");
@@ -754,7 +754,7 @@ public class Commands {
 		try {
 			mEvent.deleteMessage(); //Deletes the last message (the command).
 
-        	//An embed with the channels where contract related commands can be used.
+        		//An embed with the channels where contract related commands can be used.
 			EmbedBuilder channels = new EmbedBuilder();
 			channels
 				.setTitle("Channels")
@@ -763,25 +763,25 @@ public class Commands {
 				.setFooter("These are the channels where contract related commands can be used.");
 
 			//Opens up a connection to the 'BHT' SQL database (Channels).
-        	Class.forName("com.mysql.cj.jdbc.Driver");
-        	Connection connection = DriverManager.getConnection("...");
+        		Class.forName("com.mysql.cj.jdbc.Driver");
+        		Connection connection = DriverManager.getConnection("...");
 
 			//Creates a 'SELECT' SQL statement.
-        	Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-        	ResultSet resultSet = statement.executeQuery("SELECT * FROM Channels");
+        		Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        		ResultSet resultSet = statement.executeQuery("SELECT * FROM Channels");
 
 			//If there are any channels, adds them to the above mentioned embed. If not, notifies the user.
-        	resultSet.last();
-        	if(resultSet.getRow() > 0) {
-        		int k = 1;
-        		resultSet.beforeFirst();
-    			while(resultSet.next()) {
-    				channels.addField(k + ". " + String.valueOf(resultSet.getString("channelName")), "**ID: **" + String.valueOf(resultSet.getLong("channelId")));
-    				k++;
-    			}
-        	} else {
-        		channels.addField("Empty", "There are no white-listed channels.");
-        	}
+        		resultSet.last();
+        		if(resultSet.getRow() > 0) {
+        			int k = 1;
+        			resultSet.beforeFirst();
+    				while(resultSet.next()) {
+    					channels.addField(k + ". " + String.valueOf(resultSet.getString("channelName")), "**ID: **" + String.valueOf(resultSet.getLong("channelId")));
+    					k++;
+    				}
+        		} else {
+        			channels.addField("Empty", "There are no white-listed channels.");
+        		}
 			mEvent.getChannel().sendMessage(channels);
 
 			//Closes the above connections.
@@ -801,10 +801,10 @@ public class Commands {
 	public void addChannel(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			//Opens up a connection to the 'BHT' SQL database (Channels).
-        	Class.forName("com.mysql.cj.jdbc.Driver");
-        	Connection connection = DriverManager.getConnection("...");
+        		Class.forName("com.mysql.cj.jdbc.Driver");
+        		Connection connection = DriverManager.getConnection("...");
 
-        	//Adds the channel with the ID after the `~addChannel` command to the 'Channels' SQL database if it's not there already.
+        		//Adds the channel with the ID after the `~addChannel` command to the 'Channels' SQL database if it's not there already.
 			PreparedStatement preparedStatement0 = connection.prepareStatement("SELECT COUNT(channelId) FROM Channels WHERE channelId = ?");
 			preparedStatement0.setLong(1, Long.parseLong(mEvent.getMessage().getContent().substring(12)));
 			ResultSet resultSet = preparedStatement0.executeQuery();
@@ -885,10 +885,10 @@ public class Commands {
 	public void removeChannel(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			//Opens up a connection to the 'BHT' SQL database (Channels).
-        	Class.forName("com.mysql.cj.jdbc.Driver");
-        	Connection connection = DriverManager.getConnection("...");
+        		Class.forName("com.mysql.cj.jdbc.Driver");
+        		Connection connection = DriverManager.getConnection("...");
 
-        	//Removes the channel with the ID after the `~removeChannel` command from the 'Channels' SQL database.
+        		//Removes the channel with the ID after the `~removeChannel` command from the 'Channels' SQL database.
 			PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM Channels WHERE channelId = ?");
 			preparedStatement.setLong(1, Long.parseLong(mEvent.getMessage().getContent().substring(15)));
 			int affectedRows = preparedStatement.executeUpdate();
@@ -943,7 +943,7 @@ public class Commands {
 		try {
 			mEvent.deleteMessage(); //Deletes the last message (the command).
 
-        	//An embed with the roles who can use contract related commands.
+        		//An embed with the roles who can use contract related commands.
 			EmbedBuilder roles = new EmbedBuilder();
 			roles
 				.setTitle("Roles")
@@ -952,25 +952,25 @@ public class Commands {
 				.setFooter("These are the roles who can use contract related commands.");
 
 			//Opens up a connection to the 'BHT' SQL database (Roles).
-        	Class.forName("com.mysql.cj.jdbc.Driver");
-        	Connection connection = DriverManager.getConnection("...");
+        		Class.forName("com.mysql.cj.jdbc.Driver");
+        		Connection connection = DriverManager.getConnection("...");
 
 			//Creates a 'SELECT' SQL statement.
-        	Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-        	ResultSet resultSet = statement.executeQuery("SELECT * FROM Roles");
+        		Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        		ResultSet resultSet = statement.executeQuery("SELECT * FROM Roles");
 
 			//If there are any white-listed roles, adds them to the above mentioned embed. If not, notifies the user.
-        	resultSet.last();
-        	if(resultSet.getRow() > 0) {
-        		int k = 1;
-        		resultSet.beforeFirst();
-    			while(resultSet.next()) {
-    				roles.addField(k + ". " + String.valueOf(resultSet.getString("roleName")), "**ID: **" + String.valueOf(resultSet.getLong("roleId")));
-    				k++;
-    			}
-        	} else {
-        		roles.addField("Empty", "There are no white-listed roles.");
-        	}
+        		resultSet.last();
+        		if(resultSet.getRow() > 0) {
+        			int k = 1;
+        			resultSet.beforeFirst();
+    				while(resultSet.next()) {
+    					roles.addField(k + ". " + String.valueOf(resultSet.getString("roleName")), "**ID: **" + String.valueOf(resultSet.getLong("roleId")));
+    					k++;
+    				}
+        		} else {
+        			roles.addField("Empty", "There are no white-listed roles.");
+        		}
 			mEvent.getChannel().sendMessage(roles);
 
 			//Closes the above connections.
@@ -990,10 +990,10 @@ public class Commands {
 	public void addRole(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			//Opens up a connection to the 'BHT' SQL database (Roles).
-        	Class.forName("com.mysql.cj.jdbc.Driver");
-        	Connection connection = DriverManager.getConnection("...");
+        		Class.forName("com.mysql.cj.jdbc.Driver");
+        		Connection connection = DriverManager.getConnection("...");
 
-        	//Adds the role with the ID after the `~addRole` command to the 'Roles' SQL database if it's not there already.
+        		//Adds the role with the ID after the `~addRole` command to the 'Roles' SQL database if it's not there already.
 			PreparedStatement preparedStatement0 = connection.prepareStatement("SELECT COUNT(roleId) FROM Roles WHERE roleId = ?");
 			preparedStatement0.setLong(1, Long.parseLong(mEvent.getMessage().getContent().substring(9)));
 			ResultSet resultSet = preparedStatement0.executeQuery();
@@ -1076,10 +1076,10 @@ public class Commands {
 	public void removeRole(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			//Opens up a connection to the 'BHT' SQL database (Roles).
-        	Class.forName("com.mysql.cj.jdbc.Driver");
-        	Connection connection = DriverManager.getConnection("...");
+        		Class.forName("com.mysql.cj.jdbc.Driver");
+        		Connection connection = DriverManager.getConnection("...");
 
-        	//Removes the channel with the ID after the `~removeRole` command from the 'Roles' SQL database.
+        		//Removes the channel with the ID after the `~removeRole` command from the 'Roles' SQL database.
 			PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM Roles WHERE roleId = ?");
 			preparedStatement.setLong(1, Long.parseLong(mEvent.getMessage().getContent().substring(12)));
 			int affectedRows = preparedStatement.executeUpdate();
@@ -1190,51 +1190,51 @@ public class Commands {
 			if(mEvent.getMessageContent().substring(9).equalsIgnoreCase("Rock") || mEvent.getMessageContent().substring(9).equalsIgnoreCase("Paper") || mEvent.getMessageContent().substring(9).equalsIgnoreCase("Scissors")) {
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction(botOptions[optionB]);
 
-	        	//Outputs the winner of the game and if it's the user, inserts his name to the database. Also, mentions the one who called the command.
-	        	if(mEvent.getMessageContent().substring(9).equalsIgnoreCase(optionBot)) {
-	        		new MessageBuilder().append("\nYou chose: **`" + mEvent.getMessageContent().substring(9) + "`**\nThe bot chose: **`" + optionBot + "`**\nIt's a **TIE**!").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
-	        	} else if((mEvent.getMessageContent().substring(9).equalsIgnoreCase("Rock") && optionB == 1) || (mEvent.getMessageContent().substring(9).equalsIgnoreCase("Paper") && optionB == 2) || (mEvent.getMessageContent().substring(9).equalsIgnoreCase("Scissors") && optionB == 0)) {
-	        		new MessageBuilder().append("\nYou chose: **`" + mEvent.getMessageContent().substring(9) + "`**\nThe bot chose: **`" + optionBot + "`**\nYou **LOSE**!").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
-	        	} else {
-	        		new MessageBuilder().append("\nYou chose: **`" + mEvent.getMessageContent().substring(9) + "`**\nThe bot chose: **`" + optionBot + "`**\nYou **WIN**!").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+	        		//Outputs the winner of the game and if it's the user, inserts his name to the database. Also, mentions the one who called the command.
+	        		if(mEvent.getMessageContent().substring(9).equalsIgnoreCase(optionBot)) {
+	        			new MessageBuilder().append("\nYou chose: **`" + mEvent.getMessageContent().substring(9) + "`**\nThe bot chose: **`" + optionBot + "`**\nIt's a **TIE**!").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+	        		} else if((mEvent.getMessageContent().substring(9).equalsIgnoreCase("Rock") && optionB == 1) || (mEvent.getMessageContent().substring(9).equalsIgnoreCase("Paper") && optionB == 2) || (mEvent.getMessageContent().substring(9).equalsIgnoreCase("Scissors") && optionB == 0)) {
+	        			new MessageBuilder().append("\nYou chose: **`" + mEvent.getMessageContent().substring(9) + "`**\nThe bot chose: **`" + optionBot + "`**\nYou **LOSE**!").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+	        		} else {
+	        			new MessageBuilder().append("\nYou chose: **`" + mEvent.getMessageContent().substring(9) + "`**\nThe bot chose: **`" + optionBot + "`**\nYou **WIN**!").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 
-	        		//Opens up a connection to the 'BHT' SQL database (Highscores).
+	        			//Opens up a connection to the 'BHT' SQL database (Highscores).
 					Class.forName("com.mysql.cj.jdbc.Driver");
 					Connection connection = DriverManager.getConnection("...");
 
-		        	//Adds the user to the 'BHT' SQL database (Highscores) if he's not there already and if he is, then his score gets updated.
-		        	PreparedStatement preparedStatement0 = connection.prepareStatement("SELECT COUNT(highscoreUser) FROM Highscores WHERE highscoreUser = ?");
+		        		//Adds the user to the 'BHT' SQL database (Highscores) if he's not there already and if he is, then his score gets updated.
+		        		PreparedStatement preparedStatement0 = connection.prepareStatement("SELECT COUNT(highscoreUser) FROM Highscores WHERE highscoreUser = ?");
 					preparedStatement0.setString(1, mEvent.getMessageAuthor().getDiscriminatedName());
 					ResultSet resultSet = preparedStatement0.executeQuery();
 					resultSet.next();
-		        	if(resultSet.getInt(1) == 0) {
-		        		PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO Highscores(highscoreUser, score) VALUES(?, 1)");
-	        			preparedStatement.setString(1, mEvent.getMessageAuthor().getDiscriminatedName());
-	        			int affectedRows = preparedStatement.executeUpdate();
-	        			if(affectedRows > 0) {
-	        				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("🎉");
+		        		if(resultSet.getInt(1) == 0) {
+		        			PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO Highscores(highscoreUser, score) VALUES(?, 1)");
+	        				preparedStatement.setString(1, mEvent.getMessageAuthor().getDiscriminatedName());
+	        				int affectedRows = preparedStatement.executeUpdate();
+	        				if(affectedRows > 0) {
+	        					mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("🎉");
 
-	        				//Closes the connections.
-	        				resultSet.close();
-	        				preparedStatement.close();
-	        				connection.close();
-	        			}
-		        	} else {
-		        		//Updates the user's score.
-		        		PreparedStatement preparedStatement = connection.prepareStatement("UPDATE Highscores SET score=(score+1) WHERE highscoreUser = ?");
-	        			preparedStatement.setString(1, mEvent.getMessageAuthor().getDiscriminatedName());
-	        			int affectedRows = preparedStatement.executeUpdate();
-	        			if(affectedRows > 0) {
-	        				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("🎉");
+	        					//Closes the connections.
+	        					resultSet.close();
+	        					preparedStatement.close();
+	        					connection.close();
+	        				}
+		        		} else {
+		        			//Updates the user's score.
+		        			PreparedStatement preparedStatement = connection.prepareStatement("UPDATE Highscores SET score=(score+1) WHERE highscoreUser = ?");
+	        				preparedStatement.setString(1, mEvent.getMessageAuthor().getDiscriminatedName());
+	        				int affectedRows = preparedStatement.executeUpdate();
+	        				if(affectedRows > 0) {
+	        					mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("🎉");
 
-	        				//Closes the connections.
-	        				resultSet.close();
-	        				preparedStatement.close();
-	        				connection.close();
-	        			}
-		        	}
-	        	}
-	        	logger.info("Command (~rpsPlay) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + "). - value: " + mEvent.getMessageContent().substring(9) + "."); //Sends an info log about who issued the command.
+	        					//Closes the connections.
+	        					resultSet.close();
+	        					preparedStatement.close();
+	        					connection.close();
+	        				}
+		        		}
+	        		}
+	        		logger.info("Command (~rpsPlay) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + "). - value: " + mEvent.getMessageContent().substring(9) + "."); //Sends an info log about who issued the command.
 			} else {
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
 				new MessageBuilder().append("Wrong input! Please choose either `Rock`, `Paper` or `Scissors`.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
@@ -1265,15 +1265,15 @@ public class Commands {
 			mEvent.deleteMessage(); //Deletes the last message (the command).
 
 			//Opens up a connection to the 'BHT' SQL database (Highscores).
-        	Class.forName("com.mysql.cj.jdbc.Driver");
-        	Connection connection = DriverManager.getConnection("...");
+        		Class.forName("com.mysql.cj.jdbc.Driver");
+        		Connection connection = DriverManager.getConnection("...");
 
-        	//Creates a 'COUNT' SQL statement.
+        		//Creates a 'COUNT' SQL statement.
 			Statement statement0 = connection.createStatement();
-        	ResultSet resultSet0 = statement0.executeQuery("SELECT COUNT(highscoreId) FROM Highscores");
-        	resultSet0.next();
+        		ResultSet resultSet0 = statement0.executeQuery("SELECT COUNT(highscoreId) FROM Highscores");
+        		resultSet0.next();
 
-        	//An embed with the top 10 users with the highest scores.
+        		//An embed with the top 10 users with the highest scores.
 			EmbedBuilder highscores = new EmbedBuilder();
 			highscores
 				.setTitle("RPS Highscores")
@@ -1283,11 +1283,11 @@ public class Commands {
 
 			//Closes the above connections.
 			resultSet0.close();
-        	statement0.close();
+        		statement0.close();
 
 			//Creates a 'SELECT' SQL statement.
-        	Statement statement = connection.createStatement();
-        	ResultSet resultSet = statement.executeQuery("SELECT * FROM Highscores ORDER BY score DESC");
+        		Statement statement = connection.createStatement();
+        		ResultSet resultSet = statement.executeQuery("SELECT * FROM Highscores ORDER BY score DESC");
 
 			//Adds the actual users to the above mentioned embed.
 			int k = 1;
