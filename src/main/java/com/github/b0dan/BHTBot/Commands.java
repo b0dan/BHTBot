@@ -1,5 +1,5 @@
 package com.github.b0dan.BHTBot;
-
+ 
 import java.awt.Color;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -7,7 +7,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -24,21 +23,29 @@ import org.javacord.api.entity.message.MessageDecoration;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
+import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.event.server.member.ServerMemberJoinEvent;
 import org.javacord.api.event.server.member.ServerMemberLeaveEvent;
+import org.javacord.api.event.server.role.UserRoleAddEvent;
+import org.javacord.api.event.server.role.UserRoleRemoveEvent;
 import org.javacord.api.event.user.UserChangeNicknameEvent;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Multimap;
 
 public class Commands {
 	private static final Logger logger = LogManager.getLogger(Commands.class); //Creates an instance of the 'Logger' class for 'Commands.class'.
 
-	private long roleID = 336588534351790080L; //The role value for the 'onLeaveRole' from the `~setOnLeaveRole` command (default: Luminous Path -> 336588534351790080L).
+	private long onLeaveRoleID = 336588534351790080L; //The role value for the 'onLeaveRole' from the `~setOnLeaveRole` command (default: Luminous Path -> 336588534351790080L).
 	private int pingable = 1; //The ping value for the 'onLeaveMessage' from the `~setOnLeavePing` command: 0 = disabled, 1 = enabled (default).
 
+	private Role guestRole; //The 'Guest' role.
+
 	private List<Integer> firstPages = new ArrayList<Integer>(); //A list with all the "first pages" from the `~showContracts` command.
-	private Map<String, String> allMembers = new HashMap<String, String>(); //A HashMap containing all the members' display names with their discord tag as a key.
+	private Multimap<String, String> allMembers = ArrayListMultimap.create(); //A Multimap containing all the members' display names and whether or not they are Guests with their discord tag as a key.
 
 	//A command that displays all available commands by typing `~commandsHelp` (not case-sensitive).
 	public void displayCommands(DiscordApi dApi, MessageCreateEvent mEvent) {
@@ -60,7 +67,7 @@ public class Commands {
 				.setFooter("The commands are not case-sensitive!");
 			mEvent.getChannel().sendMessage(commands);
 
-			logger.info("Command (~commandsHelp) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
+			logger.info("Command (~commandsHelp) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
 			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
@@ -68,23 +75,38 @@ public class Commands {
 		}
 	}
 
-	//A command to manually update the members' HashMap by typing `~updateMembers` (not case-sensitive).
+	//A command to manually update the members' Multimap by typing `~updateMembers` (not case-sensitive).
 	public void manuallyUpdateMembers(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			Server server = dApi.getServerById(mEvent.getServerTextChannel().get().getServer().getId()).get(); //Gets the server.
 			mEvent.deleteMessage(); //Deletes the last message (the command).
 
-			//Clear the members' HashMap if the server is not empty.
+			//Clear the members' Multimap if the server is not empty.
 			if(!allMembers.isEmpty()) {
 				allMembers.clear();
 			}
 
-			//Fills out the members' HashMap.
+			//Finds the 'Guest' role.
 			for(User user: server.getMembers()) {
-				allMembers.put(user.getDiscriminatedName(), user.getDisplayName(server));
+				for(Role role: user.getRoles(server)) {
+					if(role.getId() == 437508442635239424L) { //Guest(437508442635239424L).
+						guestRole = role;
+						break;
+					}
+				}
 			}
 
-			logger.info("Members updated by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
+			//Fills out the members' Multimap.
+			for(User user: server.getMembers()) {
+				allMembers.put(user.getDiscriminatedName(), user.getDisplayName(server));
+				if(user.getRoles(server).contains(guestRole)) {
+					allMembers.put(user.getDiscriminatedName(), "GUEST");
+				}
+			}
+
+			logger.info("Members updated by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
+		} catch(IndexOutOfBoundsException e0) {
+			logger.error("Expected/Handled: " + e0 + " -> (" + e0.getCause() + ")"); //Sends an error log about an expected/handled error.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
 			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
@@ -92,7 +114,7 @@ public class Commands {
 		}
 	}
 
-	//A command to print out the member's HashMap by typing `~getAllMembers` (not case-sensitive). 
+	//A command to print out the member's Multimap by typing `~getAllMembers` (not case-sensitive). 
 	public void getAllMembers(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			mEvent.deleteMessage(); //Deletes the last message (the command).
@@ -102,12 +124,12 @@ public class Commands {
 				logger.warn("The server has no members."); //Sends a warn log about the server being empty.
 			} else {
 				System.out.println();
-				for(Map.Entry<String, String> entry: allMembers.entrySet()) {
+				for(Map.Entry<String, String> entry: allMembers.entries()) {
 					System.out.println(entry);
 				}
 				System.out.println("Members: " + allMembers.size() + "\n");
 
-				logger.info("Command (~getAllMembers) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
+				logger.info("Command (~getAllMembers) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 			}
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
@@ -121,10 +143,10 @@ public class Commands {
 		try {
 			//Gets the number after the `~setOnLeaveRole` command and changes the role value if that role exists, also reacts on the message.
 			if(dApi.getRoles().contains(dApi.getRoleById(Long.valueOf(mEvent.getMessageContent().substring(16, mEvent.getMessageContent().length()))).get())) {
-				roleID = Long.valueOf(mEvent.getMessageContent().substring(16, mEvent.getMessageContent().length()));
+				onLeaveRoleID = Long.valueOf(mEvent.getMessageContent().substring(16, mEvent.getMessageContent().length()));
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👍");
 
-				logger.info("Command (~setOnLeaveRole) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + roleID + "."); //Sends an info log about who issued the command.
+				logger.info("Command (~setOnLeaveRole) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + onLeaveRoleID + "."); //Sends an info log about who issued the command.
 			}
 		} catch(NumberFormatException | StringIndexOutOfBoundsException e1) {
 			try {
@@ -166,7 +188,7 @@ public class Commands {
 				pingable = Integer.valueOf(mEvent.getMessageContent().substring(16, mEvent.getMessageContent().length()));
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👍");
 
-				logger.info("Command (~setOnLeavePing) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + pingable + "."); //Sends an info log about who issued the command.
+				logger.info("Command (~setOnLeavePing) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + pingable + "."); //Sends an info log about who issued the command.
 			}
 		} catch(NumberFormatException | StringIndexOutOfBoundsException e1) {
 			try {
@@ -186,7 +208,7 @@ public class Commands {
 		}
 	}
 
-	//A listener that automatically updates the members' HashMap when someone joins the server and welcomes the new member.
+	//A listener that automatically updates the members' Multimap when someone joins the server and welcomes the new member.
 	public void updateMembersOnJoinAndWelcome(DiscordApi dApi, ServerMemberJoinEvent jEvent) {
 		try {
 			Server server = dApi.getServerById(jEvent.getServer().getId()).get(); //Gets the server.
@@ -196,7 +218,7 @@ public class Commands {
 			List<String> newUsers = new ArrayList<String>();
 				newUsers.add(newUser);
 
-			allMembers.put(newUser, jEvent.getUser().getDisplayName(server)); //Puts the user who joined the server in the members' HashMap
+			allMembers.put(newUser, jEvent.getUser().getDisplayName(server)); //Puts the user who joined the server in the members' Multimap.
 
 			//Sends a welcoming message to the user that just joined.
 			MessageBuilder welcomeMessage = new MessageBuilder();
@@ -221,6 +243,11 @@ public class Commands {
 					} else {
 						validationMessage
 							.append("Welcome, " + server.getMemberByDiscriminatedName(event.getUser().getDiscriminatedName()).get().getMentionTag() + "! You have been validated.");
+
+						//Add the "GUEST" value in the members' Multimap, if the role given is a 'Guest'.
+						if(event.getRole().equals(guestRole) && !allMembers.containsEntry(newUser, "GUEST")) {
+							allMembers.put(newUser, "GUEST");
+						}
 					}
 					validationMessage.send((TextChannel)server.getSystemChannel().get());
 
@@ -239,16 +266,38 @@ public class Commands {
 		}
 	}
 
-	//A listener that automatically updates the members' HashMap when someone leaves the server, sends a message about it and adds the person to the 'Contracts' SQL database.
+	//A listener that automatically updates the members' Multimap when someone has their nickname changed.
+	public void updateMembersOnNicknameChanged(DiscordApi dApi, UserChangeNicknameEvent nEvent) {
+		try {
+			Server server = dApi.getServerById(nEvent.getServer().getId()).get(); //Gets the server.
+
+			//Changes the name in the members' Multimap of the person that just had their nickname changed/updated.
+			allMembers.removeAll(nEvent.getUser().getDiscriminatedName());
+			allMembers.put(nEvent.getUser().getDiscriminatedName(), nEvent.getUser().getDisplayName(server));
+			if(nEvent.getUser().getRoles(server).contains(guestRole)) {
+				allMembers.put(nEvent.getUser().getDiscriminatedName(), "GUEST");
+			}
+
+			logger.info("Members updated due to " + nEvent.getUser().getDiscriminatedName() + " having their nickname changed - value: " + allMembers.get(nEvent.getUser().getDiscriminatedName()) + "."); //Sends an info log about what issued the listener.
+		} catch(IndexOutOfBoundsException e0) {
+			logger.error("Expected/Handled: " + e0 + " -> (" + e0.getCause() + ")"); //Sends an error log about an expected/handled error.
+		} catch(Exception e) {
+			logger.warn("Fatal error occured!");
+			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			e.printStackTrace();
+		}
+	}
+
+	//A listener that automatically updates the members' Multimap when someone leaves the server, sends a message about it and adds the person to the 'Contracts' SQL database.
 	public void updateMembersOnLeave(DiscordApi dApi, ServerMemberLeaveEvent lEvent) {
 		try {
 			Server server = dApi.getServerById(lEvent.getServer().getId()).get(); //Gets the server.
-			AllowedMentions allowedMentions = new AllowedMentionsBuilder().addRole(roleID).setMentionRoles(true).build(); //Allows the `onLeave` role to be mentioned.
+			AllowedMentions allowedMentions = new AllowedMentionsBuilder().addRole(onLeaveRoleID).setMentionRoles(true).build(); //Allows the `onLeave` role to be mentioned.
 
 			//Sends a message and notifies the current members when someone leaves the server.
 			MessageBuilder onLeaveMessage = new MessageBuilder();
 			onLeaveMessage
-				.append(allMembers.get(lEvent.getUser().getDiscriminatedName()) + " (" + lEvent.getUser().getDiscriminatedName() + ") ", MessageDecoration.BOLD)
+				.append(Iterables.get(allMembers.get(lEvent.getUser().getDiscriminatedName()), 0) + " (" + lEvent.getUser().getDiscriminatedName() + ") ", MessageDecoration.BOLD)
 				.append("just left ")
 				.append("The Black Hand Triads", MessageDecoration.BOLD)
 				.append(". Looks like loyalty wasn't one of their virtues. Hunt that sssnake down! ");
@@ -256,51 +305,85 @@ public class Commands {
 			//Checks if the ping value is 1 and notifies the `onLeave` role if yes, then sends the message.
 			if(pingable == 1) {
 				onLeaveMessage
-					.append(server.getRoleById(roleID).get().getMentionTag())
+					.append(server.getRoleById(onLeaveRoleID).get().getMentionTag())
 					.setAllowedMentions(allowedMentions);
 			}
 			onLeaveMessage.send((TextChannel)server.getSystemChannel().get());
 
-			//Checks if the name of the person who had left the server looks like a real name and adds it to the 'Contracts' SQL database if yes.
-			if(allMembers.get(lEvent.getUser().getDiscriminatedName()).matches("^[A-Z](?=.{2,19}$)[A-Za-z.]+(?:\\h+[A-Z][A-Za-z.]+)+$")) {
-				//Opens up a connection to the 'BHT' SQL database (Contracts).
-	        		Class.forName("com.mysql.cj.jdbc.Driver");
-	        		Connection connection = DriverManager.getConnection("...");
-
-				//Adds the person who had left the server to the 'BHT' SQL database (Contracts) if he's not there already.
-				PreparedStatement preparedStatement0 = connection.prepareStatement("SELECT COUNT(contractName) FROM Contracts WHERE contractName = ?");
-				preparedStatement0.setString(1, allMembers.get(lEvent.getUser().getDiscriminatedName()));
-				ResultSet resultSet = preparedStatement0.executeQuery();
-				resultSet.next();
-	        		if(resultSet.getInt(1) == 0) {
-	        			resultSet.close();
-	        			preparedStatement0.close();
-
-	        			PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO Contracts(contractName) VALUES(?)");
-					preparedStatement.setString(1, allMembers.get(lEvent.getUser().getDiscriminatedName()));
-					int affectedRows = preparedStatement.executeUpdate();
-					if(affectedRows > 0) {
-						logger.info(allMembers.get(lEvent.getUser().getDiscriminatedName()) + " has been successfuly added to the database."); //Sends an info log about a successful insertion into the database.
-						server.getSystemChannel().get().getMessages(1).get().getNewestMessage().get().addReaction("🐍"); //Reacts with a snake emoji to the leaving message if the person was successfully added to the 'Contracts' SQL database.
-
-						//Closes the connections.
-						preparedStatement.close();
-						connection.close();
+			//Checks if the user who had just left the server has a 'Guest' role and if not, checks if his looks like a real name and adds it to the 'Contracts' SQL database if yes.
+			if(!allMembers.containsEntry(lEvent.getUser().getDiscriminatedName(), "GUEST")) {
+				if(Iterables.get(allMembers.get(lEvent.getUser().getDiscriminatedName()), 0).matches("^[A-Z](?=.{2,19}$)[A-Za-z.]+(?:\\h+[A-Z][A-Za-z.]+)+$")) {
+					//Opens up a connection to the 'BHT' SQL database (Contracts).
+		        	Class.forName("com.mysql.cj.jdbc.Driver");
+		        	Connection connection = DriverManager.getConnection("...");
+	
+					//Adds the person who had left the server to the 'BHT' SQL database (Contracts) if he's not there already.
+					PreparedStatement preparedStatement0 = connection.prepareStatement("SELECT COUNT(contractName) FROM Contracts WHERE contractName = ?");
+					preparedStatement0.setString(1, Iterables.get(allMembers.get(lEvent.getUser().getDiscriminatedName()), 0));
+					ResultSet resultSet = preparedStatement0.executeQuery();
+					resultSet.next();
+		        	if(resultSet.getInt(1) == 0) {
+		        		resultSet.close();
+		        		preparedStatement0.close();
+	
+		        		PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO Contracts(contractName) VALUES(?)");
+						preparedStatement.setString(1, Iterables.get(allMembers.get(lEvent.getUser().getDiscriminatedName()), 0));
+						int affectedRows = preparedStatement.executeUpdate();
+						if(affectedRows > 0) {
+							logger.info(Iterables.get(allMembers.get(lEvent.getUser().getDiscriminatedName()), 0) + " has been successfuly added to the database."); //Sends an info log about a successful insertion into the database.
+							server.getSystemChannel().get().getMessages(1).get().getNewestMessage().get().addReaction("🐍"); //Reacts with a snake emoji to the leaving message if the person was successfully added to the 'Contracts' SQL database.
+	
+							//Closes the connections.
+							preparedStatement.close();
+							connection.close();
+						} else {
+							logger.warn(allMembers.get(lEvent.getUser().getDiscriminatedName()) + " can not be added to the database."); //Sends a warn log about an unsuccessful insertion into the database.
+						}
 					} else {
-						logger.warn(allMembers.get(lEvent.getUser().getDiscriminatedName()) + " can not be added to the database."); //Sends a warn log about an unsuccessful insertion into the database.
+						resultSet.close();
+						preparedStatement0.close();
+						connection.close();
 					}
-				} else {
-					resultSet.close();
-					preparedStatement0.close();
-					connection.close();
-				}
-	        	}
-			//Removes the person who had left the server from the members' HashMap.
-			allMembers.remove(lEvent.getUser().getDiscriminatedName());
+		        }
+			}
+			//Removes the person who had left the server from the members' Multimap.
+			allMembers.removeAll(lEvent.getUser().getDiscriminatedName());
 
 			logger.info("Members updated due to " + lEvent.getUser().getDiscriminatedName() + " leaving the server."); //Sends an info log about what issued the listener.
-		} catch(NullPointerException e) {
-			logger.error("Expected/Handled: " + e + " -> (" + e.getCause() + ")"); //Sends an error log about an expected/handled error.
+		} catch(NullPointerException e0) {
+			logger.error("Expected/Handled: " + e0 + " -> (" + e0.getCause() + ")"); //Sends an error log about an expected/handled error.
+		} catch(Exception e) {
+			logger.warn("Fatal error occured!");
+			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			e.printStackTrace();
+		}
+	}
+
+	//A listener that automatically updates the members' Multimap when someone is given the 'Guest' role.
+	public void updateMembersOnGuestRoleAdded(DiscordApi dApi, UserRoleAddEvent arEvent) {
+		try {
+			//Adds a new "GUEST" value to the members' Multimap if the 'Guest' role is added.
+			if(arEvent.getRole().equals(guestRole) && !allMembers.containsEntry(arEvent.getUser().getDiscriminatedName(), "GUEST")) {
+				allMembers.put(arEvent.getUser().getDiscriminatedName(), "GUEST");
+			}
+
+			logger.info("Members updated due to " + Iterables.get(allMembers.get(arEvent.getUser().getDiscriminatedName()), 0) + " having a 'Guest' role added."); //Sends an info log about what issued the listener.
+		} catch(Exception e) {
+			logger.warn("Fatal error occured!");
+			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			e.printStackTrace();
+		}
+	}
+
+	//A listener that automatically updates the members' Multimap when someone has the 'Guest' role removed.
+	public void updateMembersOnGuestRoleRemoved(DiscordApi dApi, UserRoleRemoveEvent rrEvent) {
+		try {
+			//Removes the "GUEST" value of the user from the members' Multimap if the 'Guest' role is removed.
+			if(rrEvent.getRole().equals(guestRole) && allMembers.containsEntry(rrEvent.getUser().getDiscriminatedName(), "GUEST")) {
+				allMembers.remove(rrEvent.getUser().getDiscriminatedName(), "GUEST");
+			}
+
+			logger.info("Members updated due to " + Iterables.get(allMembers.get(rrEvent.getUser().getDiscriminatedName()), 0) + " having a 'Guest' role removed."); //Sends an info log about what issued the listener.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
 			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
@@ -333,7 +416,7 @@ public class Commands {
 				.setFooter("The commands are not case-sensitive!");
 			mEvent.getChannel().sendMessage(contractsCommands);
 
-			logger.info("Command (~contractsHelp) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
+			logger.info("Command (~contractsHelp) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
 			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
@@ -347,14 +430,14 @@ public class Commands {
 			mEvent.deleteMessage(); //Deletes the last message (the command).
 
 			//Opens up a connection to the 'BHT' SQL database (Contracts).
-        		Class.forName("com.mysql.cj.jdbc.Driver");
-        		Connection connection = DriverManager.getConnection("...");
+        	Class.forName("com.mysql.cj.jdbc.Driver");
+        	Connection connection = DriverManager.getConnection("...");
 
-			//Creates a 'SELECT' SQL statement.
-			Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-			ResultSet resultSet = statement.executeQuery("SELECT * FROM Contracts");
+        	//Creates a 'SELECT' SQL statement.
+        	Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        	ResultSet resultSet = statement.executeQuery("SELECT * FROM Contracts");
 
-        		//An embed with all active contracts.
+        	//An embed with all active contracts.
 			EmbedBuilder contracts = new EmbedBuilder();
 			contracts
 				.setTitle("Active Contracts")
@@ -364,7 +447,7 @@ public class Commands {
 
 			//If there are any contracts, finds the total amount of pages needed to group the contracts. If not, notifies the user.
 			resultSet.last();
-			if(!(resultSet.getRow() <= 0)) {
+			if(resultSet.getRow() > 0) {
 				final int totalContracts = resultSet.getRow();
 				int tempTotalPages = (totalContracts / 25) + 1;
 				if(totalContracts % 25 == 0) {
@@ -391,57 +474,57 @@ public class Commands {
 							firstPages.add(firstContractOnPage);
 						}
 					}
-	       				contracts.addField(currentContractNumber + ". " + resultSet.getString("contractName"), "**Contract ID:** " + resultSet.getInt("contractId"));
+					contracts.addField(currentContractNumber + ". " + resultSet.getString("contractName"), "**Contract ID:** " + resultSet.getInt("contractId"));
 
-	       				currentContractNumber++;
-	       				if(resultSet.getRow() % 25 == 0 || resultSet.getRow() == totalContracts) {
-	       					lastContractOnPage = resultSet.getRow();
-	       					break;
-	       				}
-	        		}
-				mEvent.getChannel().sendMessage(contracts);
-				long embedMessageId = mEvent.getChannel().getMessages(1).get().getNewestMessage().get().getId();
+	       			currentContractNumber++;
+	       			if(resultSet.getRow() % 25 == 0 || resultSet.getRow() == totalContracts) {
+	       				lastContractOnPage = resultSet.getRow();
+	       				break;
+	       			}
+	        	}
+	        	mEvent.getChannel().sendMessage(contracts);
+	        	long embedMessageId = mEvent.getChannel().getMessages(1).get().getNewestMessage().get().getId();
 
-				//Adds the reactions needed to "flip a page".
-				if(currentPage == 1 && totalPages > 1) {
-					mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("➡");
-				} else if(currentPage == totalPages && totalPages > 1) {
-					mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("⬅");
-				} else if(currentPage > 1 && currentPage < totalPages && totalPages > 1) {
-					mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("⬅");
-					mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("➡");
-				}
+	        	//Adds the reactions needed to "flip a page".
+	        	if(currentPage == 1 && totalPages > 1) {
+	        		mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("➡");
+	        	} else if(currentPage == totalPages && totalPages > 1) {
+	        		mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("⬅");
+	        	} else if(currentPage > 1 && currentPage < totalPages && totalPages > 1) {
+	        		mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("⬅");
+	        		mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("➡");
+	        	}
 
-				//Adds a listener that "flips a page" when the one who called the command reacts on the `~showContracts` message. Also, removes all reactions after 30 seconds.
-				if(totalPages > 1) {
-					int ccn = currentContractNumber;
-					int fcop = firstContractOnPage;
-					int lcop = lastContractOnPage;
-					mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReactionAddListener(event -> {
-						if(event.getUserId() == mEvent.getMessageAuthor().getId()) {
-							int cp = currentPage;
-							boolean pressedBack = false;
-							if((currentPage < totalPages) && event.getEmoji().equalsEmoji("➡")) {
-								cp = cp + 1;
-							} else if((currentPage > 1) && event.getEmoji().equalsEmoji("⬅")) {
-								pressedBack = true;
-								cp = cp - 1;
-							}
-							event.getMessage().get().delete();
-							showContracts(dApi, mEvent, cp, ccn, fcop, lcop, pressedBack);
-						}
-					}).removeAfter(30, TimeUnit.SECONDS).addRemoveHandler(() -> {
-						try {
+	        	//Adds a listener that "flips a page" when the one who called the command reacts on the `~showContracts` message. Also, removes all reactions after 30 seconds.
+	        	if(totalPages > 1) {
+	        		int ccn = currentContractNumber;
+	        		int fcop = firstContractOnPage;
+	        		int lcop = lastContractOnPage;
+	        		mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReactionAddListener(event -> {
+	        			if(event.getUserId() == mEvent.getMessageAuthor().getId()) {
+	        				int cp = currentPage;
+	        				boolean pressedBack = false;
+	            			if((currentPage < totalPages) && event.getEmoji().equalsEmoji("➡")) {
+	            				cp = cp + 1;
+	            			} else if((currentPage > 1) && event.getEmoji().equalsEmoji("⬅")) {
+	            				pressedBack = true;
+	            				cp = cp - 1;
+	            			}
+	            			event.getMessage().get().delete();
+	            			showContracts(dApi, mEvent, cp, ccn, fcop, lcop, pressedBack);
+	        			}
+	            	}).removeAfter(30, TimeUnit.SECONDS).addRemoveHandler(() -> {
+	            		try {
 							mEvent.getChannel().getMessageById(embedMessageId).get().removeAllReactions();
-						} catch(ExecutionException e0) {
-							logger.error("Expected/Handled: " + e0 + " -> (" + e0.getCause() + ")"); //Sends an error log about an expected/handled error.
+	            		} catch(ExecutionException e0) {
+	            			logger.error("Expected/Handled: " + e0 + " -> (" + e0.getCause() + ")"); //Sends an error log about an expected/handled error.
 						} catch(Exception e1) {
 							logger.warn("Fatal error occured!");
 							logger.fatal("", e1 + " -> (" + e1.getCause() + ")"); //Sends a fatal log about an unhandled error.
 							e1.printStackTrace();
 						}
-					});
-				}
+	            	});
+	        	}
 			} else {
 				contracts.addField("Empty", "There are no active contracts.");
 				mEvent.getChannel().sendMessage(contracts);
@@ -452,7 +535,7 @@ public class Commands {
 			statement.close();
 			connection.close();
 
-			logger.info("Command/Page (~showContracts) called/flipped by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command/flipped a page.
+			logger.info("Command/Page (~showContracts) called/flipped by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command/flipped a page.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
 			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
@@ -482,7 +565,7 @@ public class Commands {
 						mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👍");
 						new MessageBuilder().append("A contract has been successfully placed on `" + mEvent.getMessageContent().substring(13) + "`.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 
-						logger.info("Command (~addContract) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + mEvent.getMessageContent().substring(13) + "."); //Sends an info log about who issued the command.
+						logger.info("Command (~addContract) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + mEvent.getMessageContent().substring(13) + "."); //Sends an info log about who issued the command.
 
 						//Closes the connections.
 						preparedStatement.close();
@@ -552,7 +635,7 @@ public class Commands {
 						mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👍");
 						new MessageBuilder().append("A contract with an ID of `" + commandValues[1] + "` has been successfully updated.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 
-						logger.info("Command (~updateContract) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + commandValues[1] + "(" + commandValues[2] + ")."); //Sends an info log about who issued the command.
+						logger.info("Command (~updateContract) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + commandValues[1] + "(" + commandValues[2] + ")."); //Sends an info log about who issued the command.
 
 						//Closes the connections.
 						preparedStatement.close();
@@ -613,8 +696,8 @@ public class Commands {
 	public void removeContractFromDatabase(MessageCreateEvent mEvent) {
 		try {
 			//Opens up a connection to the 'BHT' SQL database (Contracts).
-        		Class.forName("com.mysql.cj.jdbc.Driver");
-        		Connection connection = DriverManager.getConnection("...");
+        	Class.forName("com.mysql.cj.jdbc.Driver");
+        	Connection connection = DriverManager.getConnection("...");
 
 			//Removes the contract with the ID after the `~removeContract` command from the 'Contracts' SQL database.
 			PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM Contracts WHERE contractId = ?");
@@ -624,7 +707,7 @@ public class Commands {
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👍");
 				new MessageBuilder().append("A contract with an ID of `" + mEvent.getMessageContent().substring(16) + "` has been successfully removed.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 
-				logger.info("Command (~removeContract) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + mEvent.getMessageContent().substring(16) + "."); //Sends an info log about who issued the command.
+				logger.info("Command (~removeContract) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + mEvent.getMessageContent().substring(16) + "."); //Sends an info log about who issued the command.
 
 				//Closes the connections.
 				preparedStatement.close();
@@ -671,7 +754,7 @@ public class Commands {
 		try {
 			mEvent.deleteMessage(); //Deletes the last message (the command).
 
-        		//An embed with the channels where contract related commands can be used.
+        	//An embed with the channels where contract related commands can be used.
 			EmbedBuilder channels = new EmbedBuilder();
 			channels
 				.setTitle("Channels")
@@ -680,25 +763,25 @@ public class Commands {
 				.setFooter("These are the channels where contract related commands can be used.");
 
 			//Opens up a connection to the 'BHT' SQL database (Channels).
-        		Class.forName("com.mysql.cj.jdbc.Driver");
-        		Connection connection = DriverManager.getConnection("...");
+        	Class.forName("com.mysql.cj.jdbc.Driver");
+        	Connection connection = DriverManager.getConnection("...");
 
 			//Creates a 'SELECT' SQL statement.
-			Statement statement = connection.createStatement();
-        		ResultSet resultSet = statement.executeQuery("SELECT * FROM Channels");
+        	Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        	ResultSet resultSet = statement.executeQuery("SELECT * FROM Channels");
 
 			//If there are any channels, adds them to the above mentioned embed. If not, notifies the user.
-        		resultSet.last();
-        		if(!(resultSet.getRow() <= 0)) {
-        			int k = 1;
-        			resultSet.beforeFirst();
-    				while(resultSet.next()) {
-    					channels.addField(k + ". " + String.valueOf(resultSet.getString("channelName")), "**ID: **" + String.valueOf(resultSet.getLong("channelId")));
-    					k++;
-    				}
-			} else {
-				channels.addField("Empty", "There are no white-listed channels.");
-			}
+        	resultSet.last();
+        	if(resultSet.getRow() > 0) {
+        		int k = 1;
+        		resultSet.beforeFirst();
+    			while(resultSet.next()) {
+    				channels.addField(k + ". " + String.valueOf(resultSet.getString("channelName")), "**ID: **" + String.valueOf(resultSet.getLong("channelId")));
+    				k++;
+    			}
+        	} else {
+        		channels.addField("Empty", "There are no white-listed channels.");
+        	}
 			mEvent.getChannel().sendMessage(channels);
 
 			//Closes the above connections.
@@ -706,7 +789,7 @@ public class Commands {
 			statement.close();
 			connection.close();
 
-			logger.info("Command (~showChannels) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
+			logger.info("Command (~showChannels) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
 			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
@@ -718,10 +801,10 @@ public class Commands {
 	public void addChannel(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			//Opens up a connection to the 'BHT' SQL database (Channels).
-			Class.forName("com.mysql.cj.jdbc.Driver");
-			Connection connection = DriverManager.getConnection("...");
+        	Class.forName("com.mysql.cj.jdbc.Driver");
+        	Connection connection = DriverManager.getConnection("...");
 
-        		//Adds the channel with the ID after the `~addChannel` command to the 'Channels' SQL database if it's not there already.
+        	//Adds the channel with the ID after the `~addChannel` command to the 'Channels' SQL database if it's not there already.
 			PreparedStatement preparedStatement0 = connection.prepareStatement("SELECT COUNT(channelId) FROM Channels WHERE channelId = ?");
 			preparedStatement0.setLong(1, Long.parseLong(mEvent.getMessage().getContent().substring(12)));
 			ResultSet resultSet = preparedStatement0.executeQuery();
@@ -737,7 +820,7 @@ public class Commands {
 					mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👍");
 					new MessageBuilder().append("Contract related commands are now available in the following channel: " + dApi.getServerTextChannelById(Long.parseLong(mEvent.getMessage().getContent().substring(12))).get().getMentionTag() + ".").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 
-					logger.info("Command (~addChannel) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + mEvent.getMessageContent().substring(12) + "."); //Sends an info log about who issued the command.
+					logger.info("Command (~addChannel) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + mEvent.getMessageContent().substring(12) + "."); //Sends an info log about who issued the command.
 
 					//Closes the connections.
 					preparedStatement.close();
@@ -780,7 +863,6 @@ public class Commands {
 			} catch(Exception e1_2) {
 				logger.warn("Fatal error occured!");
 				logger.fatal("", e1_2 + " -> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
-				e1_2.printStackTrace();
 			}
 		} catch(NoSuchElementException e2_1) {
 			try {
@@ -791,7 +873,6 @@ public class Commands {
 			} catch(Exception e2_2) {
 				logger.warn("Fatal error occured!");
 				logger.fatal("", e2_2 + " -> (" + e2_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
-				e2_2.printStackTrace();
 			}
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
@@ -804,10 +885,10 @@ public class Commands {
 	public void removeChannel(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			//Opens up a connection to the 'BHT' SQL database (Channels).
-			Class.forName("com.mysql.cj.jdbc.Driver");
-			Connection connection = DriverManager.getConnection("...");
+        	Class.forName("com.mysql.cj.jdbc.Driver");
+        	Connection connection = DriverManager.getConnection("...");
 
-        		//Removes the channel with the ID after the `~removeChannel` command from the 'Channels' SQL database.
+        	//Removes the channel with the ID after the `~removeChannel` command from the 'Channels' SQL database.
 			PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM Channels WHERE channelId = ?");
 			preparedStatement.setLong(1, Long.parseLong(mEvent.getMessage().getContent().substring(15)));
 			int affectedRows = preparedStatement.executeUpdate();
@@ -815,7 +896,7 @@ public class Commands {
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👍");
 				new MessageBuilder().append("Contract related commands are no longer available in the following channel: " + dApi.getServerTextChannelById(Long.parseLong(mEvent.getMessage().getContent().substring(15))).get().getMentionTag() + ".").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 
-				logger.info("Command (~removeChannel) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + mEvent.getMessageContent().substring(15) + "."); //Sends an info log about who issued the command.
+				logger.info("Command (~removeChannel) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + mEvent.getMessageContent().substring(15) + "."); //Sends an info log about who issued the command.
 
 				//Closes the connections.
 				preparedStatement.close();
@@ -862,7 +943,7 @@ public class Commands {
 		try {
 			mEvent.deleteMessage(); //Deletes the last message (the command).
 
-        		//An embed with the roles who can use contract related commands.
+        	//An embed with the roles who can use contract related commands.
 			EmbedBuilder roles = new EmbedBuilder();
 			roles
 				.setTitle("Roles")
@@ -871,24 +952,25 @@ public class Commands {
 				.setFooter("These are the roles who can use contract related commands.");
 
 			//Opens up a connection to the 'BHT' SQL database (Roles).
-			Class.forName("com.mysql.cj.jdbc.Driver");
-			Connection connection = DriverManager.getConnection("...");
+        	Class.forName("com.mysql.cj.jdbc.Driver");
+        	Connection connection = DriverManager.getConnection("...");
 
 			//Creates a 'SELECT' SQL statement.
-			Statement statement = connection.createStatement();
-        		ResultSet resultSet = statement.executeQuery("SELECT * FROM Roles");
+        	Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        	ResultSet resultSet = statement.executeQuery("SELECT * FROM Roles");
 
 			//If there are any white-listed roles, adds them to the above mentioned embed. If not, notifies the user.
-        		if(!(resultSet.getRow() <= 0)) {
-				int k = 1;
-				resultSet.beforeFirst();
-				while(resultSet.next()) {
-					roles.addField(k + ". " + String.valueOf(resultSet.getString("roleName")), "**ID: **" + String.valueOf(resultSet.getLong("roleId")));
-					k++;
-				}
-        		} else {
-        			roles.addField("Empty", "There are no white-listed roles.");
-        		}
+        	resultSet.last();
+        	if(resultSet.getRow() > 0) {
+        		int k = 1;
+        		resultSet.beforeFirst();
+    			while(resultSet.next()) {
+    				roles.addField(k + ". " + String.valueOf(resultSet.getString("roleName")), "**ID: **" + String.valueOf(resultSet.getLong("roleId")));
+    				k++;
+    			}
+        	} else {
+        		roles.addField("Empty", "There are no white-listed roles.");
+        	}
 			mEvent.getChannel().sendMessage(roles);
 
 			//Closes the above connections.
@@ -896,7 +978,7 @@ public class Commands {
 			statement.close();
 			connection.close();
 
-			logger.info("Command (~showRoles) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
+			logger.info("Command (~showRoles) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
 			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
@@ -908,10 +990,10 @@ public class Commands {
 	public void addRole(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			//Opens up a connection to the 'BHT' SQL database (Roles).
-			Class.forName("com.mysql.cj.jdbc.Driver");
-			Connection connection = DriverManager.getConnection("...");
+        	Class.forName("com.mysql.cj.jdbc.Driver");
+        	Connection connection = DriverManager.getConnection("...");
 
-			//Adds the role with the ID after the `~addRole` command to the 'Roles' SQL database if it's not there already.
+        	//Adds the role with the ID after the `~addRole` command to the 'Roles' SQL database if it's not there already.
 			PreparedStatement preparedStatement0 = connection.prepareStatement("SELECT COUNT(roleId) FROM Roles WHERE roleId = ?");
 			preparedStatement0.setLong(1, Long.parseLong(mEvent.getMessage().getContent().substring(9)));
 			ResultSet resultSet = preparedStatement0.executeQuery();
@@ -927,7 +1009,7 @@ public class Commands {
 					mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👍");
 					new MessageBuilder().append("Contract related commands are now available to the following role: `" + dApi.getRoleById(Long.parseLong(mEvent.getMessage().getContent().substring(9))).get().getName() + "`.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 
-					logger.info("Command (~addRole) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + mEvent.getMessageContent().substring(9) + "."); //Sends an info log about who issued the command.
+					logger.info("Command (~addRole) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + mEvent.getMessageContent().substring(9) + "."); //Sends an info log about who issued the command.
 
 					//Closes the connections.
 					preparedStatement.close();
@@ -994,10 +1076,10 @@ public class Commands {
 	public void removeRole(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			//Opens up a connection to the 'BHT' SQL database (Roles).
-			Class.forName("com.mysql.cj.jdbc.Driver");
-			Connection connection = DriverManager.getConnection("...");
+        	Class.forName("com.mysql.cj.jdbc.Driver");
+        	Connection connection = DriverManager.getConnection("...");
 
-			//Removes the channel with the ID after the `~removeRole` command from the 'Roles' SQL database.
+        	//Removes the channel with the ID after the `~removeRole` command from the 'Roles' SQL database.
 			PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM Roles WHERE roleId = ?");
 			preparedStatement.setLong(1, Long.parseLong(mEvent.getMessage().getContent().substring(12)));
 			int affectedRows = preparedStatement.executeUpdate();
@@ -1005,7 +1087,7 @@ public class Commands {
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👍");
 				new MessageBuilder().append("Contract related commands are no longer available to the following role: `" + dApi.getRoleById(Long.parseLong(mEvent.getMessage().getContent().substring(12))).get().getName() + "`.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 
-				logger.info("Command (~removeRole) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + mEvent.getMessageContent().substring(12) + "."); //Sends an info log about who issued the command.
+				logger.info("Command (~removeRole) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + mEvent.getMessageContent().substring(12) + "."); //Sends an info log about who issued the command.
 
 				//Closes the connections.
 				preparedStatement.close();
@@ -1073,7 +1155,7 @@ public class Commands {
 				.setFooter("The commands are not case-sensitive!");
 			mEvent.getChannel().sendMessage(rpsCommands);
 
-			logger.info("Command (~rpsHelp) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
+			logger.info("Command (~rpsHelp) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
 			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
@@ -1108,51 +1190,51 @@ public class Commands {
 			if(mEvent.getMessageContent().substring(9).equalsIgnoreCase("Rock") || mEvent.getMessageContent().substring(9).equalsIgnoreCase("Paper") || mEvent.getMessageContent().substring(9).equalsIgnoreCase("Scissors")) {
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction(botOptions[optionB]);
 
-				//Outputs the winner of the game and if it's the user, inserts his name to the database. Also, mentions the one who called the command.
-				if(mEvent.getMessageContent().substring(9).equalsIgnoreCase(optionBot)) {
-					new MessageBuilder().append("\nYou chose: **`" + mEvent.getMessageContent().substring(9) + "`**\nThe bot chose: **`" + optionBot + "`**\nIt's a **TIE**!").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
-				} else if((mEvent.getMessageContent().substring(9).equalsIgnoreCase("Rock") && optionB == 1) || (mEvent.getMessageContent().substring(9).equalsIgnoreCase("Paper") && optionB == 2) || (mEvent.getMessageContent().substring(9).equalsIgnoreCase("Scissors") && optionB == 0)) {
-					new MessageBuilder().append("\nYou chose: **`" + mEvent.getMessageContent().substring(9) + "`**\nThe bot chose: **`" + optionBot + "`**\nYou **LOSE**!").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
-				} else {
-					new MessageBuilder().append("\nYou chose: **`" + mEvent.getMessageContent().substring(9) + "`**\nThe bot chose: **`" + optionBot + "`**\nYou **WIN**!").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+	        	//Outputs the winner of the game and if it's the user, inserts his name to the database. Also, mentions the one who called the command.
+	        	if(mEvent.getMessageContent().substring(9).equalsIgnoreCase(optionBot)) {
+	        		new MessageBuilder().append("\nYou chose: **`" + mEvent.getMessageContent().substring(9) + "`**\nThe bot chose: **`" + optionBot + "`**\nIt's a **TIE**!").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+	        	} else if((mEvent.getMessageContent().substring(9).equalsIgnoreCase("Rock") && optionB == 1) || (mEvent.getMessageContent().substring(9).equalsIgnoreCase("Paper") && optionB == 2) || (mEvent.getMessageContent().substring(9).equalsIgnoreCase("Scissors") && optionB == 0)) {
+	        		new MessageBuilder().append("\nYou chose: **`" + mEvent.getMessageContent().substring(9) + "`**\nThe bot chose: **`" + optionBot + "`**\nYou **LOSE**!").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+	        	} else {
+	        		new MessageBuilder().append("\nYou chose: **`" + mEvent.getMessageContent().substring(9) + "`**\nThe bot chose: **`" + optionBot + "`**\nYou **WIN**!").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 
-					//Opens up a connection to the 'BHT' SQL database (Highscores).
+	        		//Opens up a connection to the 'BHT' SQL database (Highscores).
 					Class.forName("com.mysql.cj.jdbc.Driver");
 					Connection connection = DriverManager.getConnection("...");
 
-					//Adds the user to the 'BHT' SQL database (Highscores) if he's not there already and if he is, then his score gets updated.
-					PreparedStatement preparedStatement0 = connection.prepareStatement("SELECT COUNT(highscoreUser) FROM Highscores WHERE highscoreUser = ?");
+		        	//Adds the user to the 'BHT' SQL database (Highscores) if he's not there already and if he is, then his score gets updated.
+		        	PreparedStatement preparedStatement0 = connection.prepareStatement("SELECT COUNT(highscoreUser) FROM Highscores WHERE highscoreUser = ?");
 					preparedStatement0.setString(1, mEvent.getMessageAuthor().getDiscriminatedName());
 					ResultSet resultSet = preparedStatement0.executeQuery();
 					resultSet.next();
-					if(resultSet.getInt(1) == 0) {
-						PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO Highscores(highscoreUser, score) VALUES(?, 1)");
-						preparedStatement.setString(1, mEvent.getMessageAuthor().getDiscriminatedName());
-						int affectedRows = preparedStatement.executeUpdate();
-						if(affectedRows > 0) {
-							mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("🎉");
+		        	if(resultSet.getInt(1) == 0) {
+		        		PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO Highscores(highscoreUser, score) VALUES(?, 1)");
+	        			preparedStatement.setString(1, mEvent.getMessageAuthor().getDiscriminatedName());
+	        			int affectedRows = preparedStatement.executeUpdate();
+	        			if(affectedRows > 0) {
+	        				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("🎉");
 
-							//Closes the connections.
-							resultSet.close();
-							preparedStatement.close();
-							connection.close();
-						}
-					} else {
-						//Updates the user's score.
-						PreparedStatement preparedStatement = connection.prepareStatement("UPDATE Highscores SET score=(score+1) WHERE highscoreUser = ?");
-						preparedStatement.setString(1, mEvent.getMessageAuthor().getDiscriminatedName());
-						int affectedRows = preparedStatement.executeUpdate();
-						if(affectedRows > 0) {
-							mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("🎉");
+	        				//Closes the connections.
+	        				resultSet.close();
+	        				preparedStatement.close();
+	        				connection.close();
+	        			}
+		        	} else {
+		        		//Updates the user's score.
+		        		PreparedStatement preparedStatement = connection.prepareStatement("UPDATE Highscores SET score=(score+1) WHERE highscoreUser = ?");
+	        			preparedStatement.setString(1, mEvent.getMessageAuthor().getDiscriminatedName());
+	        			int affectedRows = preparedStatement.executeUpdate();
+	        			if(affectedRows > 0) {
+	        				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("🎉");
 
-							//Closes the connections.
-							resultSet.close();
-							preparedStatement.close();
-							connection.close();
-						}
-					}
-				}
-	        		logger.info("Command (~rpsPlay) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + "). - value: " + mEvent.getMessageContent().substring(9) + "."); //Sends an info log about who issued the command.
+	        				//Closes the connections.
+	        				resultSet.close();
+	        				preparedStatement.close();
+	        				connection.close();
+	        			}
+		        	}
+	        	}
+	        	logger.info("Command (~rpsPlay) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + "). - value: " + mEvent.getMessageContent().substring(9) + "."); //Sends an info log about who issued the command.
 			} else {
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
 				new MessageBuilder().append("Wrong input! Please choose either `Rock`, `Paper` or `Scissors`.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
@@ -1183,15 +1265,15 @@ public class Commands {
 			mEvent.deleteMessage(); //Deletes the last message (the command).
 
 			//Opens up a connection to the 'BHT' SQL database (Highscores).
-			Class.forName("com.mysql.cj.jdbc.Driver");
-			Connection connection = DriverManager.getConnection("...");
+        	Class.forName("com.mysql.cj.jdbc.Driver");
+        	Connection connection = DriverManager.getConnection("...");
 
-        		//Creates a 'COUNT' SQL statement.
+        	//Creates a 'COUNT' SQL statement.
 			Statement statement0 = connection.createStatement();
-        		ResultSet resultSet0 = statement0.executeQuery("SELECT COUNT(highscoreId) FROM Highscores");
-        		resultSet0.next();
+        	ResultSet resultSet0 = statement0.executeQuery("SELECT COUNT(highscoreId) FROM Highscores");
+        	resultSet0.next();
 
-        		//An embed with the top 10 users with the highest scores.
+        	//An embed with the top 10 users with the highest scores.
 			EmbedBuilder highscores = new EmbedBuilder();
 			highscores
 				.setTitle("RPS Highscores")
@@ -1201,11 +1283,11 @@ public class Commands {
 
 			//Closes the above connections.
 			resultSet0.close();
-        		statement0.close();
+        	statement0.close();
 
 			//Creates a 'SELECT' SQL statement.
-			Statement statement = connection.createStatement();
-			ResultSet resultSet = statement.executeQuery("SELECT * FROM Highscores ORDER BY score DESC");
+        	Statement statement = connection.createStatement();
+        	ResultSet resultSet = statement.executeQuery("SELECT * FROM Highscores ORDER BY score DESC");
 
 			//Adds the actual users to the above mentioned embed.
 			int k = 1;
@@ -1220,7 +1302,7 @@ public class Commands {
 			statement.close();
 			connection.close();
 
-			logger.info("Command (~rpsHighscores) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
+			logger.info("Command (~rpsHighscores) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
 			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
@@ -1239,11 +1321,11 @@ public class Commands {
 				.setThumbnail(dApi.getYourself().getAvatar())
 				.setColor(Color.RED)
 				.addField("Steps", "**1.** Go to `User Settings`;\n**2.** Scroll down to `Advanced` (under `APP SETTINGS`) and click on it;\n**3.** Enable `Developer Mode`.")
-				.addField("Commands", "You can also use one of the commands (`~showChannels`, `~showRoles`) to check the ID of an already whitelisted channel/role.")
+				.addField("Commands", "You can also use one of the commands (`~showChannels`, `~showRoles`) to check the ID of an already white-listed channel/role.")
 				.setFooter("Use `~contractsHelp` for the commands where you can use the Channel/Role ID.");
 			mEvent.getChannel().sendMessage(contractsCommands);
 
-			logger.info("Command (~idHelp) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
+			logger.info("Command (~idHelp) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
 			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
@@ -1257,7 +1339,7 @@ public class Commands {
 			mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("🤖");
 			new MessageBuilder().append("https://github.com/b0dan/BHTBot").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 
-			logger.info("Command (~sourceCode) called by " + allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
+			logger.info("Command (~sourceCode) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
 			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
