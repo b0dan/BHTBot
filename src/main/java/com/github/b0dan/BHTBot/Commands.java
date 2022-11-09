@@ -588,14 +588,14 @@ public class Commands {
 				}
 			} else {
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
-				new MessageBuilder().append("Error! That is not a valid name.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+				new MessageBuilder().append("Error! That is not a valid name:\n**1.** Special characters and numbers are not allowed;\n**2.** Each word must begin with a capital letter;\n**3.** The length of the full name must be between 3 and 20 letters.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			}
 		} catch(StringIndexOutOfBoundsException e1_1) {
 			try {
 				logger.error("Expected/Handled: " + e1_1 + " -> (" + e1_1.getCause() + ")"); //Sends an error log about an expected/handled error.
 
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
-				new MessageBuilder().append("Error! That is not a valid name.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+				new MessageBuilder().append("Error! That is not a valid name:\n**1.** Special characters and numbers are not allowed;\n**2.** Each word must begin with a capital letter;\n**3.** The length of the full name must be between 3 and 20 letters.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e1_2) {
 				logger.warn("Fatal error occured!");
 				logger.fatal("", e1_2 + " -> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
@@ -659,7 +659,7 @@ public class Commands {
 				}
 			} else {
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
-				new MessageBuilder().append("Error! That is not a valid name.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+				new MessageBuilder().append("Error! That is not a valid name:\n**1.** Special characters and numbers are not allowed;\n**2.** Each word must begin with a capital letter;\n**3.** The length of the full name must be between 3 and 20 letters.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			}
 		} catch(ArrayIndexOutOfBoundsException e1_1) {
 			try {
