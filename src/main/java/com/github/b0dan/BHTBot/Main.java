@@ -25,7 +25,7 @@ public class Main {
 		Commands cmd = new Commands(); //Creates an object from the 'Commands' class.
 
 		//Different commands and permissions on who can use them.
-		api.addMessageCreateListener(event -> { //Head Shan Chu(262802994574131200L), Shan Chu(262784255816499201L), Tech Manager(343680704502300672L).
+		api.addMessageCreateListener(event -> { //Head Shan Chu(262802994574131200L), Shan Chu(262784255816499201L), Tech Manager(343680704502300672L), Crew Leader(419232575261769730L), Luminous Path(336588534351790080L).
        			try {
        				Server server = api.getServerById(event.getServerTextChannel().get().getServer().getId()).get(); //Gets the server.
 
@@ -55,7 +55,7 @@ public class Main {
 					} else if(event.getMessageContent().equalsIgnoreCase("~sourceCode")) {
 						cmd.sourceCode(event);
            				} else if(event.getMessageContent().substring(0, 8).equalsIgnoreCase("~addRole")) {
-           					if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner() || api.getRoleById(343680704502300672L).get().hasUser(event.getMessageAuthor().asUser().get()))) {
+           					if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner() || api.getRoleById(343680704502300672L).get().hasUser(event.getMessageAuthor().asUser().get()) || (api.getRoleById(419232575261769730L).get().hasUser(event.getMessageAuthor().asUser().get()) && api.getRoleById(336588534351790080L).get().hasUser(event.getMessageAuthor().asUser().get())))) {
            						cmd.addRole(api, event);
            					} else {
            						event.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
@@ -66,12 +66,14 @@ public class Main {
            							.append("'" + api.getRoleById(262784255816499201L).get().getName() + "'")
            							.append(", ")
            							.append("'" + api.getRoleById(343680704502300672L).get().getName() + "'")
+           							.append(", ")
+           							.append("'" + api.getRoleById(419232575261769730L).get().getName() + " + " + api.getRoleById(336588534351790080L).get().getName() + "'")
            							.append(".")
            							.replyTo(event.getMessageId())
     								.send(event.getChannel());
            					}
            				} else if(event.getMessageContent().substring(0, 11).equalsIgnoreCase("~removeRole")) {
-           					if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner() || api.getRoleById(343680704502300672L).get().hasUser(event.getMessageAuthor().asUser().get()))) {
+           					if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner() || api.getRoleById(343680704502300672L).get().hasUser(event.getMessageAuthor().asUser().get()) || (api.getRoleById(419232575261769730L).get().hasUser(event.getMessageAuthor().asUser().get()) && api.getRoleById(336588534351790080L).get().hasUser(event.getMessageAuthor().asUser().get())))) {
            						cmd.removeRole(api, event);
            					} else {
            						event.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
@@ -82,12 +84,14 @@ public class Main {
            							.append("'" + api.getRoleById(262784255816499201L).get().getName() + "'")
            							.append(", ")
            							.append("'" + api.getRoleById(343680704502300672L).get().getName() + "'")
+           							.append(", ")
+           							.append("'" + api.getRoleById(419232575261769730L).get().getName() + " + " + api.getRoleById(336588534351790080L).get().getName() + "'")
            							.append(".")
            							.replyTo(event.getMessageId())
     								.send(event.getChannel());
            					}
            				} else if(event.getMessageContent().substring(0, 11).equalsIgnoreCase("~addChannel")) {
-           					if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner() || api.getRoleById(343680704502300672L).get().hasUser(event.getMessageAuthor().asUser().get()))) {
+           					if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner() || api.getRoleById(343680704502300672L).get().hasUser(event.getMessageAuthor().asUser().get()) || (api.getRoleById(419232575261769730L).get().hasUser(event.getMessageAuthor().asUser().get()) && api.getRoleById(336588534351790080L).get().hasUser(event.getMessageAuthor().asUser().get())))) {
            						cmd.addChannel(api, event);
            					} else {
            						event.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
@@ -98,6 +102,8 @@ public class Main {
            							.append("'" + api.getRoleById(262784255816499201L).get().getName() + "'")
            							.append(", ")
            							.append("'" + api.getRoleById(343680704502300672L).get().getName() + "'")
+           							.append(", ")
+           							.append("'" + api.getRoleById(419232575261769730L).get().getName() + " + " + api.getRoleById(336588534351790080L).get().getName() + "'")
            							.append(".")
            							.replyTo(event.getMessageId())
     								.send(event.getChannel());
@@ -187,7 +193,7 @@ public class Main {
 							connection.close();
         	        			}
            				} else if(event.getMessageContent().substring(0, 14).equalsIgnoreCase("~removeChannel")) {
-           					if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner() || api.getRoleById(343680704502300672L).get().hasUser(event.getMessageAuthor().asUser().get()))) {
+           					if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner() || api.getRoleById(343680704502300672L).get().hasUser(event.getMessageAuthor().asUser().get()) || (api.getRoleById(419232575261769730L).get().hasUser(event.getMessageAuthor().asUser().get()) && api.getRoleById(336588534351790080L).get().hasUser(event.getMessageAuthor().asUser().get())))) {
            						cmd.removeChannel(api, event);
            					} else {
            						event.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
@@ -198,6 +204,8 @@ public class Main {
            							.append("'" + api.getRoleById(262784255816499201L).get().getName() + "'")
            							.append(", ")
            							.append("'" + api.getRoleById(343680704502300672L).get().getName() + "'")
+           							.append(", ")
+           							.append("'" + api.getRoleById(419232575261769730L).get().getName() + " + " + api.getRoleById(336588534351790080L).get().getName() + "'")
            							.append(".")
            							.replyTo(event.getMessageId())
     								.send(event.getChannel());
