@@ -58,7 +58,7 @@ public class Commands {
 				.setThumbnail(dApi.getYourself().getAvatar())
 				.setColor(Color.RED)
 				.addField("~commandsHelp", "Displays all available commands.")
-				.addField("~rpsHelp", "Displays all the info needed to use the `~rpsPlay` (rock, paper, scissors) command.")
+				.addField("~Help", "Displays all the info needed to use the `~rpsPlay` (rock, paper, scissors) command.")
 				.addField("~contractsHelp", "Displays all contract related commands.")
 				.addField("~setOnLeaveRole *[Role ID]*", "Sets which role to be pinged when someone leaves the server.")
 				.addInlineField("~setOnLeavePing *0*", "Disables the `onLeave` ping.")
@@ -302,6 +302,8 @@ public class Commands {
 				.append("The Black Hand Triads", MessageDecoration.BOLD)
 				.append(". Looks like loyalty wasn't one of their virtues. Hunt that sssnake down! ");
 
+			logger.info("Members updated due to " + lEvent.getUser().getDiscriminatedName() + " leaving the server."); //Sends an info log about what issued the listener.
+
 			//Checks if the ping value is 1 and notifies the `onLeave` role if yes, then sends the message.
 			if(pingable == 1) {
 				onLeaveMessage
@@ -403,8 +405,8 @@ public class Commands {
 				.setColor(Color.RED)
 				.addField("~showContracts", "Shows a list of all active contracts.")
 				.addField("~addContract *[Full Name]*", "Adds a new contract.")
-				.addField("~updateContract *[ID]* *[Full Name]*", "Updates the contract with the specified ID.")
-				.addField("~removeContract *[ID]*", "Removes the contract with the specified ID.")
+				.addField("~updateContract *[Contract ID]* *[Full Name]*", "Updates the contract with the specified ID.")
+				.addField("~removeContract *[Contract ID]*", "Removes the contract with the specified ID.")
 				.addField("‎", "‎")
 				.addField("~showChannels", "Shows a list of all the channels where contract related commands can be used.")
 				.addInlineField("~addChannel *[Channel ID]*", "Allows the use of contract related commands in the channel with the specified ID.")
@@ -443,7 +445,7 @@ public class Commands {
 				.setTitle("Active Contracts")
 				.setThumbnail("https://i.imgur.com/HoOkwBs.png")
 				.setColor(Color.RED)
-				.setFooter("Make sure to remove the contract you've completed by typing `~removeContract [ID]`!");
+				.setFooter("Make sure to remove the contract you've completed by typing `~removeContract [Contract ID]`!");
 
 			//If there are any contracts, finds the total amount of pages needed to group the contracts. If not, notifies the user.
 			resultSet.last();
@@ -666,7 +668,7 @@ public class Commands {
 				logger.error("Expected/Handled: " + e1_1 + " -> (" + e1_1.getCause() + ")"); //Sends an error log about an expected/handled error.
 
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
-				new MessageBuilder().append("Error! Please, follow the format: `~updateContract [ID] [Full Name]`.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+				new MessageBuilder().append("Error! Please, follow the format: `~updateContract [Contract ID] [Full Name]`.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e1_2) {
 				logger.warn("Fatal error occured!");
 				logger.fatal("", e1_2 + " -> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
@@ -1234,7 +1236,7 @@ public class Commands {
 	        				}
 		        		}
 	        		}
-	        		logger.info("Command (~rpsPlay) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + "). - value: " + mEvent.getMessageContent().substring(9) + "."); //Sends an info log about who issued the command.
+	        		logger.info("Command (~rpsPlay) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + mEvent.getMessageContent().substring(9) + "."); //Sends an info log about who issued the command.
 			} else {
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
 				new MessageBuilder().append("Wrong input! Please choose either `Rock`, `Paper` or `Scissors`.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
