@@ -288,7 +288,7 @@ public class Commands {
 		}
 	}
 
-	//A listener that automatically updates the members' Multimap when someone leaves the server, sends a message about it and adds the person to the 'Contracts' SQL database.
+	//A listener that automatically updates the members' Multimap when someone leaves the server, sends a message about it and adds the person to the 'BHT/Contracts' SQL database.
 	public void updateMembersOnLeave(DiscordApi dApi, ServerMemberLeaveEvent lEvent) {
 		try {
 			Server server = dApi.getServerById(lEvent.getServer().getId()).get(); //Gets the server.
@@ -312,7 +312,7 @@ public class Commands {
 			}
 			onLeaveMessage.send((TextChannel)server.getSystemChannel().get());
 
-			//Checks if the user who had just left the server has a 'Guest' role and if not, checks if his looks like a real name and adds it to the 'Contracts' SQL database if yes.
+			//Checks if the user who had just left the server has a 'Guest' role and if not, checks if his looks like a real name and adds it to the 'BHT/Contracts' SQL database if yes.
 			if(!allMembers.containsEntry(lEvent.getUser().getDiscriminatedName(), "GUEST")) {
 				if(Iterables.get(allMembers.get(lEvent.getUser().getDiscriminatedName()), 0).matches("^[A-Z](?=.{2,19}$)[A-Za-z.]+(?:\\h+[A-Z][A-Za-z.]+)+$")) {
 					//Opens up a connection to the 'BHT' SQL database (Contracts).
@@ -497,7 +497,7 @@ public class Commands {
 	        			mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("➡");
 	        		}
 
-	        		//Adds a listener that "flips a page" when the one who called the command reacts on the `~showContracts` message. Also, removes all reactions after 30 seconds.
+	        		//Adds a listener that "flips a page" when the one who called the command reacts on the `~showContracts` message. Also, removes all reactions after 35 seconds.
 	        		if(totalPages > 1) {
 	        			int ccn = currentContractNumber;
 	        			int fcop = firstContractOnPage;
@@ -515,7 +515,7 @@ public class Commands {
 	            					event.getMessage().get().delete();
 	            					showContracts(dApi, mEvent, cp, ccn, fcop, lcop, pressedBack);
 	        				}
-	            			}).removeAfter(30, TimeUnit.SECONDS).addRemoveHandler(() -> {
+	            			}).removeAfter(35, TimeUnit.SECONDS).addRemoveHandler(() -> {
 	            				try {
 							mEvent.getChannel().getMessageById(embedMessageId).get().removeAllReactions();
 	            				} catch(ExecutionException e0) {
@@ -545,7 +545,7 @@ public class Commands {
 		}
 	}
 
-	//A command to manually add a contract to the 'Contracts' SQL database by typing `~addContract` (not case-sensitive).
+	//A command to manually add a contract to the 'BHT/Contracts' SQL database by typing `~addContract` (not case-sensitive).
 	public void manuallyAddContractToDatabase(MessageCreateEvent mEvent) {
 		try {
 			//Checks if the name after the `~addContract` command resembles an actual name.
@@ -612,7 +612,7 @@ public class Commands {
 		}
 	}
 
-	//A command to manually update a contract from the 'Contracts' SQL database by typing `~updateContract` (not case-sensitive).
+	//A command to manually update a contract from the 'BHT/Contracts' SQL database by typing `~updateContract` (not case-sensitive).
 	public void updateContractInDatabase(MessageCreateEvent mEvent) {
 		try {
 			String[] commandValues = mEvent.getMessage().getContent().split(" ", 3); //Splits the command in 3 parts(command - id - name).
@@ -623,7 +623,7 @@ public class Commands {
 				Class.forName("com.mysql.cj.jdbc.Driver");
 				Connection connection = DriverManager.getConnection("...");
 
-				//Updates the contract with the ID after the `~updateContract` command from the 'Contracts' SQL database if he's not there already.
+				//Updates the contract with the ID after the `~updateContract` command from the 'BHT/Contracts' SQL database if he's not there already.
 				PreparedStatement preparedStatement0 = connection.prepareStatement("SELECT COUNT(contractName) FROM Contracts WHERE contractName = ?");
 				preparedStatement0.setString(1, commandValues[2]);
 				ResultSet resultSet = preparedStatement0.executeQuery();
@@ -694,14 +694,14 @@ public class Commands {
 		}
 	} 
 
-	//A command to manually remove a contract from the 'Contracts' SQL database by typing `~removeContract` (not case-sensitive).
+	//A command to manually remove a contract from the 'BHT/Contracts' SQL database by typing `~removeContract` (not case-sensitive).
 	public void removeContractFromDatabase(MessageCreateEvent mEvent) {
 		try {
 			//Opens up a connection to the 'BHT' SQL database (Contracts).
         		Class.forName("com.mysql.cj.jdbc.Driver");
         		Connection connection = DriverManager.getConnection("...");
 
-			//Removes the contract with the ID after the `~removeContract` command from the 'Contracts' SQL database.
+			//Removes the contract with the ID after the `~removeContract` command from the 'BHT/Contracts' SQL database.
 			PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM Contracts WHERE contractId = ?");
 			preparedStatement.setInt(1, Integer.valueOf(mEvent.getMessageContent().substring(16)));
 			int affectedRows = preparedStatement.executeUpdate();
@@ -806,7 +806,7 @@ public class Commands {
         		Class.forName("com.mysql.cj.jdbc.Driver");
         		Connection connection = DriverManager.getConnection("...");
 
-        		//Adds the channel with the ID after the `~addChannel` command to the 'Channels' SQL database if it's not there already.
+        		//Adds the channel with the ID after the `~addChannel` command to the 'BHT/Channels' SQL database if it's not there already.
 			PreparedStatement preparedStatement0 = connection.prepareStatement("SELECT COUNT(channelId) FROM Channels WHERE channelId = ?");
 			preparedStatement0.setLong(1, Long.parseLong(mEvent.getMessage().getContent().substring(12)));
 			ResultSet resultSet = preparedStatement0.executeQuery();
@@ -890,7 +890,7 @@ public class Commands {
         		Class.forName("com.mysql.cj.jdbc.Driver");
         		Connection connection = DriverManager.getConnection("...");
 
-        		//Removes the channel with the ID after the `~removeChannel` command from the 'Channels' SQL database.
+        		//Removes the channel with the ID after the `~removeChannel` command from the 'BHT/Channels' SQL database.
 			PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM Channels WHERE channelId = ?");
 			preparedStatement.setLong(1, Long.parseLong(mEvent.getMessage().getContent().substring(15)));
 			int affectedRows = preparedStatement.executeUpdate();
@@ -995,7 +995,7 @@ public class Commands {
         		Class.forName("com.mysql.cj.jdbc.Driver");
         		Connection connection = DriverManager.getConnection("...");
 
-        		//Adds the role with the ID after the `~addRole` command to the 'Roles' SQL database if it's not there already.
+        		//Adds the role with the ID after the `~addRole` command to the 'BHT/Roles' SQL database if it's not there already.
 			PreparedStatement preparedStatement0 = connection.prepareStatement("SELECT COUNT(roleId) FROM Roles WHERE roleId = ?");
 			preparedStatement0.setLong(1, Long.parseLong(mEvent.getMessage().getContent().substring(9)));
 			ResultSet resultSet = preparedStatement0.executeQuery();
@@ -1081,7 +1081,7 @@ public class Commands {
         		Class.forName("com.mysql.cj.jdbc.Driver");
         		Connection connection = DriverManager.getConnection("...");
 
-        		//Removes the channel with the ID after the `~removeRole` command from the 'Roles' SQL database.
+        		//Removes the channel with the ID after the `~removeRole` command from the 'BHT/Roles' SQL database.
 			PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM Roles WHERE roleId = ?");
 			preparedStatement.setLong(1, Long.parseLong(mEvent.getMessage().getContent().substring(12)));
 			int affectedRows = preparedStatement.executeUpdate();
