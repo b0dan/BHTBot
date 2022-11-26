@@ -54,16 +54,16 @@ public class Commands {
 
 			//An embed with all the commands.
 			EmbedBuilder commands = new EmbedBuilder()
-				.setTitle("Available Commands")
+				.setTitle("General Commands")
 				.setThumbnail(dApi.getYourself().getAvatar())
 				.setColor(Color.RED)
-				.addField("~commandsHelp", "Displays all available commands.")
-				.addField("~Help", "Displays all the info needed to use the `~rpsPlay` (rock, paper, scissors) command.")
+				.addField("~commandsHelp", "Displays the general commands.")
 				.addField("~contractsHelp", "Displays all contract related commands.")
+				.addField("~rpsHelp", "Displays all the info needed to use the `~rpsPlay` (rock, paper, scissors) command.")
 				.addField("~setOnLeaveRole *[Role ID]*", "Sets which role to be pinged when someone leaves the server.")
-				.addInlineField("~setOnLeavePing *0*", "Disables the `onLeave` ping.")
-				.addInlineField("~setOnLeavePing *1*", "Enables the `onLeave` ping.")
-				.addField("~sourceCode", "Sends a link to the source code.")
+				.addInlineField("~setOnLeavePing *0*", "Disables the ping when someone leaves the server.")
+				.addInlineField("~setOnLeavePing *1*", "Enables the ping when someone leaves the server.")
+				.addField("~sourceCode", "Sends a link to the bot's source code.")
 				.setFooter("The commands are not case-sensitive!");
 			mEvent.getChannel().sendMessage(commands);
 
