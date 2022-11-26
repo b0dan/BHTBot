@@ -431,46 +431,76 @@ public class Main {
 
    		//Gets triggered when someone joins the server and updates the members' Multimap.
    		api.addServerMemberJoinListener(event -> {
-   			Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
+			try {
+   				Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
 
-   			if(server.getId() == 262781891705307137L) {
-   				cmd.updateMembersOnJoinAndWelcome(api, event);
-   			}
+   				if(server.getId() == 262781891705307137L) {
+   					cmd.updateMembersOnJoinAndWelcome(api, event);
+   				}
+			} catch(Exception e) {
+				logger.warn("Fatal error occured!");
+       				logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+       				e.printStackTrace();
+			}
        		});
 
         	//Gets triggered when someone has their nickname changed and updates the members' Multimap.
        		api.addUserChangeNicknameListener(event -> {
-        		Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
+			try {
+        			Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
 
-   			if(server.getId() == 262781891705307137L) {
-   				cmd.updateMembersOnNicknameChanged(api, event);
-   			}
+   				if(server.getId() == 262781891705307137L) {
+   					cmd.updateMembersOnNicknameChanged(api, event);
+   				}
+			} catch(Exception e) {
+				logger.warn("Fatal error occured!");
+       				logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+       				e.printStackTrace();
+			}
        		});
 
        		//Gets triggered when someone leaves the server and then notifies the current members about it and updates the members' Multimap.
         	api.addServerMemberLeaveListener(event -> {
-        		Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
+			try {
+        			Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
 
-   			if(server.getId() == 262781891705307137L) {
-   				cmd.updateMembersOnLeave(api, event);
-   			}
+   				if(server.getId() == 262781891705307137L) {
+   					cmd.updateMembersOnLeave(api, event);
+   				}
+			} catch(Exception e) {
+				logger.warn("Fatal error occured!");
+       				logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+       				e.printStackTrace();
+			}
         	});
 
 		//Gets triggered when someone is given the 'Guest' role and updates the members' Multimap.
 		api.addUserRoleAddListener(event -> {
-        		Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
+			try {
+        			Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
 
-        		if(server.getId() == 262781891705307137L) {
-				cmd.updateMembersOnGuestRoleAdded(api, event);
+        			if(server.getId() == 262781891705307137L) {
+					cmd.updateMembersOnGuestRoleAdded(api, event);
+				}
+			} catch(Exception e) {
+				logger.warn("Fatal error occured!");
+       				logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+       				e.printStackTrace();
 			}
 		});
 
 		//Gets triggered when someone has the 'Guest' role removed and updates the members' Multimap.
 		api.addUserRoleRemoveListener(event -> {
-			Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
+			try {
+				Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
 
-			if(server.getId() == 262781891705307137L) {
-				cmd.updateMembersOnGuestRoleRemoved(api, event);
+				if(server.getId() == 262781891705307137L) {
+					cmd.updateMembersOnGuestRoleRemoved(api, event);
+				}
+			} catch(Exception e) {
+				logger.warn("Fatal error occured!");
+	       			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+       				e.printStackTrace();
 			}
 		});
 	}
