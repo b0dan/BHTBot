@@ -52,8 +52,6 @@ public class Main {
 						cmd.showChannels(api, event);
 					} else if(event.getMessageContent().equalsIgnoreCase("~showRoles")) {
 						cmd.showRoles(api, event);
-					} else if(event.getMessageContent().equalsIgnoreCase("~sourceCode")) {
-						cmd.sourceCode(event);
            				} else if(event.getMessageContent().substring(0, 8).equalsIgnoreCase("~addRole")) {
            					if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner() || api.getRoleById(343680704502300672L).get().hasUser(event.getMessageAuthor().asUser().get()) || (api.getRoleById(419232575261769730L).get().hasUser(event.getMessageAuthor().asUser().get()) && api.getRoleById(336588534351790080L).get().hasUser(event.getMessageAuthor().asUser().get())))) {
            						cmd.addRole(api, event);
