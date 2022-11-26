@@ -1,5 +1,5 @@
 package com.github.b0dan.BHTBot;
- 
+
 import java.awt.Color;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -59,11 +59,10 @@ public class Commands {
 				.setColor(Color.RED)
 				.addField("~commandsHelp", "Displays the general commands.")
 				.addField("~contractsHelp", "Displays all contract related commands.")
-				.addField("~rpsHelp", "Displays all the info needed to use the `~rpsPlay` (rock, paper, scissors) command.")
+				.addField("~rpsHelp", "Displays all the info needed to use the `~rpsPlay` (Rock-Paper-Scissors) command.")
 				.addField("~setOnLeaveRole *[Role ID]*", "Sets which role to be pinged when someone leaves the server.")
 				.addInlineField("~setOnLeavePing *0*", "Disables the ping when someone leaves the server.")
 				.addInlineField("~setOnLeavePing *1*", "Enables the ping when someone leaves the server.")
-				.addField("~sourceCode", "Sends a link to the bot's source code.")
 				.setFooter("The commands are not case-sensitive!");
 			mEvent.getChannel().sendMessage(commands);
 
@@ -1148,11 +1147,11 @@ public class Commands {
 
 			//An embed with all the RPS related commands.
 			EmbedBuilder rpsCommands = new EmbedBuilder()
-				.setTitle("Rock, Paper or Scissors")
+				.setTitle("Rock-Paper-Scissors")
 				.setThumbnail(dApi.getYourself().getAvatar())
 				.setColor(Color.RED)
 				.addField("Rules", "Here's what beats what if for whatever reason you don't know how the game works:\n**1.** Paper beats rock;\n**2.** Rock beats scissors;\n**3.** Scissors beats paper.")
-				.addInlineField("~rpsPlay *[option]*", "Plays a game of \"Rock, Paper or Scissors\" against the bot.")
+				.addInlineField("~rpsPlay *[option]*", "Plays a game of Rock-Paper-Scissors against the bot.")
 				.addInlineField("~rpsHighscores", "Shows the Top 10 users with the highest score.")
 				.setFooter("The commands are not case-sensitive!");
 			mEvent.getChannel().sendMessage(rpsCommands);
@@ -1165,7 +1164,7 @@ public class Commands {
 		}
 	}
 
-	//A command to play "Rock, Paper or Scissors" with the bot by typing `~rpsPlay` (not case-sensitive).
+	//A command to play "Rock-Paper-Scissors" with the bot by typing `~rpsPlay` (not case-sensitive).
 	public void rockPaperScissorsGame(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			Random rand = new Random(); //Creates an instance from the 'Random' class.
@@ -1261,7 +1260,7 @@ public class Commands {
 		}
 	}
 
-	//A command that displays the top 10 users with the highest score in "Rock, Paper or Scissors" by typing `~rpsHighscores` (not case-sensitive).
+	//A command that displays the top 10 users with the highest score in "Rock-Paper-Scissors" by typing `~rpsHighscores` (not case-sensitive).
 	public void rockPaperScissorsHighscores(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
 			mEvent.deleteMessage(); //Deletes the last message (the command).
@@ -1328,20 +1327,6 @@ public class Commands {
 			mEvent.getChannel().sendMessage(contractsCommands);
 
 			logger.info("Command (~idHelp) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
-		} catch(Exception e) {
-			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
-			e.printStackTrace();
-		}
-	}
-
-	//Sends a link to the source code page on GitHub by typing `~sourceCode` (not case-sensitive).
-	public void sourceCode(MessageCreateEvent mEvent) {
-		try {
-			mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("🤖");
-			new MessageBuilder().append("https://github.com/b0dan/BHTBot").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
-
-			logger.info("Command (~sourceCode) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
 			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
