@@ -537,6 +537,8 @@ public class Commands {
 			connection.close();
 
 			logger.info("Command/Page (~showContracts) called/flipped by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command/flipped a page.
+		} catch(IndexOutOfBoundsException e0) {
+			logger.error("Expected/Handled: " + e0 + " -> (" + e0.getCause() + ")"); //Sends an error log about an expected/handled error.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
 			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
