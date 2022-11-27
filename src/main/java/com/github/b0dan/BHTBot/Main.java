@@ -48,6 +48,8 @@ public class Main {
            					cmd.contractsHelp(api, event);
 					} else if(event.getMessageContent().equalsIgnoreCase("~showContracts")) {
 						cmd.showContracts(api, event, 1, 1, 0, 0, false);
+					} else if(event.getMessageContent().equalsIgnoreCase("~showPriorityContracts")) {
+           					cmd.showPriorityContracts(event);
 					} else if(event.getMessageContent().equalsIgnoreCase("~showChannels")) {
 						cmd.showChannels(api, event);
 					} else if(event.getMessageContent().equalsIgnoreCase("~showRoles")) {
@@ -376,7 +378,175 @@ public class Main {
 							statement.close();
 							connection.close();
         	        			}
-           				} else if(event.getMessageContent().substring(0, 15).equalsIgnoreCase("~setOnLeaveRole")) {
+					} else if(event.getMessageContent().substring(0, 20).equalsIgnoreCase("~addPriorityContract")) {
+           					//Opens up a connection to the 'BHT' SQL database (Channels, Roles).
+        	        			Class.forName("com.mysql.cj.jdbc.Driver");
+        	        			Connection connection = DriverManager.getConnection("...");
+
+        	        			//Creates a 'SELECT' SQL statement.
+        	        			Statement statement = connection.createStatement();
+
+        	        			//Checks if the user issuing the command is in the correct channel.
+        	        			ResultSet resultSet = statement.executeQuery("SELECT channelName FROM Channels");
+        					boolean channel = false;
+        					while(resultSet.next() && channel == false) {
+        						if(resultSet.getString(1).equals(event.getChannel().asServerTextChannel().get().getName())) {
+        							channel = true;
+        						}
+        					}
+
+        					//Checks if the user issuing the command has at least one of the required roles.
+        					resultSet = statement.executeQuery("SELECT roleId FROM Roles");
+        					boolean role = false;
+        					while(resultSet.next() && role == false) {
+        						if(api.getRoleById(resultSet.getLong(1)).get().hasUser(event.getMessageAuthor().asUser().get())) {
+        							role = true;
+        						}
+        					}
+
+        					//If both conditions are met, the commands gets issued. If not, it notifies the user what's missing.
+        	        			if(channel == true && role == true) {
+        	        				//Closes the connections.
+        	        				resultSet.close();
+        	        				statement.close();
+        	        				connection.close();
+
+        	        				cmd.addPriorityContract(event);
+        	        			} else if((channel == true && role == false) && (event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner())) {
+        	        				//Closes the connections.
+        	        				resultSet.close();
+        	        				statement.close();
+        	        				connection.close();
+
+							cmd.addPriorityContract(event);
+        	        			} else if(channel == false) {
+        	        				event.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
+
+        	        			//Prints out the channels where the command can be used.
+        	        			ResultSet resultSet0 = statement.executeQuery("SELECT channelId FROM Channels");
+        	        			MessageBuilder channels = new MessageBuilder().append("The command `~addPriorityContract` can only be used in the following channels: ");
+
+        	        			if(resultSet0.next()) {
+        	        				channels.append(api.getServerTextChannelById(resultSet0.getLong(1)).get().getMentionTag());
+        	        			}
+        	        			while(resultSet0.next()) {
+        	        				channels
+        	    						.append(", ")
+        	    						.append(api.getServerTextChannelById(resultSet0.getLong(1)).get().getMentionTag());
+        	        			}
+        	        			channels.append(".").replyTo(event.getMessageId()).send(event.getChannel());
+
+        	        			//Closes the connections.
+						resultSet0.close();
+						statement.close();
+						connection.close();
+                			} else if(role == false) {
+        	        			event.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
+
+        	        			//Prints out the roles who can use the command.
+        	        			ResultSet resultSet0 = statement.executeQuery("SELECT roleId FROM Roles");
+        	        			MessageBuilder roles = new MessageBuilder().append("You can only use the `~addPriorityContract` command if you have at least one of the following roles: ");
+
+        	        			if(resultSet0.next()) {
+        	        				roles.append("`" + api.getRoleById(resultSet0.getLong(1)).get().getName() + "`");
+        	        			}
+        	        			while(resultSet0.next()) {
+        	        				roles
+        	    						.append(", ")
+        	    						.append("`" + api.getRoleById(resultSet0.getLong(1)).get().getName() + "`");
+        	        			}
+        	        			roles.append(".").replyTo(event.getMessageId()).send(event.getChannel());
+
+        	        			//Closes the connections.
+						resultSet0.close();
+						statement.close();
+						connection.close();
+        	        		}
+           			} else if(event.getMessageContent().substring(0, 23).equalsIgnoreCase("~removePriorityContract")) {
+           				//Opens up a connection to the 'BHT' SQL database (Channels, Roles).
+        	        		Class.forName("com.mysql.cj.jdbc.Driver");
+        	        		Connection connection = DriverManager.getConnection("...");
+
+        	        		//Creates a 'SELECT' SQL statement.
+        	        		Statement statement = connection.createStatement();
+
+        	        		//Checks if the user issuing the command is in the correct channel.
+        	        		ResultSet resultSet = statement.executeQuery("SELECT channelName FROM Channels");
+        				boolean channel = false;
+        				while(resultSet.next() && channel == false) {
+        					if(resultSet.getString(1).equals(event.getChannel().asServerTextChannel().get().getName())) {
+        						channel = true;
+        					}
+        				}
+
+        				//Checks if the user issuing the command has at least one of the required roles.
+        				resultSet = statement.executeQuery("SELECT roleId FROM Roles");
+        				boolean role = false;
+        				while(resultSet.next() && role == false) {
+        					if(api.getRoleById(resultSet.getLong(1)).get().hasUser(event.getMessageAuthor().asUser().get())) {
+        						role = true;
+        					}
+        				}
+
+        				//If both conditions are met, the commands gets issued. If not, it notifies the user what's missing.
+        	        		if(channel == true && role == true) {
+        	        			//Closes the connections.
+        	        			resultSet.close();
+        	        			statement.close();
+        	        			connection.close();
+
+        	        			cmd.removePriorityContract(event);
+        	        		} else if((channel == true && role == false) && (event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner())) {
+        	        			//Closes the connections.
+        	        			resultSet.close();
+        	        			statement.close();
+        	        			connection.close();
+
+        	        			cmd.removePriorityContract(event);
+        	        		} else if(channel == false) {
+        	        			event.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
+
+        	        			//Prints out the channels where the command can be used.
+        	        			ResultSet resultSet0 = statement.executeQuery("SELECT channelId FROM Channels");
+        	        			MessageBuilder channels = new MessageBuilder().append("The command `~removePriorityContract` can only be used in the following channels: ");
+
+        	        			if(resultSet0.next()) {
+        	        				channels.append(api.getServerTextChannelById(resultSet0.getLong(1)).get().getMentionTag());
+        	        			}
+        	        			while(resultSet0.next()) {
+        	        				channels
+        	    						.append(", ")
+        	    						.append(api.getServerTextChannelById(resultSet0.getLong(1)).get().getMentionTag());
+        	        			}
+        	        			channels.append(".").replyTo(event.getMessageId()).send(event.getChannel());
+
+        	        			//Closes the connections.
+						resultSet0.close();
+						statement.close();
+						connection.close();
+        	        		} else if(role == false) {
+        	        			event.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
+
+        	        			//Prints out the roles who can use the command.
+						ResultSet resultSet0 = statement.executeQuery("SELECT roleId FROM Roles");
+        	        			MessageBuilder roles = new MessageBuilder().append("You can only use the `~removePriorityContract` command if you have at least one of the following roles: ");
+
+        	        			if(resultSet0.next()) {
+        	        				roles.append("`" + api.getRoleById(resultSet0.getLong(1)).get().getName() + "`");
+        	        			}
+        	        			while(resultSet0.next()) {
+        	        				roles
+        	    						.append(", ")
+        	    						.append("`" + api.getRoleById(resultSet0.getLong(1)).get().getName() + "`");
+        	        			}
+        	        			roles.append(".").replyTo(event.getMessageId()).send(event.getChannel());
+
+        	        			//Closes the connections.
+						resultSet0.close();
+						statement.close();
+						connection.close();
+        	        		}
+           			} else if(event.getMessageContent().substring(0, 15).equalsIgnoreCase("~setOnLeaveRole")) {
            					if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner())) {
            						cmd.setOnLeaveRole(api, event);
            					} else {
