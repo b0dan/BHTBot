@@ -767,7 +767,7 @@ public class Commands {
 				.setTitle("Priority Contracts")
 				.setThumbnail("https://i.imgur.com/HoOkwBs.png")
 				.setColor(Color.RED)
-				.setFooter("Make sure to remove the contract that is not a priority anymore by typing `~removePriorityContract [Contract ID]`!");
+				.setFooter("Make sure to remove the contract that is no longer a priority anymore by typing `~removePriorityContract [Contract ID]`!");
 
 			//Opens up a connection to the 'BHT' SQL database (Contracts).
         		Class.forName("com.mysql.cj.jdbc.Driver");
