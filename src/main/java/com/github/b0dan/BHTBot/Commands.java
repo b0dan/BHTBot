@@ -328,7 +328,7 @@ public class Commands {
 		        			resultSet.close();
 		        			preparedStatement0.close();
 	
-		        			PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO Contracts(contractName) VALUES(?)");
+		        			PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO Contracts(contractName, isPriorityContract) VALUES(?, 0)");
 						preparedStatement.setString(1, Iterables.get(allMembers.get(lEvent.getUser().getDiscriminatedName()), 0));
 						int affectedRows = preparedStatement.executeUpdate();
 						if(affectedRows > 0) {
@@ -367,9 +367,8 @@ public class Commands {
 			//Adds a new "GUEST" value to the members' Multimap if the 'Guest' role is added.
 			if(arEvent.getRole().equals(guestRole) && !allMembers.containsEntry(arEvent.getUser().getDiscriminatedName(), "GUEST")) {
 				allMembers.put(arEvent.getUser().getDiscriminatedName(), "GUEST");
+				logger.info("Members updated due to " + Iterables.get(allMembers.get(arEvent.getUser().getDiscriminatedName()), 0) + " having a 'Guest' role added."); //Sends an info log about what issued the listener.
 			}
-
-			logger.info("Members updated due to " + Iterables.get(allMembers.get(arEvent.getUser().getDiscriminatedName()), 0) + " having a 'Guest' role added."); //Sends an info log about what issued the listener.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
 			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
@@ -383,9 +382,8 @@ public class Commands {
 			//Removes the "GUEST" value of the user from the members' Multimap if the 'Guest' role is removed.
 			if(rrEvent.getRole().equals(guestRole) && allMembers.containsEntry(rrEvent.getUser().getDiscriminatedName(), "GUEST")) {
 				allMembers.remove(rrEvent.getUser().getDiscriminatedName(), "GUEST");
+				logger.info("Members updated due to " + Iterables.get(allMembers.get(rrEvent.getUser().getDiscriminatedName()), 0) + " having a 'Guest' role removed."); //Sends an info log about what issued the listener.
 			}
-
-			logger.info("Members updated due to " + Iterables.get(allMembers.get(rrEvent.getUser().getDiscriminatedName()), 0) + " having a 'Guest' role removed."); //Sends an info log about what issued the listener.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
 			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
@@ -566,7 +564,7 @@ public class Commands {
 				ResultSet resultSet = preparedStatement0.executeQuery();
 				resultSet.next();
 				if(resultSet.getInt(1) == 0) {
-					PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO Contracts(contractName) VALUES(?)");
+					PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO Contracts(contractName, isPriorityContract) VALUES(?, 0)");
 					preparedStatement.setString(1, mEvent.getMessageContent().substring(13));
 					int affectedRows = preparedStatement.executeUpdate();
 					if(affectedRows > 0) {
