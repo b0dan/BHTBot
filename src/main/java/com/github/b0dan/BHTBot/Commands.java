@@ -441,7 +441,7 @@ public class Commands {
 
         		//Creates a 'SELECT' SQL statement.
         		Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-        		ResultSet resultSet = statement.executeQuery("SELECT * FROM Contracts");
+        		ResultSet resultSet = statement.executeQuery("SELECT contractId, contractName FROM Contracts");
 
         		//An embed with all active contracts.
 			EmbedBuilder contracts = new EmbedBuilder();
