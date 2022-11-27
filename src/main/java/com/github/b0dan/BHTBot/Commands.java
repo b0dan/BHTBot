@@ -645,7 +645,7 @@ public class Commands {
 						connection.close();
 					} else {
 						mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
-						new MessageBuilder().append("Error! The ID doesn't exist.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+						new MessageBuilder().append("Error! The Contract ID doesn't exist.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 
 						//Closes the connections.
 						preparedStatement.close();
@@ -717,7 +717,7 @@ public class Commands {
 				connection.close();
 			} else {
 				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
-				new MessageBuilder().append("Error! The ID doesn't exist.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+				new MessageBuilder().append("Error! The Contract ID doesn't exist.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 
 				//Closes the connections.
 				preparedStatement.close();
