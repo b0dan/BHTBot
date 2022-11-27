@@ -117,10 +117,10 @@ public class Main {
 						Statement statement = connection.createStatement();
 
 						//Checks if the user issuing the command is in the correct channel.
-						ResultSet resultSet = statement.executeQuery("SELECT channelName FROM Channels");
+						ResultSet resultSet = statement.executeQuery("SELECT channelId FROM Channels");
 						boolean channel = false;
 						while(resultSet.next() && channel == false) {
-							if(resultSet.getString(1).equals(event.getChannel().asServerTextChannel().get().getName())) {
+							if(resultSet.getLong(1) == event.getChannel().asServerTextChannel().get().getId()) {
 								channel = true;
 							}
 						}
@@ -219,10 +219,10 @@ public class Main {
 						Statement statement = connection.createStatement();
 
 						//Checks if the user issuing the command is in the correct channel.
-						ResultSet resultSet = statement.executeQuery("SELECT channelName FROM Channels");
+						ResultSet resultSet = statement.executeQuery("SELECT channelId FROM Channels");
 						boolean channel = false;
 						while(resultSet.next() && channel == false) {
-							if(resultSet.getString(1).equals(event.getChannel().asServerTextChannel().get().getName())) {
+							if(resultSet.getLong(1) == event.getChannel().asServerTextChannel().get().getId()) {
 								channel = true;
 							}
 						}
@@ -303,10 +303,10 @@ public class Main {
 						Statement statement = connection.createStatement();
 
 						//Checks if the user issuing the command is in the correct channel.
-						ResultSet resultSet = statement.executeQuery("SELECT channelName FROM Channels");
+						ResultSet resultSet = statement.executeQuery("SELECT channelId FROM Channels");
 						boolean channel = false;
 						while(resultSet.next() && channel == false) {
-							if(resultSet.getString(1).equals(event.getChannel().asServerTextChannel().get().getName())) {
+							if(resultSet.getLong(1) == event.getChannel().asServerTextChannel().get().getId()) {
 								channel = true;
 							}
 						}
@@ -387,10 +387,10 @@ public class Main {
         	        			Statement statement = connection.createStatement();
 
         	        			//Checks if the user issuing the command is in the correct channel.
-        	        			ResultSet resultSet = statement.executeQuery("SELECT channelName FROM Channels");
+        	        			ResultSet resultSet = statement.executeQuery("SELECT channelId FROM Channels");
         					boolean channel = false;
         					while(resultSet.next() && channel == false) {
-        						if(resultSet.getString(1).equals(event.getChannel().asServerTextChannel().get().getName())) {
+        						if(resultSet.getLong(1) == event.getChannel().asServerTextChannel().get().getId()) {
         							channel = true;
         						}
         					}
@@ -471,10 +471,10 @@ public class Main {
         	        		Statement statement = connection.createStatement();
 
         	        		//Checks if the user issuing the command is in the correct channel.
-        	        		ResultSet resultSet = statement.executeQuery("SELECT channelName FROM Channels");
+        	        		ResultSet resultSet = statement.executeQuery("SELECT channelId FROM Channels");
         				boolean channel = false;
         				while(resultSet.next() && channel == false) {
-        					if(resultSet.getString(1).equals(event.getChannel().asServerTextChannel().get().getName())) {
+        					if(resultSet.getId(1) == event.getChannel().asServerTextChannel().get().getId()) {
         						channel = true;
         					}
         				}
