@@ -978,6 +978,14 @@ public class Commands {
         			int k = 1;
         			resultSet.beforeFirst();
     				while(resultSet.next()) {
+    					//Updates the channels' names.
+    					PreparedStatement preparedStatement = connection.prepareStatement("UPDATE Channels SET channelName = ? WHERE channelId = ?");
+            				preparedStatement.setString(1, dApi.getServerTextChannelById(resultSet.getLong("channelId")).get().getName());
+            				preparedStatement.setLong(2, resultSet.getLong("channelId"));
+            				preparedStatement.execute();
+            				preparedStatement.close();
+
+            				//Adds the channels to the above mentioned embed.
     					channels.addField(k + ". " + String.valueOf(resultSet.getString("channelName")), "**ID: **" + String.valueOf(resultSet.getLong("channelId")));
     					k++;
     				}
@@ -1167,6 +1175,14 @@ public class Commands {
         			int k = 1;
         			resultSet.beforeFirst();
     				while(resultSet.next()) {
+    					//Updates the roles' names.
+	    				PreparedStatement preparedStatement = connection.prepareStatement("UPDATE Roles SET roleName = ? WHERE roleId = ?");
+            				preparedStatement.setString(1, dApi.getRoleById(resultSet.getLong("roleId")).get().getName());
+        		    		preparedStatement.setLong(2, resultSet.getLong("roleId"));
+            				preparedStatement.execute();
+            				preparedStatement.close();
+
+            				//Adds the roles to the above mentioned embed.
     					roles.addField(k + ". " + String.valueOf(resultSet.getString("roleName")), "**ID: **" + String.valueOf(resultSet.getLong("roleId")));
     					k++;
     				}
