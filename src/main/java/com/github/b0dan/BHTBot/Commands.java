@@ -757,6 +757,202 @@ public class Commands {
 		}
 	}
 
+	//A command that displays all active priority contracts by typing `~showPriorityContracts` (not case-sensitive).
+	public void showPriorityContracts(MessageCreateEvent mEvent) {
+		try {
+			mEvent.deleteMessage(); //Deletes the last message (the command).
+
+			//An embed with all the commands.
+			EmbedBuilder priorityContracts = new EmbedBuilder()
+				.setTitle("Priority Contracts")
+				.setThumbnail("https://i.imgur.com/HoOkwBs.png")
+				.setColor(Color.RED)
+				.setFooter("Make sure to remove the contract that is not a priority anymore by typing `~removePriorityContract [Contract ID]`!");
+
+			//Opens up a connection to the 'BHT' SQL database (Contracts).
+        		Class.forName("com.mysql.cj.jdbc.Driver");
+        		Connection connection = DriverManager.getConnection("jdbc:mysql://user323731367064240131_mysql/bht", "root", "xxX9KhljY+rl75wQ9VkNHa7au+mV3c0O");
+
+        		//Creates a 'SELECT' SQL statement.
+        		Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        		ResultSet resultSet = statement.executeQuery("SELECT contractId, contractName FROM Contracts WHERE isPriorityContract = 1");
+
+        		resultSet.last();
+			if(resultSet.getRow() > 0) {
+				int currentPriorityContractNumber = 0;
+				resultSet.beforeFirst();
+				while(resultSet.next()) {
+					currentPriorityContractNumber++;
+					priorityContracts.addField(currentPriorityContractNumber + ". " + resultSet.getString("contractName"), "**Contract ID:** " + resultSet.getInt("contractId"));
+				}
+			} else {
+				priorityContracts.addField("Empty", "There are no active contracts.");
+			}
+			mEvent.getChannel().sendMessage(priorityContracts);
+
+			//Closes the connections.
+			resultSet.close();
+			statement.close();
+			connection.close();
+
+			logger.info("Command (~showPriorityContracts) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
+		} catch(IndexOutOfBoundsException e0) {
+			logger.error("Expected/Handled: " + e0 + " -> (" + e0.getCause() + ")"); //Sends an error log about an expected/handled error.
+		} catch(Exception e) {
+			logger.warn("Fatal error occured!");
+			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			e.printStackTrace();
+		}
+	}
+
+	//A command to make a priority contract from the 'BHT/Contracts' SQL database by typing `~addPriorityContract` (not case-sensitive).
+	public void addPriorityContract(MessageCreateEvent mEvent) {
+		try {
+			//Opens up a connection to the 'BHT' SQL database (Contracts).
+        		Class.forName("com.mysql.cj.jdbc.Driver");
+        		Connection connection = DriverManager.getConnection("jdbc:mysql://user323731367064240131_mysql/bht", "root", "xxX9KhljY+rl75wQ9VkNHa7au+mV3c0O");
+
+        		//Sets the 'isPriorityContract' value to 1 to the contract with the ID after the `~addPriorityContract` command from the 'BHT/Contracts' SQL database, if it's not 1 already.
+			PreparedStatement preparedStatement0 = connection.prepareStatement("SELECT isPriorityContract FROM Contracts WHERE contractId = ?");
+			preparedStatement0.setInt(1, Integer.parseInt(mEvent.getMessage().getContent().substring(21)));
+			ResultSet resultSet = preparedStatement0.executeQuery();
+			resultSet.next();
+			if(resultSet.getInt(1) == 0) {
+				PreparedStatement preparedStatement = connection.prepareStatement("UPDATE Contracts SET isPriorityContract = 1 WHERE contractId = ?");
+				preparedStatement.setLong(1, Integer.parseInt(mEvent.getMessage().getContent().substring(21)));
+				int affectedRows = preparedStatement.executeUpdate();
+				if(affectedRows > 0) {
+					mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👍");
+					new MessageBuilder().append("The contract with an ID of `" + mEvent.getMessage().getContent().substring(21) + "` is now a priority contract.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+
+					logger.info("Command (~addPriorityContract) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + mEvent.getMessageContent().substring(21) + "."); //Sends an info log about who issued the command.
+				} else {
+					mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
+				}
+				preparedStatement.close();
+			} else {
+				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
+				new MessageBuilder().append("Error! The contract with the specified ID is already a priority contract.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+			}
+
+			//Closes the connections.
+			resultSet.close();
+			preparedStatement0.close();
+			connection.close();
+		} catch(StringIndexOutOfBoundsException e0_1) {
+			try {
+				logger.error("Expected/Handled: " + e0_1 + " -> (" + e0_1.getCause() + ")"); //Sends an error log about an expected/handled error.
+
+				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
+				new MessageBuilder().append("Wrong input! The value after the `~addPriorityContract` command must be a digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+			} catch(Exception e0_2) {
+				logger.warn("Fatal error occured!");
+				logger.fatal("", e0_2 + " -> (" + e0_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				e0_2.printStackTrace();
+			}
+		} catch(NumberFormatException e1_1) {
+			try {
+				logger.error("Expected/Handled: " + e1_1 + " -> (" + e1_1.getCause() + ")"); //Sends an error log about an expected/handled error.
+
+				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
+				new MessageBuilder().append("Wrong input! The value after the `~addPriorityContract` command must be a digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+			} catch(Exception e1_2) {
+				logger.warn("Fatal error occured!");
+				logger.fatal("", e1_2 + " -> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				e1_2.printStackTrace();
+			}
+		} catch(SQLException e2_1) {
+			try {
+				logger.error("Expected/Handled: " + e2_1 + " -> (" + e2_1.getCause() + ")"); //Sends an error log about an expected/handled error.
+
+				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
+				new MessageBuilder().append("Error! The Contract ID doesn't exist.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+			} catch(Exception e2_2) {
+				logger.warn("Fatal error occured!");
+				logger.fatal("", e2_2 + " -> (" + e2_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				e2_2.printStackTrace();
+			}
+		} catch(Exception e) {
+			logger.warn("Fatal error occured!");
+			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			e.printStackTrace();
+		}
+	}
+
+	//A command to remove a priority contract from the 'BHT/Contracts' SQL database by typing `~removePriorityContract` (not case-sensitive).
+	public void removePriorityContract(MessageCreateEvent mEvent) {
+		try {
+			//Opens up a connection to the 'BHT' SQL database (Contracts).
+        		Class.forName("com.mysql.cj.jdbc.Driver");
+        		Connection connection = DriverManager.getConnection("jdbc:mysql://user323731367064240131_mysql/bht", "root", "xxX9KhljY+rl75wQ9VkNHa7au+mV3c0O");
+
+        		//Sets the 'isPriorityContract' value to 1 to the contract with the ID after the `~removePriorityContract` command from the 'BHT/Contracts' SQL database, if it's not 1 already.
+			PreparedStatement preparedStatement0 = connection.prepareStatement("SELECT isPriorityContract FROM Contracts WHERE contractId = ?");
+			preparedStatement0.setInt(1, Integer.parseInt(mEvent.getMessage().getContent().substring(24)));
+			ResultSet resultSet = preparedStatement0.executeQuery();
+			resultSet.next();
+			if(resultSet.getInt(1) == 1) {
+				PreparedStatement preparedStatement = connection.prepareStatement("UPDATE Contracts SET isPriorityContract = 0 WHERE contractId = ?");
+				preparedStatement.setLong(1, Integer.parseInt(mEvent.getMessage().getContent().substring(24)));
+				int affectedRows = preparedStatement.executeUpdate();
+				if(affectedRows > 0) {
+					mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👍");
+					new MessageBuilder().append("The contract with an ID of `" + mEvent.getMessage().getContent().substring(24) + "` is no longer a priority contract.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+
+					logger.info("Command (~removePriorityContract) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + mEvent.getMessageContent().substring(24) + "."); //Sends an info log about who issued the command.
+				} else {
+					mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
+				}
+				preparedStatement.close();
+			} else {
+				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
+				new MessageBuilder().append("Error! The contract with the specified ID is not a priority contract.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+			}
+
+			//Closes the connections.
+			resultSet.close();
+			preparedStatement0.close();
+			connection.close();
+		} catch(StringIndexOutOfBoundsException e0_1) {
+			try {
+				logger.error("Expected/Handled: " + e0_1 + " -> (" + e0_1.getCause() + ")"); //Sends an error log about an expected/handled error.
+
+				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
+				new MessageBuilder().append("Wrong input! The value after the `~removePriorityContract` command must be a digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+			} catch(Exception e0_2) {
+				logger.warn("Fatal error occured!");
+				logger.fatal("", e0_2 + " -> (" + e0_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				e0_2.printStackTrace();
+			}
+		} catch(NumberFormatException e1_1) {
+			try {
+				logger.error("Expected/Handled: " + e1_1 + " -> (" + e1_1.getCause() + ")"); //Sends an error log about an expected/handled error.
+
+				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
+				new MessageBuilder().append("Wrong input! The value after the `~removePriorityContract` command must be a digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+			} catch(Exception e1_2) {
+				logger.warn("Fatal error occured!");
+				logger.fatal("", e1_2 + " -> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				e1_2.printStackTrace();
+			}
+		} catch(SQLException e2_1) {
+			try {
+				logger.error("Expected/Handled: " + e2_1 + " -> (" + e2_1.getCause() + ")"); //Sends an error log about an expected/handled error.
+
+				mEvent.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
+				new MessageBuilder().append("Error! The Contract ID doesn't exist.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+			} catch(Exception e2_2) {
+				logger.warn("Fatal error occured!");
+				logger.fatal("", e2_2 + " -> (" + e2_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				e2_2.printStackTrace();
+			}
+		} catch(Exception e) {
+			logger.warn("Fatal error occured!");
+			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			e.printStackTrace();
+		}
+	}
+
 	//A command that displays all the channels where contract related commands can be used by typing `~showChannels` (not case-sensitive).
 	public void showChannels(DiscordApi dApi, MessageCreateEvent mEvent) {
 		try {
