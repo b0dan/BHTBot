@@ -288,6 +288,36 @@ public class Commands {
 		}
 	}
 
+	//A listener that automatically updates the members' Multimap when someone is given the 'Guest' role.
+	public void updateMembersOnGuestRoleAdded(DiscordApi dApi, UserRoleAddEvent arEvent) {
+		try {
+			//Adds a new "GUEST" value to the members' Multimap if the 'Guest' role is added.
+			if(arEvent.getRole().equals(guestRole) && !allMembers.containsEntry(arEvent.getUser().getDiscriminatedName(), "GUEST")) {
+				allMembers.put(arEvent.getUser().getDiscriminatedName(), "GUEST");
+				logger.info("Members updated due to " + Iterables.get(allMembers.get(arEvent.getUser().getDiscriminatedName()), 0) + " having a 'Guest' role added."); //Sends an info log about what issued the listener.
+			}
+		} catch(Exception e) {
+			logger.warn("Fatal error occured!");
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			e.printStackTrace();
+		}
+	}
+
+	//A listener that automatically updates the members' Multimap when someone has the 'Guest' role removed.
+	public void updateMembersOnGuestRoleRemoved(DiscordApi dApi, UserRoleRemoveEvent rrEvent) {
+		try {
+			//Removes the "GUEST" value of the user from the members' Multimap if the 'Guest' role is removed.
+			if(rrEvent.getRole().equals(guestRole) && allMembers.containsEntry(rrEvent.getUser().getDiscriminatedName(), "GUEST")) {
+				allMembers.remove(rrEvent.getUser().getDiscriminatedName(), "GUEST");
+				logger.info("Members updated due to " + Iterables.get(allMembers.get(rrEvent.getUser().getDiscriminatedName()), 0) + " having a 'Guest' role removed."); //Sends an info log about what issued the listener.
+			}
+		} catch(Exception e) {
+			logger.warn("Fatal error occured!");
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			e.printStackTrace();
+		}
+	}
+
 	//A listener that automatically updates the members' Multimap when someone leaves the server, sends a message about it and adds the person to the 'BHT/Contracts' SQL database.
 	public void updateMembersOnLeave(DiscordApi dApi, ServerMemberLeaveEvent lEvent) {
 		try {
@@ -354,36 +384,6 @@ public class Commands {
 			logger.info("Members updated due to " + lEvent.getUser().getDiscriminatedName() + " leaving the server."); //Sends an info log about what issued the listener.
 		} catch(NullPointerException e0) {
 			logger.error("Expected/Handled: " + e0 + " -> (" + e0.getCause() + ")"); //Sends an error log about an expected/handled error.
-		} catch(Exception e) {
-			logger.warn("Fatal error occured!");
-			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
-			e.printStackTrace();
-		}
-	}
-
-	//A listener that automatically updates the members' Multimap when someone is given the 'Guest' role.
-	public void updateMembersOnGuestRoleAdded(DiscordApi dApi, UserRoleAddEvent arEvent) {
-		try {
-			//Adds a new "GUEST" value to the members' Multimap if the 'Guest' role is added.
-			if(arEvent.getRole().equals(guestRole) && !allMembers.containsEntry(arEvent.getUser().getDiscriminatedName(), "GUEST")) {
-				allMembers.put(arEvent.getUser().getDiscriminatedName(), "GUEST");
-				logger.info("Members updated due to " + Iterables.get(allMembers.get(arEvent.getUser().getDiscriminatedName()), 0) + " having a 'Guest' role added."); //Sends an info log about what issued the listener.
-			}
-		} catch(Exception e) {
-			logger.warn("Fatal error occured!");
-			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
-			e.printStackTrace();
-		}
-	}
-
-	//A listener that automatically updates the members' Multimap when someone has the 'Guest' role removed.
-	public void updateMembersOnGuestRoleRemoved(DiscordApi dApi, UserRoleRemoveEvent rrEvent) {
-		try {
-			//Removes the "GUEST" value of the user from the members' Multimap if the 'Guest' role is removed.
-			if(rrEvent.getRole().equals(guestRole) && allMembers.containsEntry(rrEvent.getUser().getDiscriminatedName(), "GUEST")) {
-				allMembers.remove(rrEvent.getUser().getDiscriminatedName(), "GUEST");
-				logger.info("Members updated due to " + Iterables.get(allMembers.get(rrEvent.getUser().getDiscriminatedName()), 0) + " having a 'Guest' role removed."); //Sends an info log about what issued the listener.
-			}
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
 			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
