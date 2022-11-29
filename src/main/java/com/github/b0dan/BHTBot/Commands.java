@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,9 +27,13 @@ import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
+import org.javacord.api.event.channel.server.ServerChannelChangeNameEvent;
+import org.javacord.api.event.channel.server.ServerChannelDeleteEvent;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.event.server.member.ServerMemberJoinEvent;
 import org.javacord.api.event.server.member.ServerMemberLeaveEvent;
+import org.javacord.api.event.server.role.RoleChangeNameEvent;
+import org.javacord.api.event.server.role.RoleDeleteEvent;
 import org.javacord.api.event.server.role.UserRoleAddEvent;
 import org.javacord.api.event.server.role.UserRoleRemoveEvent;
 import org.javacord.api.event.user.UserChangeNicknameEvent;
@@ -205,6 +210,116 @@ public class Commands {
 			logger.warn("Fatal error occured!");
 			logger.fatal("" + e1 + " -> (" + e1.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e1.printStackTrace();
+		}
+	}
+
+	//A listener that automatically updates the 'BHT/Channels' SQL database when someone changes the name of a channel that's inside said database.
+	public void updateDBChannelsOnChangeName(ServerChannelChangeNameEvent ccnEvent) {
+		try {
+			//Opens up a connection to the 'BHT' SQL database (Channels).
+        		Class.forName("com.mysql.cj.jdbc.Driver");
+        		Connection connection = DriverManager.getConnection("...");
+
+        		//If the channel that has been renamed is in the 'BHT' SQL database (Channels), updates it in there.
+			PreparedStatement preparedStatement0 = connection.prepareStatement("SELECT COUNT(channelId) FROM Channels WHERE channelId = ?");
+			preparedStatement0.setLong(1, ccnEvent.getChannel().getId());
+			ResultSet resultSet = preparedStatement0.executeQuery();
+			resultSet.next();
+			if(resultSet.getInt(1) == 1) {
+	        	PreparedStatement preparedStatement = connection.prepareStatement("UPDATE Channels SET channelName = ? WHERE channelId = ?");
+	        	preparedStatement.setString(1, ccnEvent.getNewName());
+				preparedStatement.setLong(2, ccnEvent.getChannel().getId());
+				int affectedRows = preparedStatement.executeUpdate();
+				if(affectedRows > 0) {
+					logger.info("The 'BHT/Channels' database has been successfully updated due to a channel being renamed.");
+				}
+			}
+		} catch(Exception e) {
+			logger.warn("Fatal error occured!");
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			e.printStackTrace();
+		}
+	}
+
+	//A listener that automatically updates the 'BHT/Channels' SQL database when someone deletes a channel that's inside said database.
+	public void updateDBChannelsOnDelete(ServerChannelDeleteEvent cdEvent) {
+		try {
+			//Opens up a connection to the 'BHT' SQL database (Channels).
+        		Class.forName("com.mysql.cj.jdbc.Driver");
+        		Connection connection = DriverManager.getConnection("...");
+
+        		//If the channel that has been deleted is in the 'BHT' SQL database (Channels), removes it from there.
+			PreparedStatement preparedStatement0 = connection.prepareStatement("SELECT COUNT(channelId) FROM Channels WHERE channelId = ?");
+			preparedStatement0.setLong(1, cdEvent.getChannel().getId());
+			ResultSet resultSet = preparedStatement0.executeQuery();
+			resultSet.next();
+			if(resultSet.getInt(1) == 1) {
+	        	PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM Channels WHERE channelId = ?");
+				preparedStatement.setLong(1, cdEvent.getChannel().getId());
+				int affectedRows = preparedStatement.executeUpdate();
+				if(affectedRows > 0) {
+					logger.info("The 'BHT/Channels' database has been successfully updated due to a channel being deleted.");
+				}
+			}
+		} catch(Exception e) {
+			logger.warn("Fatal error occured!");
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			e.printStackTrace();
+		}
+	}
+
+	//A listener that automatically updates the 'BHT/Roles' SQL database when someone changes the name of a role that's inside said database.
+	public void updateDBRolesOnChangeName(RoleChangeNameEvent rcnEvent) {
+		try {
+			//Opens up a connection to the 'BHT' SQL database (Roles).
+        		Class.forName("com.mysql.cj.jdbc.Driver");
+        		Connection connection = DriverManager.getConnection("...");
+
+        		//If the role that has been renamed is in the 'BHT' SQL database (Roles), updates it in there.
+			PreparedStatement preparedStatement0 = connection.prepareStatement("SELECT COUNT(roleId) FROM Roles WHERE roleId = ?");
+			preparedStatement0.setLong(1, rcnEvent.getRole().getId());
+			ResultSet resultSet = preparedStatement0.executeQuery();
+			resultSet.next();
+			if(resultSet.getInt(1) == 1) {
+	        	PreparedStatement preparedStatement = connection.prepareStatement("UPDATE Roles SET roleName = ? WHERE roleId = ?");
+	        	preparedStatement.setString(1, rcnEvent.getNewName());
+				preparedStatement.setLong(2, rcnEvent.getRole().getId());
+				int affectedRows = preparedStatement.executeUpdate();
+				if(affectedRows > 0) {
+					logger.info("The 'BHT/Roles' database has been successfully updated due to a role being renamed.");
+				}
+			}
+		} catch(Exception e) {
+			logger.warn("Fatal error occured!");
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			e.printStackTrace();
+		}
+	}
+
+	//A listener that automatically updates the 'BHT/Roles' SQL database when someone deletes a role that's inside said database.
+	public void updateDBRolesOnDelete(RoleDeleteEvent rdEvent) {
+		try {
+			//Opens up a connection to the 'BHT' SQL database (Roles).
+        		Class.forName("com.mysql.cj.jdbc.Driver");
+        		Connection connection = DriverManager.getConnection("...");
+
+        		//If the role that has been deleted is in the 'BHT' SQL database (Roles), removes it from there.
+			PreparedStatement preparedStatement0 = connection.prepareStatement("SELECT COUNT(roleId) FROM Roles WHERE roleId = ?");
+			preparedStatement0.setLong(1, rdEvent.getRole().getId());
+			ResultSet resultSet = preparedStatement0.executeQuery();
+			resultSet.next();
+			if(resultSet.getInt(1) == 1) {
+	        	PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM Roles WHERE roleId = ?");
+				preparedStatement.setLong(1, rdEvent.getRole().getId());
+				int affectedRows = preparedStatement.executeUpdate();
+				if(affectedRows > 0) {
+					logger.info("The 'BHT/Roles' database has been successfully updated due to a role being deleted.");
+				}
+			}
+		} catch(Exception e) {
+			logger.warn("Fatal error occured!");
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			e.printStackTrace();
 		}
 	}
 
@@ -978,13 +1093,6 @@ public class Commands {
         			int k = 1;
         			resultSet.beforeFirst();
     				while(resultSet.next()) {
-    					//Updates the channels' names.
-    					PreparedStatement preparedStatement = connection.prepareStatement("UPDATE Channels SET channelName = ? WHERE channelId = ?");
-            				preparedStatement.setString(1, dApi.getServerTextChannelById(resultSet.getLong("channelId")).get().getName());
-            				preparedStatement.setLong(2, resultSet.getLong("channelId"));
-            				preparedStatement.execute();
-            				preparedStatement.close();
-
             				//Adds the channels to the above mentioned embed.
     					channels.addField(k + ". " + String.valueOf(resultSet.getString("channelName")), "**ID: **" + String.valueOf(resultSet.getLong("channelId")));
     					k++;
@@ -1175,14 +1283,7 @@ public class Commands {
         			int k = 1;
         			resultSet.beforeFirst();
     				while(resultSet.next()) {
-    					//Updates the roles' names.
-	    				PreparedStatement preparedStatement = connection.prepareStatement("UPDATE Roles SET roleName = ? WHERE roleId = ?");
-            				preparedStatement.setString(1, dApi.getRoleById(resultSet.getLong("roleId")).get().getName());
-        		    		preparedStatement.setLong(2, resultSet.getLong("roleId"));
-            				preparedStatement.execute();
-            				preparedStatement.close();
-
-            				//Adds the roles to the above mentioned embed.
+    					//Adds the roles to the above mentioned embed.
     					roles.addField(k + ". " + String.valueOf(resultSet.getString("roleName")), "**ID: **" + String.valueOf(resultSet.getLong("roleId")));
     					k++;
     				}
