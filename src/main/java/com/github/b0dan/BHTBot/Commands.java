@@ -70,7 +70,7 @@ public class Commands {
 			logger.info("Command (~commandsHelp) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
 		}
 	}
@@ -109,7 +109,7 @@ public class Commands {
 			logger.error("Expected/Handled: " + e0 + " -> (" + e0.getCause() + ")"); //Sends an error log about an expected/handled error.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
 		}
 	}
@@ -133,7 +133,7 @@ public class Commands {
 			}
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
 		}
 	}
@@ -156,7 +156,7 @@ public class Commands {
 				new MessageBuilder().append("Wrong input! The ID must be a digit of type `Long`. Use `~idHelp` for more information on how to get the ID.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e0_0) {
 				logger.warn("Fatal error occured!");
-				logger.fatal("", e0_0 + " -> (" + e0_0.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				logger.fatal("" + e0_0 + " -> (" + e0_0.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e0_0.printStackTrace();
 			}
 		} catch(NoSuchElementException e) {
@@ -167,12 +167,12 @@ public class Commands {
 				new MessageBuilder().append("Error! The Role ID doesn't exist.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e0_1) {
 				logger.warn("Fatal error occured!");
-				logger.fatal("", e0_1 + " -> (" + e0_1.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				logger.fatal("" + e0_1 + " -> (" + e0_1.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e0_1.printStackTrace();
 			}
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
 		}
 	}
@@ -198,12 +198,12 @@ public class Commands {
 				new MessageBuilder().append("Wrong input! The number should be either 0 or 1.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch (Exception e2) {
 				logger.warn("Fatal error occured!");
-				logger.fatal("", e2 + " -> (" + e2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				logger.fatal("" + e2 + " -> (" + e2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e2.printStackTrace();
 			}
 		} catch(Exception e1) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e1 + " -> (" + e1.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e1 + " -> (" + e1.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e1.printStackTrace();
 		}
 	}
@@ -261,7 +261,7 @@ public class Commands {
 			});
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
 		}
 	}
@@ -283,7 +283,7 @@ public class Commands {
 			logger.error("Expected/Handled: " + e0 + " -> (" + e0.getCause() + ")"); //Sends an error log about an expected/handled error.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
 		}
 	}
@@ -356,7 +356,7 @@ public class Commands {
 			logger.error("Expected/Handled: " + e0 + " -> (" + e0.getCause() + ")"); //Sends an error log about an expected/handled error.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
 		}
 	}
@@ -371,7 +371,7 @@ public class Commands {
 			}
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
 		}
 	}
@@ -386,7 +386,7 @@ public class Commands {
 			}
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
 		}
 	}
@@ -423,7 +423,7 @@ public class Commands {
 			logger.info("Command (~contractsHelp) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
 		}
 	}
@@ -524,7 +524,7 @@ public class Commands {
 	            					logger.error("Expected/Handled: " + e0 + " -> (" + e0.getCause() + ")"); //Sends an error log about an expected/handled error.
 						} catch(Exception e1) {
 							logger.warn("Fatal error occured!");
-							logger.fatal("", e1 + " -> (" + e1.getCause() + ")"); //Sends a fatal log about an unhandled error.
+							logger.fatal("" + e1 + " -> (" + e1.getCause() + ")"); //Sends a fatal log about an unhandled error.
 							e1.printStackTrace();
 						}
 	            			});
@@ -544,7 +544,7 @@ public class Commands {
 			logger.error("Expected/Handled: " + e0 + " -> (" + e0.getCause() + ")"); //Sends an error log about an expected/handled error.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
 		}
 	}
@@ -604,14 +604,14 @@ public class Commands {
 				new MessageBuilder().append("Error! That is not a valid name:\n**1.** Each word must begin with a capital letter, have at least two letters in it and only one blank space in-between;\n**2.** Special characters and numbers are not allowed;\n**3.** The length of the full name must be between 3 and 20 letters;\n**4.** The name must contain at least one blank space.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e1_2) {
 				logger.warn("Fatal error occured!");
-				logger.fatal("", e1_2 + " -> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				logger.fatal("" + e1_2 + " -> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e1_2.printStackTrace();
 			}
 		} catch(NullPointerException e) {
 			logger.error("Expected/Handled: " + e + " -> (" + e.getCause() + ")"); //Sends an error log about an expected/handled error.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
 		}
 	}
@@ -675,7 +675,7 @@ public class Commands {
 				new MessageBuilder().append("Error! Please, follow the format: `~updateContract [Contract ID] [Full Name]`.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e1_2) {
 				logger.warn("Fatal error occured!");
-				logger.fatal("", e1_2 + " -> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				logger.fatal("" + e1_2 + " -> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e1_2.printStackTrace();
 			}
 		} catch(NumberFormatException e2_1) {
@@ -686,14 +686,14 @@ public class Commands {
 				new MessageBuilder().append("Wrong input! The value after the `~updateContract` command must be a digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e2_2) {
 				logger.warn("Fatal error occured!");
-				logger.fatal("", e2_2 + " -> (" + e2_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				logger.fatal("" + e2_2 + " -> (" + e2_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e2_2.printStackTrace();
 			}
 		} catch(NullPointerException e) {
 			logger.error("Expected/Handled: " + e + " -> (" + e.getCause() + ")"); //Sends an error log about an expected/handled error.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
 		}
 	} 
@@ -734,7 +734,7 @@ public class Commands {
 				new MessageBuilder().append("Wrong input! The value after the `~removeContract` command must be a digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e0_2) {
 				logger.warn("Fatal error occured!");
-				logger.fatal("", e0_2 + " -> (" + e0_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				logger.fatal("" + e0_2 + " -> (" + e0_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e0_2.printStackTrace();
 			}
 		} catch(NumberFormatException e1_1) {
@@ -745,12 +745,12 @@ public class Commands {
 				new MessageBuilder().append("Wrong input! The value after the `~removeContract` command must be a digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e1_2) {
 				logger.warn("Fatal error occured!");
-				logger.fatal("", e1_2 + " -> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				logger.fatal("" + e1_2 + " -> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e1_2.printStackTrace();
 			}
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
 		}
 	}
@@ -798,7 +798,7 @@ public class Commands {
 			logger.error("Expected/Handled: " + e0 + " -> (" + e0.getCause() + ")"); //Sends an error log about an expected/handled error.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
 		}
 	}
@@ -845,7 +845,7 @@ public class Commands {
 				new MessageBuilder().append("Wrong input! The value after the `~addPriorityContract` command must be a digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e0_2) {
 				logger.warn("Fatal error occured!");
-				logger.fatal("", e0_2 + " -> (" + e0_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				logger.fatal("" + e0_2 + " -> (" + e0_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e0_2.printStackTrace();
 			}
 		} catch(NumberFormatException e1_1) {
@@ -856,7 +856,7 @@ public class Commands {
 				new MessageBuilder().append("Wrong input! The value after the `~addPriorityContract` command must be a digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e1_2) {
 				logger.warn("Fatal error occured!");
-				logger.fatal("", e1_2 + " -> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				logger.fatal("" + e1_2 + " -> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e1_2.printStackTrace();
 			}
 		} catch(SQLException e2_1) {
@@ -867,12 +867,12 @@ public class Commands {
 				new MessageBuilder().append("Error! The Contract ID doesn't exist.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e2_2) {
 				logger.warn("Fatal error occured!");
-				logger.fatal("", e2_2 + " -> (" + e2_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				logger.fatal("" + e2_2 + " -> (" + e2_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e2_2.printStackTrace();
 			}
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
 		}
 	}
@@ -919,7 +919,7 @@ public class Commands {
 				new MessageBuilder().append("Wrong input! The value after the `~removePriorityContract` command must be a digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e0_2) {
 				logger.warn("Fatal error occured!");
-				logger.fatal("", e0_2 + " -> (" + e0_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				logger.fatal("" + e0_2 + " -> (" + e0_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e0_2.printStackTrace();
 			}
 		} catch(NumberFormatException e1_1) {
@@ -930,7 +930,7 @@ public class Commands {
 				new MessageBuilder().append("Wrong input! The value after the `~removePriorityContract` command must be a digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e1_2) {
 				logger.warn("Fatal error occured!");
-				logger.fatal("", e1_2 + " -> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				logger.fatal("" + e1_2 + " -> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e1_2.printStackTrace();
 			}
 		} catch(SQLException e2_1) {
@@ -941,12 +941,12 @@ public class Commands {
 				new MessageBuilder().append("Error! The Contract ID doesn't exist.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e2_2) {
 				logger.warn("Fatal error occured!");
-				logger.fatal("", e2_2 + " -> (" + e2_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				logger.fatal("" + e2_2 + " -> (" + e2_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e2_2.printStackTrace();
 			}
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
 		}
 	}
@@ -1002,7 +1002,7 @@ public class Commands {
 			logger.info("Command (~showChannels) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
 		}
 	}
@@ -1061,7 +1061,7 @@ public class Commands {
 				new MessageBuilder().append("Wrong input! The value after the `~addChannel` command must be a long digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e0_2) {
 				logger.warn("Fatal error occured!");
-				logger.fatal("", e0_2 + " -> (" + e0_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				logger.fatal("" + e0_2 + " -> (" + e0_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e0_2.printStackTrace();
 			}
 		} catch(NumberFormatException e1_1) {
@@ -1072,7 +1072,7 @@ public class Commands {
 				new MessageBuilder().append("Wrong input! The value after the `~addChannel` command must be a long digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e1_2) {
 				logger.warn("Fatal error occured!");
-				logger.fatal("", e1_2 + " -> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				logger.fatal("" + e1_2 + " -> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			}
 		} catch(NoSuchElementException e2_1) {
 			try {
@@ -1082,11 +1082,11 @@ public class Commands {
 				new MessageBuilder().append("Error! There is no channel with the specified ID in the server.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e2_2) {
 				logger.warn("Fatal error occured!");
-				logger.fatal("", e2_2 + " -> (" + e2_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				logger.fatal("" + e2_2 + " -> (" + e2_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			}
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
 		}
 	}
@@ -1127,7 +1127,7 @@ public class Commands {
 				new MessageBuilder().append("Wrong input! The value after the `~removeChannel` command must be a long digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e0_2) {
 				logger.warn("Fatal error occured!");
-				logger.fatal("", e0_2 + " -> (" + e0_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				logger.fatal("" + e0_2 + " -> (" + e0_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e0_2.printStackTrace();
 			}
 		} catch(NumberFormatException e1_1) {
@@ -1138,12 +1138,12 @@ public class Commands {
 				new MessageBuilder().append("Wrong input! The value after the `~removeChannel` command must be a long digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e1_2) {
 				logger.warn("Fatal error occured!");
-				logger.fatal("", e1_2 + " -> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				logger.fatal("" + e1_2 + " -> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e1_2.printStackTrace();
 			}
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
 		}
 	}
@@ -1199,7 +1199,7 @@ public class Commands {
 			logger.info("Command (~showRoles) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
 		}
 	}
@@ -1258,7 +1258,7 @@ public class Commands {
 				new MessageBuilder().append("Wrong input! The value after the `~addRole` command must be a long digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e0_2) {
 				logger.warn("Fatal error occured!");
-				logger.fatal("", e0_2 + " -> (" + e0_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				logger.fatal("" + e0_2 + " -> (" + e0_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e0_2.printStackTrace();
 			}
 		} catch(NumberFormatException e1_1) {
@@ -1269,7 +1269,7 @@ public class Commands {
 				new MessageBuilder().append("Wrong input! The value after the `~addRole` command must be a long digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e1_2) {
 				logger.warn("Fatal error occured!");
-				logger.fatal("", e1_2 + " -> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				logger.fatal("" + e1_2 + " -> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e1_2.printStackTrace();
 			}
 		} catch(NoSuchElementException e2_1) {
@@ -1280,12 +1280,12 @@ public class Commands {
 				new MessageBuilder().append("Error! There is no role with the specified ID in the server.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e2_2) {
 				logger.warn("Fatal error occured!");
-				logger.fatal("", e2_2 + " -> (" + e2_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				logger.fatal("" + e2_2 + " -> (" + e2_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e2_2.printStackTrace();
 			}
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
 		}
 	}
@@ -1326,7 +1326,7 @@ public class Commands {
 				new MessageBuilder().append("Wrong input! The value after the `~removeRole` command must be a long digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e0_2) {
 				logger.warn("Fatal error occured!");
-				logger.fatal("", e0_2 + " -> (" + e0_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				logger.fatal("" + e0_2 + " -> (" + e0_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e0_2.printStackTrace();
 			}
 		} catch(NumberFormatException e1_1) {
@@ -1337,7 +1337,7 @@ public class Commands {
 				new MessageBuilder().append("Wrong input! The value after the `~removeRole` command must be a long digit.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e1_2) {
 				logger.warn("Fatal error occured!");
-				logger.fatal("", e1_2 + " -> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				logger.fatal("" + e1_2 + " -> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e1_2.printStackTrace();
 			}
 		} catch(NoSuchElementException e2_1) {
@@ -1347,12 +1347,12 @@ public class Commands {
 				new MessageBuilder().append("Contract related commands are no longer available to the role with the following ID: `" + mEvent.getMessage().getContent().substring(12) + "`.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e0_3) {
 				logger.warn("Fatal error occured!");
-				logger.fatal("", e0_3 + " -> (" + e0_3.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				logger.fatal("" + e0_3 + " -> (" + e0_3.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e0_3.printStackTrace();
 			}
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
 		}
 	}
@@ -1376,7 +1376,7 @@ public class Commands {
 			logger.info("Command (~rpsHelp) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
 		}
 	}
@@ -1465,14 +1465,14 @@ public class Commands {
 				new MessageBuilder().append("Wrong input! Please choose either `Rock`, `Paper` or `Scissors`.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e1_2) {
 				logger.warn("Fatal error occured!");
-				logger.fatal("", e1_2 + " -> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				logger.fatal("" + e1_2 + " -> (" + e1_2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e1_2.printStackTrace();
 			}
 		} catch(NullPointerException e) {
 			logger.error("Expected/Handled: " + e + " -> (" + e.getCause() + ")"); //Sends an error log about an expected/handled error.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
 		}
 	}
@@ -1523,7 +1523,7 @@ public class Commands {
 			logger.info("Command (~rpsHighscores) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
 		}
 	}
@@ -1546,7 +1546,7 @@ public class Commands {
 			logger.info("Command (~idHelp) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 		} catch(Exception e) {
 			logger.warn("Fatal error occured!");
-			logger.fatal("", e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
 			e.printStackTrace();
 		}
 	}
