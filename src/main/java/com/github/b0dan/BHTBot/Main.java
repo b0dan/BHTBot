@@ -597,6 +597,66 @@ public class Main {
        			}
 		});
 
+		//Gets triggered when someone renames a channel from the server.
+       		api.addServerChannelChangeNameListener(event -> {
+       			try {
+       				Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
+
+				if(server.getId() == 262781891705307137L) {
+					cmd.updateDBChannelsOnChangeName(event);
+				}
+       			} catch(Exception e) {
+       				logger.warn("Fatal error occured!");
+       				logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+       				e.printStackTrace();
+       			}
+       		});
+
+		//Gets triggered when someone deletes a channel from the server.
+        	api.addServerChannelDeleteListener(event -> {
+        		try {
+        			Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
+
+				if(server.getId() == 262781891705307137L) {
+					cmd.updateDBChannelsOnDelete(event);
+				}
+        		} catch(Exception e) {
+        			logger.warn("Fatal error occured!");
+       				logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+       				e.printStackTrace();
+        		}
+		});
+
+        	//Gets triggered when someone renames a role from the server.
+       		api.addRoleChangeNameListener(event -> {
+       			try {
+       				Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
+
+				if(server.getId() == 262781891705307137L) {
+					cmd.updateDBRolesOnChangeName(event);
+				}
+       			} catch(Exception e) {
+       				logger.warn("Fatal error occured!");
+       				logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+       				e.printStackTrace();
+       			}
+       		});
+
+        	//Gets triggered when someone deletes a role from the server.
+		api.addRoleDeleteListener(event -> {
+			try {
+        			Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
+
+				if(server.getId() == 262781891705307137L) {
+					cmd.updateDBRolesOnDelete(event);
+				}
+        		} catch(Exception e) {
+        			logger.warn("Fatal error occured!");
+       				logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+       				e.printStackTrace();
+        		}
+		});
+
    		//Gets triggered when someone joins the server and updates the members' Multimap.
    		api.addServerMemberJoinListener(event -> {
 			try {
