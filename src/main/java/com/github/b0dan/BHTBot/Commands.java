@@ -559,7 +559,6 @@ public class Commands {
         		//An embed with all active contracts.
 			EmbedBuilder contracts = new EmbedBuilder();
 			contracts
-				.setTitle("Active Contracts")
 				.setThumbnail("https://i.imgur.com/HoOkwBs.png")
 				.setColor(Color.RED)
 				.setFooter("Make sure to remove the contract you've completed by typing `~removeContract [Contract ID]`!");
@@ -601,7 +600,14 @@ public class Commands {
 	       					break;
 	       				}
 	        		}
-	        		mEvent.getChannel().sendMessage(contracts);
+
+				//Displays the title of the embed. If it has more than 25 contracts, displays the page as well.
+				if(totalContracts > 25) {
+					contracts.setTitle("Active Contracts | Page " + currentPage);
+				} else {
+					contracts.setTitle("Active Contracts");
+				}
+				mEvent.getChannel().sendMessage(contracts);
 	        		long embedMessageId = mEvent.getChannel().getMessages(1).get().getNewestMessage().get().getId();
 
 	        		//Adds the reactions needed to "flip a page".
