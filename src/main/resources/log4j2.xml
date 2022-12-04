@@ -10,7 +10,7 @@
 			</Filters>
 		</Console>
 
-		<File name = "ErrorLogFile" fileName = "logs/errors.log">
+		<File name = "ErrorLogFile" fileName = "/etc/java/errors.log">
 			<PatternLayout pattern = "%d{dd/MMM/yyyy, HH:mm:ss.SSS} [%logger{36}]  %-5level ---  %msg%n"/>
 		</File>
 	</Appenders>
