@@ -18,31 +18,6 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 
 public class Main {
-	private static final List<String> availableCommands = new ArrayList<>() {{
-		add("updateMembers");
-		add("commandsHelp");
-		add("contractsHelp");
-		add("rpsHelp");
-		add("idHelp");
-		add("setOnLeaveRole");
-		add("setOnLeavePing");
-		add("showContracts");
-		add("addContract");
-		add("updateContract");
-		add("removeContract");
-		add("showPriorityContracts");
-		add("addPriorityContract");
-		add("removePriorityContract");
-		add("showChannels");
-		add("addChannel");
-		add("removeChannel");
-		add("showRoles");
-		add("addRole");
-		add("removeRole");
-		add("rpsPlay");
-		add("rpsHighscores");
-	}};
-
 	public static void main(String[] args) {
 		Logger logger = LogManager.getLogger(Main.class); //Creates an instance of the 'Logger' class for 'Main.class'.
 
@@ -813,11 +788,11 @@ public class Main {
 							int commandIndex = -1;
 							if(event.getMessageContent().charAt(0) != '~') {
 								String[] message = event.getMessageContent().split(" ", 2);
-								for(String availableCommand: availableCommands) {
+								for(String availableCommand: cmd.getAvailableCommands()) {
 									commandIndex++;
 									if(availableCommand.equalsIgnoreCase(message[0].substring(1))) {
 										event.getMessage().addReaction("👀");
-										new MessageBuilder().append("Did you mean `~" + availableCommands.get(commandIndex) + "`?\nThe prefix for the commands is a `~` and not a `" + event.getMessageContent().charAt(0) + "`.")
+										new MessageBuilder().append("Did you mean `~" + cmd.getAvailableCommands().get(commandIndex) + "`?\nThe prefix for the commands is a `~` and not a `" + event.getMessageContent().charAt(0) + "`.")
 											.replyTo(event.getMessageId())
 											.send(event.getChannel());
 										break;
