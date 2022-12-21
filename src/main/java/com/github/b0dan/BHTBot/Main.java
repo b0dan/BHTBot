@@ -777,12 +777,6 @@ public class Main {
 								case "idhelp" -> cmd.idHelp(api, event);
 								case "rpsplay" -> cmd.rockPaperScissorsGame(event, argument1);
 								case "rpshighscores" -> cmd.rockPaperScissorsHighscores(api, event);
-								default -> {
-									event.getMessage().addReaction("👀");
-									new MessageBuilder().append("The command you are attempting to use does not exist. Please refer to `~commandsHelp` for a list of available general commands and their usage.")
-										.replyTo(event.getMessageId())
-										.send(event.getChannel());
-								}
 							}
 						} else if(!Character.isAlphabetic(event.getMessageContent().charAt(0)) && !Character.isDigit(event.getMessageContent().charAt(0))) {
 							int commandIndex = -1;
