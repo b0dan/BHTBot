@@ -42,6 +42,36 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 
 public class Commands {
+	//All the available commands and a get method for them.
+	private final List<String> availableCommands = new ArrayList<>() {{
+		add("updateMembers");
+		add("commandsHelp");
+		add("contractsHelp");
+		add("rpsHelp");
+		add("idHelp");
+		add("setOnLeaveRole");
+		add("setOnLeavePing");
+		add("showContracts");
+		add("addContract");
+		add("updateContract");
+		add("removeContract");
+		add("showPriorityContracts");
+		add("addPriorityContract");
+		add("removePriorityContract");
+		add("showChannels");
+		add("addChannel");
+		add("removeChannel");
+		add("showRoles");
+		add("addRole");
+		add("removeRole");
+		add("rpsPlay");
+		add("rpsHighscores");
+	}};
+	
+	public List<String> getAvailableCommands() {
+		return availableCommands;
+	}
+
 	private static final Logger logger = LogManager.getLogger(Commands.class); //Creates an instance of the 'Logger' class for 'Commands.class'.
 
 	private long onLeaveRoleID = 336588534351790080L; //The role value for the 'onLeaveRole' from the `~setOnLeaveRole` command (default: Luminous Path -> 336588534351790080L).
