@@ -135,7 +135,7 @@ public class Commands {
 				logger.warn("The server has no members."); //Sends a warning log about the server being empty.
 			} else {
 				System.out.println();
-				for (Map.Entry<String, String> entry : allMembers.entries()) {
+				for(Map.Entry<String, String> entry: allMembers.entries()) {
 					System.out.println(entry);
 				}
 				System.out.println("Members: " + allMembers.size() + "\n");
