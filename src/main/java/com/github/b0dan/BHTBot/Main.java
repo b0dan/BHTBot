@@ -1,10 +1,11 @@
 package com.github.b0dan.BHTBot;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,721 +13,960 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.message.MessageBuilder;
+import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.user.User;
 
 public class Main {
-	private static final Logger logger = LogManager.getLogger(Main.class); //Creates an instance of the 'Logger' class for 'Main.class'.
+	private static final List<String> availableCommands = new ArrayList<>() {{
+		add("updateMembers");
+		add("commandsHelp");
+		add("contractsHelp");
+		add("rpsHelp");
+		add("idHelp");
+		add("setOnLeaveRole");
+		add("setOnLeavePing");
+		add("showContracts");
+		add("addContract");
+		add("updateContract");
+		add("removeContract");
+		add("showPriorityContracts");
+		add("addPriorityContract");
+		add("removePriorityContract");
+		add("showChannels");
+		add("addChannel");
+		add("removeChannel");
+		add("showRoles");
+		add("addRole");
+		add("removeRole");
+		add("rpsPlay");
+		add("rpsHighscores");
+	}};
 
-	public static void main(String[] args) throws IOException {
-		DiscordApi api = new DiscordApiBuilder().setToken("...").setAllIntents().login().join(); //Creates an object from the Discord API.        
+	public static void main(String[] args) {
+		Logger logger = LogManager.getLogger(Main.class); //Creates an instance of the 'Logger' class for 'Main.class'.
+
+		DiscordApi api = new DiscordApiBuilder().setToken("...").setAllIntents().login().join(); //Creates an object from the Discord API.
 		System.out.println(api.getServers() + "\nBHT Bot is online!\n");
 		api.updateActivity(ActivityType.LISTENING, "~commandsHelp"); //Updates the activity to "Listening to ~commandsHelp".
 
-		Commands cmd = new Commands(); //Creates an object from the 'Commands' class.
+       		Commands cmd = new Commands(); //Creates an object from the 'Commands' class.
 
-		//Different commands and permissions on who can use them.
-		api.addMessageCreateListener(event -> { //Head Shan Chu(262802994574131200L), Shan Chu(262784255816499201L), Tech Manager(343680704502300672L), Crew Leader(419232575261769730L), Luminous Path(336588534351790080L).
-       			try {
-       				Server server = api.getServerById(event.getServerTextChannel().get().getServer().getId()).get(); //Gets the server.
+      	 	//Different commands and permissions on who can use them.
+       		api.addMessageCreateListener(event -> { //Head Shan Chu(262802994574131200L), Shan Chu(262784255816499201L), Tech Manager(343680704502300672L), Crew Leader(419232575261769730L), Luminous Path(336588534351790080L).
+			try {
+				if(event.getServer().isPresent()) {
+					Server server = event.getServer().get();
+					if(server.getId() == 262781891705307137L) {
+						if(event.getMessageContent().charAt(0) == '~') {
+							String[] commandArguments;
+							if(event.getMessageContent().substring(0, 12).equalsIgnoreCase("~addContract")) {
+								commandArguments = event.getMessageContent().split(" ", 2);
+							} else {
+								commandArguments = event.getMessageContent().split(" ", 3);
+							}
+							String command = commandArguments[0];
+							String argument1 = null;
+							if(commandArguments.length >= 2) {
+								argument1 = commandArguments[1];
+							}
+							String argument2 = null;
+							if(commandArguments.length == 3) {
+								argument2 = commandArguments[2];
+							}
 
-       				if(server.getId() == 262781891705307137L) {
-       					if(event.getMessageContent().equalsIgnoreCase("~commandsHelp")) {
-           					cmd.displayCommands(api, event);
-					} else if(event.getMessageContent().equals("~updateMembers") && (event.getMessageAuthor().isBotOwner() || event.getMessageAuthor().isServerAdmin()) && event.getChannel().equals(api.getServerById(event.getServerTextChannel().get().getServer().getId()).get().getSystemChannel().get())) {
-           					cmd.manuallyUpdateMembers(api, event);
-           				} else if(event.getMessageContent().equals("~getAllMembers") && event.getMessageAuthor().isBotOwner() && event.getChannel().equals(api.getServerById(event.getServerTextChannel().get().getServer().getId()).get().getSystemChannel().get())) {
-           					cmd.getAllMembers(api, event);
-           				} else if(event.getMessageContent().equalsIgnoreCase("~rpsHelp")) {
-           					cmd.rockPaperScissorsHelp(api, event);
-           				} else if(event.getMessageContent().equalsIgnoreCase("~idHelp")) {
-           					cmd.idHelp(api, event);
-           				} else if(event.getMessageContent().substring(0, 8).equalsIgnoreCase("~rpsPlay")) {
-           					cmd.rockPaperScissorsGame(api, event);
-           				} else if(event.getMessageContent().equalsIgnoreCase("~rpsHighscores")) {
-						cmd.rockPaperScissorsHighscores(api, event);
-					} else if(event.getMessageContent().equalsIgnoreCase("~contractsHelp")) {
-           					cmd.contractsHelp(api, event);
-					} else if(event.getMessageContent().equalsIgnoreCase("~showContracts")) {
-						cmd.showContracts(api, event, 1, 1, 0, 0, false);
-					} else if(event.getMessageContent().equalsIgnoreCase("~showPriorityContracts")) {
-           					cmd.showPriorityContracts(event);
-					} else if(event.getMessageContent().equalsIgnoreCase("~showChannels")) {
-						cmd.showChannels(api, event);
-					} else if(event.getMessageContent().equalsIgnoreCase("~showRoles")) {
-						cmd.showRoles(api, event);
-           				} else if(event.getMessageContent().substring(0, 8).equalsIgnoreCase("~addRole")) {
-           					if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner() || api.getRoleById(343680704502300672L).get().hasUser(event.getMessageAuthor().asUser().get()) || (api.getRoleById(419232575261769730L).get().hasUser(event.getMessageAuthor().asUser().get()) && api.getRoleById(336588534351790080L).get().hasUser(event.getMessageAuthor().asUser().get())))) {
-           						cmd.addRole(api, event);
-           					} else {
-           						event.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
-           						new MessageBuilder()
-           							.append("You can only use the `~addRole` command if you have at least one of the following roles: ")
-           							.append("`" + api.getRoleById(262802994574131200L).get().getName() + "`")
-           							.append(", ")
-           							.append("`" + api.getRoleById(262784255816499201L).get().getName() + "`")
-           							.append(", ")
-           							.append("`" + api.getRoleById(343680704502300672L).get().getName() + "`")
-           							.append(", ")
-           							.append("`" + api.getRoleById(419232575261769730L).get().getName() + " + " + api.getRoleById(336588534351790080L).get().getName() + "`")
-           							.append(".")
-           							.replyTo(event.getMessageId())
-    								.send(event.getChannel());
-           					}
-           				} else if(event.getMessageContent().substring(0, 11).equalsIgnoreCase("~removeRole")) {
-           					if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner() || api.getRoleById(343680704502300672L).get().hasUser(event.getMessageAuthor().asUser().get()) || (api.getRoleById(419232575261769730L).get().hasUser(event.getMessageAuthor().asUser().get()) && api.getRoleById(336588534351790080L).get().hasUser(event.getMessageAuthor().asUser().get())))) {
-           						cmd.removeRole(api, event);
-           					} else {
-           						event.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
-           						new MessageBuilder()
-           							.append("You can only use the `~removeRole` command if you have at least one of the following roles: ")
-           							.append("`" + api.getRoleById(262802994574131200L).get().getName() + "`")
-           							.append(", ")
-           							.append("`" + api.getRoleById(262784255816499201L).get().getName() + "`")
-           							.append(", ")
-           							.append("`" + api.getRoleById(343680704502300672L).get().getName() + "`")
-           							.append(", ")
-           							.append("`" + api.getRoleById(419232575261769730L).get().getName() + " + " + api.getRoleById(336588534351790080L).get().getName() + "`")
-           							.append(".")
-           							.replyTo(event.getMessageId())
-    								.send(event.getChannel());
-           					}
-           				} else if(event.getMessageContent().substring(0, 11).equalsIgnoreCase("~addChannel")) {
-           					if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner() || api.getRoleById(343680704502300672L).get().hasUser(event.getMessageAuthor().asUser().get()) || (api.getRoleById(419232575261769730L).get().hasUser(event.getMessageAuthor().asUser().get()) && api.getRoleById(336588534351790080L).get().hasUser(event.getMessageAuthor().asUser().get())))) {
-           						cmd.addChannel(api, event);
-           					} else {
-           						event.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
-           						new MessageBuilder()
-           							.append("You can only use the `~addChannel` command if you have at least one of the following roles: ")
-           							.append("`" + api.getRoleById(262802994574131200L).get().getName() + "`")
-           							.append(", ")
-           							.append("`" + api.getRoleById(262784255816499201L).get().getName() + "`")
-           							.append(", ")
-           							.append("`" + api.getRoleById(343680704502300672L).get().getName() + "`")
-           							.append(", ")
-           							.append("`" + api.getRoleById(419232575261769730L).get().getName() + " + " + api.getRoleById(336588534351790080L).get().getName() + "`")
-           							.append(".")
-           							.replyTo(event.getMessageId())
-    								.send(event.getChannel());
-           					}
-           				} else if(event.getMessageContent().substring(0, 12).equalsIgnoreCase("~addContract")) {
-           					//Opens up a connection to the 'BHT' SQL database (Channels, Roles).
-        	        			Class.forName("com.mysql.cj.jdbc.Driver");
-        	        			Connection connection = DriverManager.getConnection("...");
+							switch(command.substring(1).toLowerCase()) {
+								case "updatemembers" -> {
+									if(server.getSystemChannel().isPresent() && (event.getMessageAuthor().isBotOwner() || event.getMessageAuthor().isServerAdmin())) {
+										if(event.getChannel().equals(server.getSystemChannel().get())) {
+											cmd.manuallyUpdateMembers(server, event);
+										} else {
+											event.getMessage().addReaction("👎");
+											new MessageBuilder().append("You can only use the `~updateMembers` command in ")
+												.append(server.getSystemChannel().get().getMentionTag() + ".")
+												.replyTo(event.getMessageId())
+												.send(event.getChannel());
+										}
+									} else {
+										event.getMessage().addReaction("👎");
 
-						//Creates a 'SELECT' SQL statement.
-						Statement statement = connection.createStatement();
+										Role role1 = null;
+										if(server.getRoleById(262784255816499201L).isPresent()) {
+											role1 = server.getRoleById(262784255816499201L).get();
+										}
+										Role role2 = null;
+										if(server.getRoleById(262802994574131200L).isPresent()) {
+											role2 = server.getRoleById(262802994574131200L).get();
+										}
 
-						//Checks if the user issuing the command is in the correct channel.
-						ResultSet resultSet = statement.executeQuery("SELECT channelId FROM Channels");
-						boolean channel = false;
-						while(resultSet.next() && channel == false) {
-							if(resultSet.getLong(1) == event.getChannel().asServerTextChannel().get().getId()) {
-								channel = true;
+										if(role1 != null && role2 != null) {
+											new MessageBuilder().append("You can only use the `~updateMembers` command if you have at least one of the following roles: ")
+												.append("`" + role1.getName() + "`").append(", ")
+												.append("`" + role2.getName() + "`").append(".")
+												.replyTo(event.getMessageId())
+												.send(event.getChannel());
+										}
+									}
+								}
+								case "getallmembers" -> {
+									if(server.getSystemChannel().isPresent() && event.getMessageAuthor().isBotOwner()) {
+										if(event.getChannel().equals(server.getSystemChannel().get())) {
+											cmd.getAllMembers(event);
+										}
+									}
+								}
+								case "commandshelp" -> cmd.displayCommands(api, event);
+								case "contractshelp" -> cmd.contractsHelp(event);
+								case "rpshelp" -> cmd.rockPaperScissorsHelp(api, event);
+								case "setonleaverole" -> {
+									if(event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner()) {
+										if(event.getChannel().equals(server.getSystemChannel().get())) {
+											cmd.setOnLeaveRole(server, event, argument1);
+										} else {
+											event.getMessage().addReaction("👎");
+											new MessageBuilder().append("You can only use the `~setOnLeaveRole` command in ")
+												.append(server.getSystemChannel().get().getMentionTag() + ".")
+												.replyTo(event.getMessageId())
+												.send(event.getChannel());
+										}
+									} else {
+										event.getMessage().addReaction("👎");
+
+										Role role1 = null;
+										if(server.getRoleById(262784255816499201L).isPresent()) {
+											role1 = server.getRoleById(262784255816499201L).get();
+										}
+										Role role2 = null;
+										if(server.getRoleById(262802994574131200L).isPresent()) {
+											role2 = server.getRoleById(262802994574131200L).get();
+										}
+
+										if(role1 != null && role2 != null) {
+											new MessageBuilder()
+												.append("You can only use the `~setOnLeavePing` command if you have at least one of the following roles: ")
+												.append("`" + role1.getName() + "`").append(", ")
+												.append("`" + role2.getName() + "`").append(".")
+												.replyTo(event.getMessageId())
+												.send(event.getChannel());
+										}
+									}
+								}
+								case "setonleaveping" -> {
+									if(event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner()) {
+										if(event.getChannel().equals(server.getSystemChannel().get())) {
+											cmd.setOnLeavePing(event, argument1);
+										} else {
+											event.getMessage().addReaction("👎");
+											new MessageBuilder().append("You can only use the `~setOnLeavePing` command in ")
+												.append(server.getSystemChannel().get().getMentionTag() + ".")
+												.replyTo(event.getMessageId())
+												.send(event.getChannel());
+										}
+									} else {
+										event.getMessage().addReaction("👎");
+
+										Role role1 = null;
+										if(server.getRoleById(262784255816499201L).isPresent()) {
+											role1 = server.getRoleById(262784255816499201L).get();
+										}
+										Role role2 = null;
+										if(server.getRoleById(262802994574131200L).isPresent()) {
+											role2 = server.getRoleById(262802994574131200L).get();
+										}
+
+										if(role1 != null && role2 != null) {
+											new MessageBuilder()
+												.append("You can only use the `~setOnLeavePing` command if you have at least one of the following roles: ")
+												.append("`" + role1.getName() + "`").append(", ")
+												.append("`" + role2.getName() + "`").append(".")
+												.replyTo(event.getMessageId())
+												.send(event.getChannel());
+										}
+									}
+								}
+								case "showcontracts" -> cmd.showContracts(event, 1, 1, 0, 0, false);
+								case "addcontract" -> {
+									//Opens up a connection to the 'BHT' SQL database (Channels, Roles).
+									Class.forName("com.mysql.cj.jdbc.Driver");
+									Connection connection = DriverManager.getConnection("...");
+
+									//Creates a 'SELECT' SQL statement.
+									Statement statement = connection.createStatement();
+
+									//Checks if the user issuing the command is in the correct channel.
+									ResultSet resultSet = statement.executeQuery("SELECT channelId FROM Channels");
+									boolean channel = false;
+									if(event.getChannel().asServerTextChannel().isPresent()) {
+										while(resultSet.next() && !channel) {
+											if(resultSet.getLong(1) == event.getChannel().asServerTextChannel().get().getId()) {
+												channel = true;
+											}
+										}
+									}
+
+									//Checks if the user issuing the command has at least one of the required roles.
+									resultSet = statement.executeQuery("SELECT roleId FROM Roles");
+									boolean role = false;
+										while(resultSet.next() && !role) {
+											if(server.getRoleById(resultSet.getLong(1)).isPresent()) {
+												if(server.getRoleById(resultSet.getLong(1)).get().hasUser(event.getMessageAuthor().asUser().get())) {
+													role = true;
+												}
+											}
+										}
+									//}
+
+									//If both conditions are met, the commands gets issued. If not, it notifies the user what's missing.
+									if((channel && role) || (channel && (event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner()))) {
+										//Closes the connections.
+										resultSet.close();
+										statement.close();
+										connection.close();
+
+										cmd.manuallyAddContractToDatabase(event, argument1);
+									} else if(!channel) {
+										event.getMessage().addReaction("👎");
+
+										//Prints out the channels where the command can be used.
+										ResultSet resultSet0 = statement.executeQuery("SELECT channelId FROM Channels");
+										MessageBuilder channels = new MessageBuilder().append("The command `~addContract` can only be used in the following channels: ");
+
+										if(resultSet0.next()) {
+											if(server.getChannelById(resultSet0.getLong(1)).isPresent() && server.getChannelById(resultSet0.getLong(1)).get().asServerTextChannel().isPresent()) {
+												channels.append(server.getChannelById(resultSet0.getLong(1)).get().asServerTextChannel().get().getMentionTag());
+											}
+										}
+										while(resultSet0.next()) {
+											if(server.getChannelById(resultSet0.getLong(1)).isPresent() && server.getChannelById(resultSet0.getLong(1)).get().asServerTextChannel().isPresent()) {
+												channels
+													.append(", ")
+													.append(server.getChannelById(resultSet0.getLong(1)).get().asServerTextChannel().get().getMentionTag());
+											}
+										}
+										channels.append(".").replyTo(event.getMessageId()).send(event.getChannel());
+
+										//Closes the connections.
+										resultSet0.close();
+										statement.close();
+										connection.close();
+									} else {
+										event.getMessage().addReaction("👎");
+
+										//Prints out the roles who can use the command.
+										ResultSet resultSet0 = statement.executeQuery("SELECT roleId FROM Roles");
+										MessageBuilder roles = new MessageBuilder().append("You can only use the `~addContract` command if you have at least one of the following roles: ");
+
+										if(resultSet0.next()) {
+											if(server.getRoleById(resultSet0.getLong(1)).isPresent()) {
+												roles.append("`" + server.getRoleById(resultSet0.getLong(1)).get().getName() + "`");
+											}
+										}
+										while(resultSet0.next()) {
+											if(server.getRoleById(resultSet0.getLong(1)).isPresent()) {
+												roles
+													.append(", ")
+													.append("`" + server.getRoleById(resultSet0.getLong(1)).get().getName() + "`");
+											}
+										}
+										roles.append(".").replyTo(event.getMessageId()).send(event.getChannel());
+
+										//Closes the connections.
+										resultSet0.close();
+										statement.close();
+										connection.close();
+									}
+								}
+								case "updatecontract" -> {
+									//Opens up a connection to the 'BHT' SQL database (Channels, Roles).
+									Class.forName("com.mysql.cj.jdbc.Driver");
+									Connection connection = DriverManager.getConnection("...");
+
+									//Creates a 'SELECT' SQL statement.
+									Statement statement = connection.createStatement();
+
+									//Checks if the user issuing the command is in the correct channel.
+									ResultSet resultSet = statement.executeQuery("SELECT channelId FROM Channels");
+									boolean channel = false;
+									while(resultSet.next() && !channel) {
+										if(resultSet.getLong(1) == event.getChannel().asServerTextChannel().get().getId()) {
+											channel = true;
+										}
+									}
+
+									//Checks if the user issuing the command has at least one of the required roles.
+									resultSet = statement.executeQuery("SELECT roleId FROM Roles");
+									boolean role = false;
+									while(resultSet.next() && !role) {
+										if(server.getRoleById(resultSet.getLong(1)).isPresent()) {
+											if(server.getRoleById(resultSet.getLong(1)).get().hasUser(event.getMessageAuthor().asUser().get())) {
+												role = true;
+											}
+										}
+									}
+
+									//If both conditions are met, the commands gets issued. If not, it notifies the user what's missing.
+									if((channel && role) || (channel && (event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner()))) {
+										//Closes the connections.
+										resultSet.close();
+										statement.close();
+										connection.close();
+
+										cmd.updateContractInDatabase(event, argument1, argument2);
+									} else if(!channel) {
+										event.getMessage().addReaction("👎");
+
+										//Prints out the channels where the command can be used.
+										ResultSet resultSet0 = statement.executeQuery("SELECT channelId FROM Channels");
+										MessageBuilder channels = new MessageBuilder().append("The command `~updateContract` can only be used in the following channels: ");
+
+										if(resultSet0.next()) {
+											if(server.getChannelById(resultSet0.getLong(1)).isPresent() && server.getChannelById(resultSet0.getLong(1)).get().asServerTextChannel().isPresent()) {
+												channels.append(server.getChannelById(resultSet0.getLong(1)).get().asServerTextChannel().get().getMentionTag());
+											}
+										}
+										while(resultSet0.next()) {
+											if(server.getChannelById(resultSet0.getLong(1)).isPresent() && server.getChannelById(resultSet0.getLong(1)).get().asServerTextChannel().isPresent()) {
+												channels
+													.append(", ")
+													.append(server.getChannelById(resultSet0.getLong(1)).get().asServerTextChannel().get().getMentionTag());
+											}
+										}
+										channels.append(".").replyTo(event.getMessageId()).send(event.getChannel());
+
+										//Closes the connections.
+										resultSet0.close();
+										statement.close();
+										connection.close();
+									} else {
+										event.getMessage().addReaction("👎");
+
+										//Prints out the roles who can use the command.
+										ResultSet resultSet0 = statement.executeQuery("SELECT roleId FROM Roles");
+										MessageBuilder roles = new MessageBuilder().append("You can only use the `~updateContract` command if you have at least one of the following roles: ");
+
+										if(resultSet0.next()) {
+											if(server.getRoleById(resultSet0.getLong(1)).isPresent()) {
+												roles.append("`" + server.getRoleById(resultSet0.getLong(1)).get().getName() + "`");
+											}
+										}
+										while(resultSet0.next()) {
+											if(server.getRoleById(resultSet0.getLong(1)).isPresent()) {
+												roles
+													.append(", ")
+													.append("`" + server.getRoleById(resultSet0.getLong(1)).get().getName() + "`");
+											}
+										}
+										roles.append(".").replyTo(event.getMessageId()).send(event.getChannel());
+
+										//Closes the connections.
+										resultSet0.close();
+										statement.close();
+										connection.close();
+									}
+								}
+								case "removecontract" -> {
+									//Opens up a connection to the 'BHT' SQL database (Channels, Roles).
+									Class.forName("com.mysql.cj.jdbc.Driver");
+									Connection connection = DriverManager.getConnection("...");
+
+									//Creates a 'SELECT' SQL statement.
+									Statement statement = connection.createStatement();
+
+									//Checks if the user issuing the command is in the correct channel.
+									ResultSet resultSet = statement.executeQuery("SELECT channelId FROM Channels");
+									boolean channel = false;
+									while(resultSet.next() && !channel) {
+										if(resultSet.getLong(1) == event.getChannel().asServerTextChannel().get().getId()) {
+											channel = true;
+										}
+									}
+
+									//Checks if the user issuing the command has at least one of the required roles.
+									resultSet = statement.executeQuery("SELECT roleId FROM Roles");
+									boolean role = false;
+									while(resultSet.next() && !role) {
+										if(server.getRoleById(resultSet.getLong(1)).isPresent()) {
+											if(server.getRoleById(resultSet.getLong(1)).get().hasUser(event.getMessageAuthor().asUser().get())) {
+												role = true;
+											}
+										}
+									}
+
+									//If both conditions are met, the commands gets issued. If not, it notifies the user what's missing.
+									if((channel && role) || (channel && (event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner()))) {
+										//Closes the connections.
+										resultSet.close();
+										statement.close();
+										connection.close();
+
+										cmd.removeContractFromDatabase(event, argument1);
+									} else if(!channel) {
+										event.getMessage().addReaction("👎");
+
+										//Prints out the channels where the command can be used.
+										ResultSet resultSet0 = statement.executeQuery("SELECT channelId FROM Channels");
+										MessageBuilder channels = new MessageBuilder().append("The command `~removeContract` can only be used in the following channels: ");
+
+										if(resultSet0.next()) {
+											if(server.getChannelById(resultSet0.getLong(1)).isPresent() && server.getChannelById(resultSet0.getLong(1)).get().asServerTextChannel().isPresent()) {
+												channels.append(server.getChannelById(resultSet0.getLong(1)).get().asServerTextChannel().get().getMentionTag());
+											}
+										}
+										while(resultSet0.next()) {
+											if(server.getChannelById(resultSet0.getLong(1)).isPresent() && server.getChannelById(resultSet0.getLong(1)).get().asServerTextChannel().isPresent()) {
+												channels
+													.append(", ")
+													.append(server.getChannelById(resultSet0.getLong(1)).get().asServerTextChannel().get().getMentionTag());
+											}
+										}
+										channels.append(".").replyTo(event.getMessageId()).send(event.getChannel());
+
+										//Closes the connections.
+										resultSet0.close();
+										statement.close();
+										connection.close();
+									} else {
+										event.getMessage().addReaction("👎");
+
+										//Prints out the roles who can use the command.
+										ResultSet resultSet0 = statement.executeQuery("SELECT roleId FROM Roles");
+										MessageBuilder roles = new MessageBuilder().append("You can only use the `~removeContract` command if you have at least one of the following roles: ");
+
+										if(resultSet0.next()) {
+											if(server.getRoleById(resultSet0.getLong(1)).isPresent()) {
+												roles.append("`" + server.getRoleById(resultSet0.getLong(1)).get().getName() + "`");
+											}
+										}
+										while(resultSet0.next()) {
+											if(server.getRoleById(resultSet0.getLong(1)).isPresent()) {
+												roles
+													.append(", ")
+													.append("`" + server.getRoleById(resultSet0.getLong(1)).get().getName() + "`");
+											}
+										}
+										roles.append(".").replyTo(event.getMessageId()).send(event.getChannel());
+
+										//Closes the connections.
+										resultSet0.close();
+										statement.close();
+										connection.close();
+									}
+								}
+								case "showprioritycontracts" -> cmd.showPriorityContracts(event);
+								case "addprioritycontract" -> {
+									//Opens up a connection to the 'BHT' SQL database (Channels, Roles).
+									Class.forName("com.mysql.cj.jdbc.Driver");
+									Connection connection = DriverManager.getConnection("...");
+
+									//Creates a 'SELECT' SQL statement.
+									Statement statement = connection.createStatement();
+
+									//Checks if the user issuing the command is in the correct channel.
+									ResultSet resultSet = statement.executeQuery("SELECT channelId FROM Channels");
+									boolean channel = false;
+									while(resultSet.next() && !channel) {
+										if(resultSet.getLong(1) == event.getChannel().asServerTextChannel().get().getId()) {
+											channel = true;
+										}
+									}
+
+									//Checks if the user issuing the command has at least one of the required roles.
+									resultSet = statement.executeQuery("SELECT roleId FROM Roles");
+									boolean role = false;
+									while(resultSet.next() && !role) {
+										if(server.getRoleById(resultSet.getLong(1)).isPresent()) {
+											if(server.getRoleById(resultSet.getLong(1)).get().hasUser(event.getMessageAuthor().asUser().get())) {
+												role = true;
+											}
+										}
+									}
+
+									//If both conditions are met, the commands gets issued. If not, it notifies the user what's missing.
+									if((channel && role) || (channel && (event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner()))) {
+										//Closes the connections.
+										resultSet.close();
+										statement.close();
+										connection.close();
+
+										cmd.addPriorityContract(event, argument1);
+									} else if(!channel) {
+										event.getMessage().addReaction("👎");
+
+										//Prints out the channels where the command can be used.
+										ResultSet resultSet0 = statement.executeQuery("SELECT channelId FROM Channels");
+										MessageBuilder channels = new MessageBuilder().append("The command `~addPriorityContract` can only be used in the following channels: ");
+
+										if(resultSet0.next()) {
+											if(server.getChannelById(resultSet0.getLong(1)).isPresent() && server.getChannelById(resultSet0.getLong(1)).get().asServerTextChannel().isPresent()) {
+												channels.append(server.getChannelById(resultSet0.getLong(1)).get().asServerTextChannel().get().getMentionTag());
+											}
+										}
+										while(resultSet0.next()) {
+											if(server.getChannelById(resultSet0.getLong(1)).isPresent() && server.getChannelById(resultSet0.getLong(1)).get().asServerTextChannel().isPresent()) {
+												channels
+													.append(", ")
+													.append(server.getChannelById(resultSet0.getLong(1)).get().asServerTextChannel().get().getMentionTag());
+											}
+										}
+										channels.append(".").replyTo(event.getMessageId()).send(event.getChannel());
+
+										//Closes the connections.
+										resultSet0.close();
+										statement.close();
+										connection.close();
+									} else {
+										event.getMessage().addReaction("👎");
+
+										//Prints out the roles who can use the command.
+										ResultSet resultSet0 = statement.executeQuery("SELECT roleId FROM Roles");
+										MessageBuilder roles = new MessageBuilder().append("You can only use the `~addPriorityContract` command if you have at least one of the following roles: ");
+
+										if(resultSet0.next()) {
+											if(server.getRoleById(resultSet0.getLong(1)).isPresent()) {
+												roles.append("`" + server.getRoleById(resultSet0.getLong(1)).get().getName() + "`");
+											}
+										}
+										while(resultSet0.next()) {
+											if(server.getRoleById(resultSet0.getLong(1)).isPresent()) {
+												roles
+													.append(", ")
+													.append("`" + server.getRoleById(resultSet0.getLong(1)).get().getName() + "`");
+											}
+										}
+										roles.append(".").replyTo(event.getMessageId()).send(event.getChannel());
+
+										//Closes the connections.
+										resultSet0.close();
+										statement.close();
+										connection.close();
+									}
+								}
+								case "removeprioritycontract" -> {
+									//Opens up a connection to the 'BHT' SQL database (Channels, Roles).
+									Class.forName("com.mysql.cj.jdbc.Driver");
+									Connection connection = DriverManager.getConnection("...");
+
+									//Creates a 'SELECT' SQL statement.
+									Statement statement = connection.createStatement();
+
+									//Checks if the user issuing the command is in the correct channel.
+									ResultSet resultSet = statement.executeQuery("SELECT channelId FROM Channels");
+									boolean channel = false;
+									while(resultSet.next() && !channel) {
+										if(resultSet.getLong(1) == event.getChannel().asServerTextChannel().get().getId()) {
+											channel = true;
+										}
+									}
+
+									//Checks if the user issuing the command has at least one of the required roles.
+									resultSet = statement.executeQuery("SELECT roleId FROM Roles");
+									boolean role = false;
+									while(resultSet.next() && !role) {
+										if(server.getRoleById(resultSet.getLong(1)).isPresent()) {
+											if(server.getRoleById(resultSet.getLong(1)).get().hasUser(event.getMessageAuthor().asUser().get())) {
+												role = true;
+											}
+										}
+									}
+
+									//If both conditions are met, the commands gets issued. If not, it notifies the user what's missing.
+									if((channel && role) || (channel && (event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner()))) {
+										//Closes the connections.
+										resultSet.close();
+										statement.close();
+										connection.close();
+
+										cmd.removePriorityContract(event, argument1);
+									} else if(!channel) {
+										event.getMessage().addReaction("👎");
+
+										//Prints out the channels where the command can be used.
+										ResultSet resultSet0 = statement.executeQuery("SELECT channelId FROM Channels");
+										MessageBuilder channels = new MessageBuilder().append("The command `~removePriorityContract` can only be used in the following channels: ");
+
+										if(resultSet0.next()) {
+											if(server.getChannelById(resultSet0.getLong(1)).isPresent() && server.getChannelById(resultSet0.getLong(1)).get().asServerTextChannel().isPresent()) {
+												channels.append(server.getChannelById(resultSet0.getLong(1)).get().asServerTextChannel().get().getMentionTag());
+											}
+										}
+										while(resultSet0.next()) {
+											if(server.getChannelById(resultSet0.getLong(1)).isPresent() && server.getChannelById(resultSet0.getLong(1)).get().asServerTextChannel().isPresent()) {
+												channels
+													.append(", ")
+													.append(server.getChannelById(resultSet0.getLong(1)).get().asServerTextChannel().get().getMentionTag());
+											}
+										}
+										channels.append(".").replyTo(event.getMessageId()).send(event.getChannel());
+
+										//Closes the connections.
+										resultSet0.close();
+										statement.close();
+										connection.close();
+									} else {
+										event.getMessage().addReaction("👎");
+
+										//Prints out the roles who can use the command.
+										ResultSet resultSet0 = statement.executeQuery("SELECT roleId FROM Roles");
+										MessageBuilder roles = new MessageBuilder().append("You can only use the `~removePriorityContract` command if you have at least one of the following roles: ");
+
+										if(resultSet0.next()) {
+											if(server.getRoleById(resultSet0.getLong(1)).isPresent()) {
+												roles.append("`" + server.getRoleById(resultSet0.getLong(1)).get().getName() + "`");
+											}
+										}
+										while(resultSet0.next()) {
+											if(server.getRoleById(resultSet0.getLong(1)).isPresent()) {
+												roles
+													.append(", ")
+													.append("`" + server.getRoleById(resultSet0.getLong(1)).get().getName() + "`");
+											}
+										}
+										roles.append(".").replyTo(event.getMessageId()).send(event.getChannel());
+
+										//Closes the connections.
+										resultSet0.close();
+										statement.close();
+										connection.close();
+									}
+								}
+								case "showchannels" -> cmd.showChannels(event);
+								case "addchannel" -> {
+									User user = null;
+									if(event.getMessageAuthor().asUser().isPresent()) {
+										user = event.getMessageAuthor().asUser().get();
+									}
+									Role role1 = null;
+									if(server.getRoleById(343680704502300672L).isPresent()) {
+										role1 = server.getRoleById(343680704502300672L).get();
+									}
+									Role role2 = null;
+									if(server.getRoleById(419232575261769730L).isPresent()) {
+										role2 = server.getRoleById(419232575261769730L).get();
+									}
+
+									if(role1 != null && role2 != null) {
+										if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner() || role1.hasUser(user) || role2.hasUser(user))) {
+											cmd.addChannel(server, event, argument1);
+										} else {
+											event.getMessage().addReaction("👎");
+
+											Role role3 = null;
+											if(server.getRoleById(262784255816499201L).isPresent()) {
+												role3 = server.getRoleById(262784255816499201L).get();
+											}
+											Role role4 = null;
+											if(server.getRoleById(262802994574131200L).isPresent()) {
+												role4 = server.getRoleById(262802994574131200L).get();
+											}
+
+											if(role3 != null && role4 != null) {
+												new MessageBuilder()
+													.append("You can only use the `~addChannel` command if you have at least one of the following roles: ")
+													.append("`" + role1.getName() + "`").append(", ")
+													.append("`" + role2.getName() + "`").append(", ")
+													.append("`" + role3.getName() + "`").append(", ")
+													.append("`" + role4.getName() + "`").append(".")
+													.replyTo(event.getMessageId())
+													.send(event.getChannel());
+											}
+										}
+									}
+								}
+								case "removechannel" -> {
+									User user = null;
+									if(event.getMessageAuthor().asUser().isPresent()) {
+										user = event.getMessageAuthor().asUser().get();
+									}
+									Role role1 = null;
+									if(server.getRoleById(343680704502300672L).isPresent()) {
+										role1 = server.getRoleById(343680704502300672L).get();
+									}
+									Role role2 = null;
+									if(server.getRoleById(419232575261769730L).isPresent()) {
+										role2 = server.getRoleById(419232575261769730L).get();
+									}
+
+									if(role1 != null && role2 != null) {
+										if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner() || role1.hasUser(user) || role2.hasUser(user))) {
+											cmd.removeChannel(server, event, argument1);
+										} else {
+											event.getMessage().addReaction("👎");
+
+											Role role3 = null;
+											if(server.getRoleById(262784255816499201L).isPresent()) {
+												role3 = server.getRoleById(262784255816499201L).get();
+											}
+											Role role4 = null;
+											if(server.getRoleById(262802994574131200L).isPresent()) {
+												role4 = server.getRoleById(262802994574131200L).get();
+											}
+
+											if(role3 != null && role4 != null) {
+												new MessageBuilder()
+													.append("You can only use the `~removeChannel` command if you have at least one of the following roles: ")
+													.append("`" + role1.getName() + "`").append(", ")
+													.append("`" + role2.getName() + "`").append(", ")
+													.append("`" + role3.getName() + "`").append(", ")
+													.append("`" + role4.getName() + "`").append(".")
+													.replyTo(event.getMessageId())
+													.send(event.getChannel());
+											}
+										}
+									}
+								}
+								case "showroles" -> cmd.showRoles(event);
+								case "addrole" -> {
+									User user = null;
+									if(event.getMessageAuthor().asUser().isPresent()) {
+										user = event.getMessageAuthor().asUser().get();
+									}
+									Role role1 = null;
+									if(server.getRoleById(343680704502300672L).isPresent()) {
+										role1 = server.getRoleById(343680704502300672L).get();
+									}
+									Role role2 = null;
+									if(server.getRoleById(419232575261769730L).isPresent()) {
+										role2 = server.getRoleById(419232575261769730L).get();
+									}
+
+									if(role1 != null && role2 != null) {
+										if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner() || role1.hasUser(user) || role2.hasUser(user))) {
+											cmd.addRole(server, event, argument1);
+										} else {
+											event.getMessage().addReaction("👎");
+
+											Role role3 = null;
+											if(server.getRoleById(262784255816499201L).isPresent()) {
+												role3 = server.getRoleById(262784255816499201L).get();
+											}
+											Role role4 = null;
+											if(server.getRoleById(262802994574131200L).isPresent()) {
+												role4 = server.getRoleById(262802994574131200L).get();
+											}
+
+											if(role3 != null && role4 != null) {
+												new MessageBuilder()
+													.append("You can only use the `~addRole` command if you have at least one of the following roles: ")
+													.append("`" + role1.getName() + "`").append(", ")
+													.append("`" + role2.getName() + "`").append(", ")
+													.append("`" + role3.getName() + "`").append(", ")
+													.append("`" + role4.getName() + "`").append(".")
+													.replyTo(event.getMessageId())
+													.send(event.getChannel());
+											}
+										}
+									}
+								}
+								case "removerole" -> {
+									User user = null;
+									if(event.getMessageAuthor().asUser().isPresent()) {
+										user = event.getMessageAuthor().asUser().get();
+									}
+									Role role1 = null;
+									if(server.getRoleById(343680704502300672L).isPresent()) {
+										role1 = server.getRoleById(343680704502300672L).get();
+									}
+									Role role2 = null;
+									if(server.getRoleById(419232575261769730L).isPresent()) {
+										role2 = server.getRoleById(419232575261769730L).get();
+									}
+
+									if(role1 != null && role2 != null) {
+										if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner() || role1.hasUser(user) || role2.hasUser(user))) {
+											cmd.removeRole(server, event, argument1);
+										} else {
+											event.getMessage().addReaction("👎");
+
+											Role role3 = null;
+											if(server.getRoleById(262784255816499201L).isPresent()) {
+												role3 = server.getRoleById(262784255816499201L).get();
+											}
+											Role role4 = null;
+											if(server.getRoleById(262802994574131200L).isPresent()) {
+												role4 = server.getRoleById(262802994574131200L).get();
+											}
+
+											if(role3 != null && role4 != null) {
+												new MessageBuilder()
+													.append("You can only use the `~removeRole` command if you have at least one of the following roles: ")
+													.append("`" + role1.getName() + "`").append(", ")
+													.append("`" + role2.getName() + "`").append(", ")
+													.append("`" + role3.getName() + "`").append(", ")
+													.append("`" + role4.getName() + "`").append(".")
+													.replyTo(event.getMessageId())
+													.send(event.getChannel());
+											}
+										}
+									}
+								}
+								case "idhelp" -> cmd.idHelp(api, event);
+								case "rpsplay" -> cmd.rockPaperScissorsGame(event, argument1);
+								case "rpshighscores" -> cmd.rockPaperScissorsHighscores(api, event);
+								default -> {
+									event.getMessage().addReaction("👀");
+									new MessageBuilder().append("The command you are attempting to use does not exist. Please refer to `~commandsHelp` for a list of available general commands and their usage.")
+										.replyTo(event.getMessageId())
+										.send(event.getChannel());
+								}
+							}
+						} else if(!Character.isAlphabetic(event.getMessageContent().charAt(0)) && !Character.isDigit(event.getMessageContent().charAt(0))) {
+							int commandIndex = -1;
+							if(event.getMessageContent().charAt(0) != '~') {
+								String[] message = event.getMessageContent().split(" ", 2);
+								for(String availableCommand: availableCommands) {
+									commandIndex++;
+									if(availableCommand.equalsIgnoreCase(message[0].substring(1))) {
+										event.getMessage().addReaction("👀");
+										new MessageBuilder().append("Did you mean `~" + availableCommands.get(commandIndex) + "`?\nThe prefix for the commands is a `~` and not a `" + event.getMessageContent().charAt(0) + "`.")
+											.replyTo(event.getMessageId())
+											.send(event.getChannel());
+										break;
+									}
+								}
 							}
 						}
-
-        					//Checks if the user issuing the command has at least one of the required roles.
-        					resultSet = statement.executeQuery("SELECT roleId FROM Roles");
-        					boolean role = false;
-        					while(resultSet.next() && role == false) {
-        						if(api.getRoleById(resultSet.getLong(1)).get().hasUser(event.getMessageAuthor().asUser().get())) {
-        							role = true;
-        						}
-        					}
-
-        					//If both conditions are met, the commands gets issued. If not, it notifies the user what's missing.
-        	        			if(channel == true && role == true) {
-        	        				//Closes the connections.
-        	        				resultSet.close();
-        	        				statement.close();
-        	        				connection.close();
-
-        	        				cmd.manuallyAddContractToDatabase(event);
-        	        			} else if((channel == true && role == false) && (event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner())) {
-        	        				//Closes the connections.
-        	        				resultSet.close();
-        	        				statement.close();
-        	        				connection.close();
-
-        	        				cmd.manuallyAddContractToDatabase(event);
-        	        			} else if(channel == false) {
-        	        				event.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
-
-        	        				//Prints out the channels where the command can be used.
-        	        				ResultSet resultSet0 = statement.executeQuery("SELECT channelId FROM Channels");
-        	        				MessageBuilder channels = new MessageBuilder().append("The command `~addContract` can only be used in the following channels: ");
-
-        	        				if(resultSet0.next()) {
-        	        					channels.append(api.getServerTextChannelById(resultSet0.getLong(1)).get().getMentionTag());
-        	        				}
-        	        				while(resultSet0.next()) {
-        	        					channels
-        	    							.append(", ")
-        	    							.append(api.getServerTextChannelById(resultSet0.getLong(1)).get().getMentionTag());
-        	        				}
-        	        				channels.append(".").replyTo(event.getMessageId()).send(event.getChannel());
-
-        	        				//Closes the connections.
-							resultSet0.close();
-							statement.close();
-							connection.close();
-        	        			} else if(role == false) {
-        	        				event.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
-
-        	        				//Prints out the roles who can use the command.
-        	        				ResultSet resultSet0 = statement.executeQuery("SELECT roleId FROM Roles");
-        	        				MessageBuilder roles = new MessageBuilder().append("You can only use the `~addContract` command if you have at least one of the following roles: ");
-
-        	        				if(resultSet0.next()) {
-        	        					roles.append("`" + api.getRoleById(resultSet0.getLong(1)).get().getName() + "`");
-        	        				}
-        	        				while(resultSet0.next()) {
-        	        					roles
-        	    							.append(", ")
-        	    							.append("`" + api.getRoleById(resultSet0.getLong(1)).get().getName() + "`");
-        	        				}
-        	        				roles.append(".").replyTo(event.getMessageId()).send(event.getChannel());
-
-        	        				//Closes the connections.
-							resultSet0.close();
-							statement.close();
-							connection.close();
-        	        			}
-           				} else if(event.getMessageContent().substring(0, 14).equalsIgnoreCase("~removeChannel")) {
-           					if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner() || api.getRoleById(343680704502300672L).get().hasUser(event.getMessageAuthor().asUser().get()) || (api.getRoleById(419232575261769730L).get().hasUser(event.getMessageAuthor().asUser().get()) && api.getRoleById(336588534351790080L).get().hasUser(event.getMessageAuthor().asUser().get())))) {
-           						cmd.removeChannel(api, event);
-           					} else {
-           						event.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
-           						new MessageBuilder()
-           							.append("You can only use the `~removeChannel` command if you have at least one of the following roles: ")
-           							.append("`" + api.getRoleById(262802994574131200L).get().getName() + "`")
-           							.append(", ")
-           							.append("`" + api.getRoleById(262784255816499201L).get().getName() + "`")
-           							.append(", ")
-           							.append("`" + api.getRoleById(343680704502300672L).get().getName() + "`")
-           							.append(", ")
-           							.append("`" + api.getRoleById(419232575261769730L).get().getName() + " + " + api.getRoleById(336588534351790080L).get().getName() + "`")
-           							.append(".")
-           							.replyTo(event.getMessageId())
-    								.send(event.getChannel());
-           					}
-           				} else if(event.getMessageContent().substring(0, 15).equalsIgnoreCase("~updateContract")) {
-           					//Opens up a connection to the 'BHT' SQL database (Channels, Roles).
-						Class.forName("com.mysql.cj.jdbc.Driver");
-        	        			Connection connection = DriverManager.getConnection("...");
-
-						//Creates a 'SELECT' SQL statement.
-						Statement statement = connection.createStatement();
-
-						//Checks if the user issuing the command is in the correct channel.
-						ResultSet resultSet = statement.executeQuery("SELECT channelId FROM Channels");
-						boolean channel = false;
-						while(resultSet.next() && channel == false) {
-							if(resultSet.getLong(1) == event.getChannel().asServerTextChannel().get().getId()) {
-								channel = true;
-							}
-						}
-
-						//Checks if the user issuing the command has at least one of the required roles.
-						resultSet = statement.executeQuery("SELECT roleId FROM Roles");
-						boolean role = false;
-						while(resultSet.next() && role == false) {
-							if(api.getRoleById(resultSet.getLong(1)).get().hasUser(event.getMessageAuthor().asUser().get())) {
-								role = true;
-							}
-						}
-
-        					//If both conditions are met, the commands gets issued. If not, it notifies the user what's missing.
-        	        			if(channel == true && role == true) {
-        	        				//Closes the connections.
-        	        				resultSet.close();
-        	        				statement.close();
-        	        				connection.close();
-
-        	        				cmd.updateContractInDatabase(event);
-        	        			} else if((channel == true && role == false) && (event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner())) {
-        	        				//Closes the connections.
-        	        				resultSet.close();
-        	        				statement.close();
-        	        				connection.close();
-
-        	        				cmd.updateContractInDatabase(event);
-        	        			} else if(channel == false) {
-        	        				event.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
-
-        	        				//Prints out the channels where the command can be used.
-        	        				ResultSet resultSet0 = statement.executeQuery("SELECT channelId FROM Channels");
-        	        				MessageBuilder channels = new MessageBuilder().append("The command `~updateContract` can only be used in the following channels: ");
-
-        	        				if(resultSet0.next()) {
-        	        					channels.append(api.getServerTextChannelById(resultSet0.getLong(1)).get().getMentionTag());
-        	        				}
-        	        				while(resultSet0.next()) {
-        	        					channels
-        	    							.append(", ")
-        	    							.append(api.getServerTextChannelById(resultSet0.getLong(1)).get().getMentionTag());
-        	        				}
-        	        				channels.append(".").replyTo(event.getMessageId()).send(event.getChannel());
-
-        	        				//Closes the connections.
-							resultSet0.close();
-							statement.close();
-							connection.close();
-        	        			} else if(role == false) {
-        	        				event.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
-
-        	        				//Prints out the roles who can use the command.
-							ResultSet resultSet0 = statement.executeQuery("SELECT roleId FROM Roles");
-							MessageBuilder roles = new MessageBuilder().append("You can only use the `~updateContract` command if you have at least one of the following roles: ");
-
-							if(resultSet0.next()) {
-								roles.append("`" + api.getRoleById(resultSet0.getLong(1)).get().getName() + "`");
-							}
-							while(resultSet0.next()) {
-								roles
-									.append(", ")
-									.append("`" + api.getRoleById(resultSet0.getLong(1)).get().getName() + "`");
-							}
-							roles.append(".").replyTo(event.getMessageId()).send(event.getChannel());
-
-        	        				//Closes the connections.
-							resultSet0.close();
-							statement.close();
-							connection.close();
-        	        			}
-           				} else if(event.getMessageContent().substring(0, 15).equals("~removeContract")) {
-						//Opens up a connection to the 'BHT' SQL database (Channels, Roles).
-						Class.forName("com.mysql.cj.jdbc.Driver");
-						Connection connection = DriverManager.getConnection("...");
-
-						//Creates a 'SELECT' SQL statement.
-						Statement statement = connection.createStatement();
-
-						//Checks if the user issuing the command is in the correct channel.
-						ResultSet resultSet = statement.executeQuery("SELECT channelId FROM Channels");
-						boolean channel = false;
-						while(resultSet.next() && channel == false) {
-							if(resultSet.getLong(1) == event.getChannel().asServerTextChannel().get().getId()) {
-								channel = true;
-							}
-						}
-
-						//Checks if the user issuing the command has at least one of the required roles.
-						resultSet = statement.executeQuery("SELECT roleId FROM Roles");
-						boolean role = false;
-						while(resultSet.next() && role == false) {
-							if(api.getRoleById(resultSet.getLong(1)).get().hasUser(event.getMessageAuthor().asUser().get())) {
-								role = true;
-							}
-						}
-
-        					//If both conditions are met, the commands gets issued. If not, it notifies the user what's missing.
-        	        			if(channel == true && role == true) {
-        	        				//Closes the connections.
-        	        				resultSet.close();
-        	        				statement.close();
-        	        				connection.close();
-
-        	        				cmd.removeContractFromDatabase(event);
-        	        			} else if((channel == true && role == false) && (event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner())) {
-        	        				//Closes the connections.
-							resultSet.close();
-							statement.close();
-							connection.close();
-
-        	        				cmd.removeContractFromDatabase(event);
-        	        			} else if(channel == false) {
-        	        				event.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
-
-							//Prints out the channels where the command can be used.
-							ResultSet resultSet0 = statement.executeQuery("SELECT channelId FROM Channels");
-							MessageBuilder channels = new MessageBuilder().append("The command `~removeContract` can only be used in the following channels: ");
-
-							if(resultSet0.next()) {
-								channels.append(api.getServerTextChannelById(resultSet0.getLong(1)).get().getMentionTag());
-							}
-							while(resultSet0.next()) {
-								channels
-									.append(", ")
-									.append(api.getServerTextChannelById(resultSet0.getLong(1)).get().getMentionTag());
-							}
-							channels.append(".").replyTo(event.getMessageId()).send(event.getChannel());
-
-        	        				//Closes the connections.
-							resultSet0.close();
-							statement.close();
-							connection.close();
-        	        			} else if(role == false) {
-							event.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
-
-							//Prints out the roles who can use the command.
-							ResultSet resultSet0 = statement.executeQuery("SELECT roleId FROM Roles");
-							MessageBuilder roles = new MessageBuilder().append("You can only use the `~removeContract` command if you have at least one of the following roles: ");
-
-							if(resultSet0.next()) {
-								roles.append("`" + api.getRoleById(resultSet0.getLong(1)).get().getName() + "`");
-							}
-							while(resultSet0.next()) {
-								roles
-									.append(", ")
-									.append("`" + api.getRoleById(resultSet0.getLong(1)).get().getName() + "`");
-							}
-							roles.append(".").replyTo(event.getMessageId()).send(event.getChannel());
-
-        	        				//Closes the connections.
-							resultSet0.close();
-							statement.close();
-							connection.close();
-        	        			}
-					} else if(event.getMessageContent().substring(0, 20).equalsIgnoreCase("~addPriorityContract")) {
-           					//Opens up a connection to the 'BHT' SQL database (Channels, Roles).
-        	        			Class.forName("com.mysql.cj.jdbc.Driver");
-        	        			Connection connection = DriverManager.getConnection("...");
-
-        	        			//Creates a 'SELECT' SQL statement.
-        	        			Statement statement = connection.createStatement();
-
-        	        			//Checks if the user issuing the command is in the correct channel.
-        	        			ResultSet resultSet = statement.executeQuery("SELECT channelId FROM Channels");
-        					boolean channel = false;
-        					while(resultSet.next() && channel == false) {
-        						if(resultSet.getLong(1) == event.getChannel().asServerTextChannel().get().getId()) {
-        							channel = true;
-        						}
-        					}
-
-        					//Checks if the user issuing the command has at least one of the required roles.
-        					resultSet = statement.executeQuery("SELECT roleId FROM Roles");
-        					boolean role = false;
-        					while(resultSet.next() && role == false) {
-        						if(api.getRoleById(resultSet.getLong(1)).get().hasUser(event.getMessageAuthor().asUser().get())) {
-        							role = true;
-        						}
-        					}
-
-        					//If both conditions are met, the commands gets issued. If not, it notifies the user what's missing.
-        	        			if(channel == true && role == true) {
-        	        				//Closes the connections.
-        	        				resultSet.close();
-        	        				statement.close();
-        	        				connection.close();
-
-        	        				cmd.addPriorityContract(event);
-        	        			} else if((channel == true && role == false) && (event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner())) {
-        	        				//Closes the connections.
-        	        				resultSet.close();
-        	        				statement.close();
-        	        				connection.close();
-
-							cmd.addPriorityContract(event);
-        	        			} else if(channel == false) {
-        	        				event.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
-
-        	        			//Prints out the channels where the command can be used.
-        	        			ResultSet resultSet0 = statement.executeQuery("SELECT channelId FROM Channels");
-        	        			MessageBuilder channels = new MessageBuilder().append("The command `~addPriorityContract` can only be used in the following channels: ");
-
-        	        			if(resultSet0.next()) {
-        	        				channels.append(api.getServerTextChannelById(resultSet0.getLong(1)).get().getMentionTag());
-        	        			}
-        	        			while(resultSet0.next()) {
-        	        				channels
-        	    						.append(", ")
-        	    						.append(api.getServerTextChannelById(resultSet0.getLong(1)).get().getMentionTag());
-        	        			}
-        	        			channels.append(".").replyTo(event.getMessageId()).send(event.getChannel());
-
-        	        			//Closes the connections.
-						resultSet0.close();
-						statement.close();
-						connection.close();
-                			} else if(role == false) {
-        	        			event.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
-
-        	        			//Prints out the roles who can use the command.
-        	        			ResultSet resultSet0 = statement.executeQuery("SELECT roleId FROM Roles");
-        	        			MessageBuilder roles = new MessageBuilder().append("You can only use the `~addPriorityContract` command if you have at least one of the following roles: ");
-
-        	        			if(resultSet0.next()) {
-        	        				roles.append("`" + api.getRoleById(resultSet0.getLong(1)).get().getName() + "`");
-        	        			}
-        	        			while(resultSet0.next()) {
-        	        				roles
-        	    						.append(", ")
-        	    						.append("`" + api.getRoleById(resultSet0.getLong(1)).get().getName() + "`");
-        	        			}
-        	        			roles.append(".").replyTo(event.getMessageId()).send(event.getChannel());
-
-        	        			//Closes the connections.
-						resultSet0.close();
-						statement.close();
-						connection.close();
-        	        		}
-           			} else if(event.getMessageContent().substring(0, 23).equalsIgnoreCase("~removePriorityContract")) {
-           				//Opens up a connection to the 'BHT' SQL database (Channels, Roles).
-        	        		Class.forName("com.mysql.cj.jdbc.Driver");
-        	        		Connection connection = DriverManager.getConnection("...");
-
-        	        		//Creates a 'SELECT' SQL statement.
-        	        		Statement statement = connection.createStatement();
-
-        	        		//Checks if the user issuing the command is in the correct channel.
-        	        		ResultSet resultSet = statement.executeQuery("SELECT channelId FROM Channels");
-        				boolean channel = false;
-        				while(resultSet.next() && channel == false) {
-        					if(resultSet.getId(1) == event.getChannel().asServerTextChannel().get().getId()) {
-        						channel = true;
-        					}
-        				}
-
-        				//Checks if the user issuing the command has at least one of the required roles.
-        				resultSet = statement.executeQuery("SELECT roleId FROM Roles");
-        				boolean role = false;
-        				while(resultSet.next() && role == false) {
-        					if(api.getRoleById(resultSet.getLong(1)).get().hasUser(event.getMessageAuthor().asUser().get())) {
-        						role = true;
-        					}
-        				}
-
-        				//If both conditions are met, the commands gets issued. If not, it notifies the user what's missing.
-        	        		if(channel == true && role == true) {
-        	        			//Closes the connections.
-        	        			resultSet.close();
-        	        			statement.close();
-        	        			connection.close();
-
-        	        			cmd.removePriorityContract(event);
-        	        		} else if((channel == true && role == false) && (event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner())) {
-        	        			//Closes the connections.
-        	        			resultSet.close();
-        	        			statement.close();
-        	        			connection.close();
-
-        	        			cmd.removePriorityContract(event);
-        	        		} else if(channel == false) {
-        	        			event.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
-
-        	        			//Prints out the channels where the command can be used.
-        	        			ResultSet resultSet0 = statement.executeQuery("SELECT channelId FROM Channels");
-        	        			MessageBuilder channels = new MessageBuilder().append("The command `~removePriorityContract` can only be used in the following channels: ");
-
-        	        			if(resultSet0.next()) {
-        	        				channels.append(api.getServerTextChannelById(resultSet0.getLong(1)).get().getMentionTag());
-        	        			}
-        	        			while(resultSet0.next()) {
-        	        				channels
-        	    						.append(", ")
-        	    						.append(api.getServerTextChannelById(resultSet0.getLong(1)).get().getMentionTag());
-        	        			}
-        	        			channels.append(".").replyTo(event.getMessageId()).send(event.getChannel());
-
-        	        			//Closes the connections.
-						resultSet0.close();
-						statement.close();
-						connection.close();
-        	        		} else if(role == false) {
-        	        			event.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
-
-        	        			//Prints out the roles who can use the command.
-						ResultSet resultSet0 = statement.executeQuery("SELECT roleId FROM Roles");
-        	        			MessageBuilder roles = new MessageBuilder().append("You can only use the `~removePriorityContract` command if you have at least one of the following roles: ");
-
-        	        			if(resultSet0.next()) {
-        	        				roles.append("`" + api.getRoleById(resultSet0.getLong(1)).get().getName() + "`");
-        	        			}
-        	        			while(resultSet0.next()) {
-        	        				roles
-        	    						.append(", ")
-        	    						.append("`" + api.getRoleById(resultSet0.getLong(1)).get().getName() + "`");
-        	        			}
-        	        			roles.append(".").replyTo(event.getMessageId()).send(event.getChannel());
-
-        	        			//Closes the connections.
-						resultSet0.close();
-						statement.close();
-						connection.close();
-        	        		}
-           			} else if(event.getMessageContent().substring(0, 15).equalsIgnoreCase("~setOnLeaveRole")) {
-           					if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner())) {
-           						cmd.setOnLeaveRole(api, event);
-           					} else {
-							event.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
-           						new MessageBuilder()
-           							.append("You can only use the `~setOnLeavePing` command if you have at least one of the following roles: ")
-           							.append("`" + api.getRoleById(262784255816499201L).get().getName() + "`")
-           							.append(", ")
-           							.append("`" + api.getRoleById(262802994574131200L).get().getName() + "`")
-           							.append(".")
-           							.replyTo(event.getMessageId())
-           							.send(event.getChannel());
-						}
-           				} else if(event.getMessageContent().substring(0, 15).equalsIgnoreCase("~setOnLeavePing")) {
-           					if((event.getMessageAuthor().isServerAdmin() || event.getMessageAuthor().isBotOwner())) {
-           						if(event.getChannel().equals(api.getServerById(event.getServerTextChannel().get().getServer().getId()).get().getSystemChannel().get())) {
-           							cmd.setOnLeavePing(event);
-           						} else {
-           							event.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
-           							new MessageBuilder()
-       									.append("The command `~setOnLeavePing` can only be used in: ")
-       									.append(api.getServerById(event.getServerTextChannel().get().getServer().getId()).get().getSystemChannel().get())
-       									.append(".")
-       									.replyTo(event.getMessageId())
-       									.send(event.getChannel());
-           						}
-           					} else {
-           						event.getChannel().getMessages(1).get().getNewestMessage().get().addReaction("👎");
-           						new MessageBuilder()
-           							.append("You can only use the `~setOnLeavePing` command if you have at least one of the following roles: ")
-           							.append("`" + api.getRoleById(262784255816499201L).get().getName() + "`")
-           							.append(", ")
-           							.append("`" + api.getRoleById(262802994574131200L).get().getName() + "`")
-           							.append(".")
-           							.replyTo(event.getMessageId())
-           							.send(event.getChannel());
-           					}
-           				}
-       				}
-       			} catch(StringIndexOutOfBoundsException e) {
-       				logger.error("Expected/Handled: " + e + " -> (" + e.getCause() + ")"); //Sends an error log about an expected/handled error.
-       			} catch(NoSuchElementException e) {
+					}
+				}
+			} catch(ArrayIndexOutOfBoundsException | StringIndexOutOfBoundsException | NoSuchElementException e) {
        				logger.error("Expected/Handled: " + e + " -> (" + e.getCause() + ")"); //Sends an error log about an expected/handled error.
        			} catch(Exception e) {
-				logger.warn("Fatal error occured!");
+				event.getMessage().addReaction("⚠");
+       				logger.warn("Fatal error occurred!");
        				logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
-				e.printStackTrace();
+       				e.printStackTrace();
        			}
 		});
 
 		//Gets triggered when someone renames a channel from the server.
        		api.addServerChannelChangeNameListener(event -> {
        			try {
-       				Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
+				Server server = event.getServer(); //Gets the server.
 
 				if(server.getId() == 262781891705307137L) {
 					cmd.updateDBChannelsOnChangeName(event);
 				}
        			} catch(Exception e) {
-       				logger.warn("Fatal error occured!");
+       				logger.warn("Fatal error occurred!");
        				logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
        				e.printStackTrace();
        			}
        		});
 
-		//Gets triggered when someone deletes a channel from the server.
-        	api.addServerChannelDeleteListener(event -> {
+        	//Gets triggered when someone deletes a channel from the server.
+		 api.addServerChannelDeleteListener(event -> {
         		try {
-        			Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
+				Server server = event.getServer(); //Gets the server.
 
 				if(server.getId() == 262781891705307137L) {
 					cmd.updateDBChannelsOnDelete(event);
 				}
         		} catch(Exception e) {
-        			logger.warn("Fatal error occured!");
+        			logger.warn("Fatal error occurred!");
        				logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
        				e.printStackTrace();
         		}
-		});
+        	});
 
-        	//Gets triggered when someone renames a role from the server.
+		//Gets triggered when someone renames a role from the server.
        		api.addRoleChangeNameListener(event -> {
        			try {
-       				Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
+				Server server = event.getServer(); //Gets the server.
 
 				if(server.getId() == 262781891705307137L) {
 					cmd.updateDBRolesOnChangeName(event);
 				}
        			} catch(Exception e) {
-       				logger.warn("Fatal error occured!");
+       				logger.warn("Fatal error occurred!");
        				logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
        				e.printStackTrace();
        			}
-       		});
+      	 	});
 
-        	//Gets triggered when someone deletes a role from the server.
+		//Gets triggered when someone deletes a role from the server.
 		api.addRoleDeleteListener(event -> {
 			try {
-        			Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
+				Server server = event.getServer(); //Gets the server.
 
 				if(server.getId() == 262781891705307137L) {
 					cmd.updateDBRolesOnDelete(event);
 				}
-        		} catch(Exception e) {
-        			logger.warn("Fatal error occured!");
-       				logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
-       				e.printStackTrace();
-        		}
+			} catch(Exception e) {
+				logger.warn("Fatal error occurred!");
+				logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+				e.printStackTrace();
+			}
 		});
 
    		//Gets triggered when someone joins the server and updates the members' Multimap.
    		api.addServerMemberJoinListener(event -> {
-			try {
-   				Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
+   			try {
+				Server server = event.getServer(); //Gets the server.
 
-   				if(server.getId() == 262781891705307137L) {
-   					cmd.updateMembersOnJoinAndWelcome(api, event);
-   				}
-			} catch(Exception e) {
-				logger.warn("Fatal error occured!");
+				if(server.getId() == 262781891705307137L) {
+					cmd.updateMembersOnJoinAndWelcome(event);
+				}
+			} catch (Exception e) {
+				logger.warn("Fatal error occurred!");
        				logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
        				e.printStackTrace();
 			}
        		});
 
         	//Gets triggered when someone has their nickname changed and updates the members' Multimap.
-       		api.addUserChangeNicknameListener(event -> {
-			try {
-        			Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
+		api.addUserChangeNicknameListener(event -> {
+        		try {
+				Server server = event.getServer(); //Gets the server.
 
-   				if(server.getId() == 262781891705307137L) {
-   					cmd.updateMembersOnNicknameChanged(api, event);
-   				}
-			} catch(Exception e) {
-				logger.warn("Fatal error occured!");
+				if(server.getId() == 262781891705307137L) {
+					cmd.updateMembersOnNicknameChanged(event);
+				}
+			} catch (Exception e) {
+				logger.warn("Fatal error occurred!");
        				logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
        				e.printStackTrace();
 			}
        		});
 
-		//Gets triggered when someone is given the 'Guest' role and updates the members' Multimap.
-		api.addUserRoleAddListener(event -> {
-			try {
-        			Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
+        	//Gets triggered when someone is given the 'Guest' role and updates the members' Multimap.
+        	api.addUserRoleAddListener(event -> {
+        		try {
+				Server server = event.getServer(); //Gets the server.
 
-        			if(server.getId() == 262781891705307137L) {
-					cmd.updateMembersOnGuestRoleAdded(api, event);
+				if(server.getId() == 262781891705307137L) {
+					cmd.updateMembersOnGuestRoleAdded(event);
 				}
-			} catch(Exception e) {
-				logger.warn("Fatal error occured!");
+			} catch (Exception e) {
+				logger.warn("Fatal error occurred!");
        				logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
        				e.printStackTrace();
 			}
 		});
 
-		//Gets triggered when someone has the 'Guest' role removed and updates the members' Multimap.
-		api.addUserRoleRemoveListener(event -> {
+        	//Gets triggered when someone has the 'Guest' role removed and updates the members' Multimap.
+        	api.addUserRoleRemoveListener(event -> {
 			try {
-				Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
+				Server server = event.getServer(); //Gets the server.
 
 				if(server.getId() == 262781891705307137L) {
-					cmd.updateMembersOnGuestRoleRemoved(api, event);
+					cmd.updateMembersOnGuestRoleRemoved(event);
 				}
-			} catch(Exception e) {
-				logger.warn("Fatal error occured!");
-	       			logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
+			} catch (Exception e) {
+				logger.warn("Fatal error occurred!");
+       				logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
        				e.printStackTrace();
 			}
-		});
+        	});
 
-       		//Gets triggered when someone leaves the server and then notifies the current members about it and updates the members' Multimap.
-        	api.addServerMemberLeaveListener(event -> {
-			try {
-        			Server server = api.getServerById(event.getServer().getId()).get(); //Gets the server.
+        	//Gets triggered when someone leaves the server and then notifies the current members about it and updates the members' Multimap.
+		api.addServerMemberLeaveListener(event -> {
+        		try {
+				Server server = event.getServer(); //Gets the server.
 
-   				if(server.getId() == 262781891705307137L) {
-   					cmd.updateMembersOnLeave(api, event);
-   				}
-			} catch(Exception e) {
-				logger.warn("Fatal error occured!");
+				if(server.getId() == 262781891705307137L) {
+					cmd.updateMembersOnLeave(event);
+				}
+			} catch (Exception e) {
+				logger.warn("Fatal error occurred!");
        				logger.fatal("" + e + " -> (" + e.getCause() + ")"); //Sends a fatal log about an unhandled error.
        				e.printStackTrace();
 			}
