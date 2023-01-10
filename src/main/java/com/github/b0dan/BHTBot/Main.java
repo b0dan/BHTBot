@@ -786,9 +786,15 @@ public class Main {
 									commandIndex++;
 									if(availableCommand.equalsIgnoreCase(message[0].substring(1))) {
 										event.getMessage().addReaction("👀");
-										new MessageBuilder().append("Did you mean `~" + cmd.getAvailableCommands().get(commandIndex) + "`?\nThe prefix for the commands is a `~` and not a `" + event.getMessageContent().charAt(0) + "`.")
-											.replyTo(event.getMessageId())
-											.send(event.getChannel());
+										if(event.getMessageContent().charAt(0) == '`') {
+											new MessageBuilder().append("Did you mean `~" + cmd.getAvailableCommands().get(commandIndex) + "`?\nThe prefix for the commands is a `~` and not a `` `.")
+												.replyTo(event.getMessageId())
+												.send(event.getChannel());
+										} else {
+											new MessageBuilder().append("Did you mean `~" + cmd.getAvailableCommands().get(commandIndex) + "`?\nThe prefix for the commands is a `~` and not a `" + event.getMessageContent().charAt(0) + "`.")
+												.replyTo(event.getMessageId())
+												.send(event.getChannel());
+										}
 										break;
 									}
 								}
