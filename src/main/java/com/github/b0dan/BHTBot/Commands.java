@@ -667,14 +667,18 @@ public class Commands {
 				}
 				long embedMessageId = mEvent.getChannel().sendMessage(contracts).get().getId();
 
-	        		//Adds the reactions needed to "flip a page".
+				//Adds the reactions needed to "flip a page".
 	        		if(currentPage == 1 && totalPages > 1) {
-					mEvent.getMessage().addReaction("➡");
+					mEvent.getChannel().getMessageById(embedMessageId).get().addReaction("➡");
+					//mEvent.getMessage().addReaction("➡");
 	        		} else if(currentPage == totalPages && totalPages > 1) {
-					mEvent.getMessage().addReaction("⬅");
+					mEvent.getChannel().getMessageById(embedMessageId).get().addReaction("⬅");
+					//mEvent.getMessage().addReaction("⬅");
 	        		} else if(currentPage > 1 && currentPage < totalPages) {
-					mEvent.getMessage().addReaction("⬅");
-					mEvent.getMessage().addReaction("➡");
+					mEvent.getChannel().getMessageById(embedMessageId).get().addReaction("⬅");
+					mEvent.getChannel().getMessageById(embedMessageId).get().addReaction("➡");
+					//mEvent.getMessage().addReaction("⬅");
+					//mEvent.getMessage().addReaction("➡");
 	        		}
 
 	        		//Adds a listener that "flips a page" when the one who called the command reacts on the `~showContracts` message. Also, removes all reactions after 35 seconds.
