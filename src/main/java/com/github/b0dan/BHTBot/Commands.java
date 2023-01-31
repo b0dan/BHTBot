@@ -500,8 +500,6 @@ public class Commands {
 				.append("The Black Hand Triads", MessageDecoration.BOLD)
 				.append(". Looks like loyalty wasn't one of their virtues. Hunt that sssnake down! ");
 
-			logger.info("Members updated due to " + lEvent.getUser().getDiscriminatedName() + " leaving the server."); //Sends an info log about what issued the listener.
-
 			//Checks if the ping value is 1 and notifies the `onLeave` role if yes, then sends the message.
 			if(pingable == 1 && server.getRoleById(onLeaveRoleID).isPresent()) {
 				onLeaveMessage
