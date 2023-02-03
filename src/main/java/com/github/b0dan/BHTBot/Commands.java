@@ -14,7 +14,6 @@ import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.lang.ArrayIndexOutOfBoundsException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
@@ -91,18 +90,18 @@ public class Commands {
 
 			//An embed with all the commands.
 			EmbedBuilder commands = new EmbedBuilder()
-					.setTitle("General Commands")
-					.setThumbnail(dApi.getYourself().getAvatar())
-					.setColor(Color.RED)
-					.addField("~commandsHelp", "Displays the general commands.")
-					.addField("~contractsHelp", "Displays all contract related commands.")
-					.addField("~rpsHelp", "Displays all the info needed to use the `~rpsPlay` (Rock-Paper-Scissors) command.")
-					.addField("‎", "‎")
-					.addField("~updateMembers", "Updates the list of current members in the server.")
-					.addField("~setOnLeaveRole *[Role ID]*", "Sets which role to be pinged when someone leaves the server.")
-					.addInlineField("~setOnLeavePing *0*", "Disables the ping when someone leaves the server.")
-					.addInlineField("~setOnLeavePing *1*", "Enables the ping when someone leaves the server.")
-					.setFooter("The commands are not case-sensitive!");
+				.setTitle("General Commands")
+				.setThumbnail(dApi.getYourself().getAvatar())
+				.setColor(Color.RED)
+				.addField("~commandsHelp", "Displays the general commands.")
+				.addField("~contractsHelp", "Displays all contract related commands.")
+				.addField("~rpsHelp", "Displays all the info needed to use the `~rpsPlay` (Rock-Paper-Scissors) command.")
+				.addField("‎", "‎")
+				.addField("~updateMembers", "Updates the list of current members in the server.")
+				.addField("~setOnLeaveRole *[Role ID]*", "Sets which role to be pinged when someone leaves the server.")
+				.addInlineField("~setOnLeavePing *0*", "Disables the ping when someone leaves the server.")
+				.addInlineField("~setOnLeavePing *1*", "Enables the ping when someone leaves the server.")
+				.setFooter("The commands are not case-sensitive!");
 			mEvent.getChannel().sendMessage(commands);
 
 			logger.info("Command (~commandsHelp) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
@@ -168,7 +167,7 @@ public class Commands {
 				for(Map.Entry<String, String> entry: allMembers.entries()) {
 					System.out.println(entry);
 				}
-				System.out.println("Members: " + allMembers.size() + "\n");
+				System.out.println("Total Members: " + allMembers.size() + "\n");
 
 				logger.info("Command (~getAllMembers) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ")."); //Sends an info log about who issued the command.
 			}
@@ -668,15 +667,11 @@ public class Commands {
 				//Adds the reactions needed to "flip a page".
 	        		if(currentPage == 1 && totalPages > 1) {
 					mEvent.getChannel().getMessageById(embedMessageId).get().addReaction("➡");
-					//mEvent.getMessage().addReaction("➡");
 	        		} else if(currentPage == totalPages && totalPages > 1) {
 					mEvent.getChannel().getMessageById(embedMessageId).get().addReaction("⬅");
-					//mEvent.getMessage().addReaction("⬅");
 	        		} else if(currentPage > 1 && currentPage < totalPages) {
 					mEvent.getChannel().getMessageById(embedMessageId).get().addReaction("⬅");
 					mEvent.getChannel().getMessageById(embedMessageId).get().addReaction("➡");
-					//mEvent.getMessage().addReaction("⬅");
-					//mEvent.getMessage().addReaction("➡");
 	        		}
 
 	        		//Adds a listener that "flips a page" when the one who called the command reacts on the `~showContracts` message. Also, removes all reactions after 35 seconds.
@@ -773,7 +768,7 @@ public class Commands {
 				mEvent.getMessage().addReaction("👎");
 				new MessageBuilder().append("Error! That is not a valid name:\n**1.** Each word must begin with a capital letter, have at least two letters in it and only one blank space in-between;\n**2.** Special characters and numbers are not allowed;\n**3.** The length of the full name must be between 3 and 20 letters;\n**4.** The name must contain at least one blank space.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			}
-		} catch(StringIndexOutOfBoundsException e1) {
+		} catch(NullPointerException | IndexOutOfBoundsException e1) {
 			try {
 				logger.error("Expected/Handled: " + e1 + " -> (" + e1.getCause() + ")"); //Sends an error log about an expected/handled error.
 
@@ -785,8 +780,6 @@ public class Commands {
 				logger.fatal("" + e2 + " -> (" + e2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e2.printStackTrace();
 			}
-		} catch(NullPointerException | IndexOutOfBoundsException e1) {
-			logger.error("Expected/Handled: " + e1 + " -> (" + e1.getCause() + ")"); //Sends an error log about an expected/handled error.
 		} catch(Exception e1) {
 			mEvent.getMessage().addReaction("⚠");
 			logger.warn("Fatal error occurred!"); //Sends a warning log about a possible fatal error.
@@ -838,7 +831,7 @@ public class Commands {
 				mEvent.getMessage().addReaction("👎");
 				new MessageBuilder().append("Error! That is not a valid name:\n**1.** Each word must begin with a capital letter, have at least two letters in it and only one blank space in-between;\n**2.** Special characters and numbers are not allowed;\n**3.** The length of the full name must be between 3 and 20 letters;\n**4.** The name must contain at least one blank space.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			}
-		} catch(ArrayIndexOutOfBoundsException e1) {
+		} catch(NullPointerException | IndexOutOfBoundsException e1) {
 			try {
 				logger.error("Expected/Handled: " + e1 + " -> (" + e1.getCause() + ")"); //Sends an error log about an expected/handled error.
 
@@ -862,8 +855,6 @@ public class Commands {
 				logger.fatal("" + e2 + " -> (" + e2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e2.printStackTrace();
 			}
-		} catch(NullPointerException | IndexOutOfBoundsException e1) {
-			logger.error("Expected/Handled: " + e1 + " -> (" + e1.getCause() + ")"); //Sends an error log about an expected/handled error.
 		} catch(Exception e1) {
 			mEvent.getMessage().addReaction("⚠");
 			logger.warn("Fatal error occurred!"); //Sends a warning log about a possible fatal error.
@@ -1181,6 +1172,7 @@ public class Commands {
 					}
 				} else {
 					mEvent.getMessage().addReaction("👎");
+					new MessageBuilder().append("Error! The channel doesn't exist.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 				}
 			} else {
 				mEvent.getMessage().addReaction("👎");
@@ -1344,19 +1336,24 @@ public class Commands {
 				if(server.getRoleById(Long.parseLong(roleID)).isPresent()) {
 					roleName = server.getRoleById(Long.parseLong(roleID)).get().getName();
 				}
-				PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO Roles(roleId, roleName) VALUES(?, ?)");
-				preparedStatement.setLong(1, Long.parseLong(roleID));
-				preparedStatement.setString(2, roleName);
-				int affectedRows = preparedStatement.executeUpdate();
-				if(affectedRows > 0) {
-					mEvent.getMessage().addReaction("👍");
-					new MessageBuilder().append("Contract related commands are now available to the following role: `" + roleName + "`.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+				if(roleName != null) {
+					PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO Roles(roleId, roleName) VALUES(?, ?)");
+					preparedStatement.setLong(1, Long.parseLong(roleID));
+					preparedStatement.setString(2, roleName);
+					int affectedRows = preparedStatement.executeUpdate();
+					if (affectedRows > 0) {
+						mEvent.getMessage().addReaction("👍");
+						new MessageBuilder().append("Contract related commands are now available to the following role: `" + roleName + "`.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 
-					logger.info("Command (~addRole) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + roleID + "=" + roleName + "."); //Sends an info log about who issued the command.
-					preparedStatement.close();
+						logger.info("Command (~addRole) called by " + Iterables.get(allMembers.get(mEvent.getMessageAuthor().getDiscriminatedName()), 0) + " (" + mEvent.getMessageAuthor().getDiscriminatedName() + ") - value: " + roleID + "=" + roleName + "."); //Sends an info log about who issued the command.
+						preparedStatement.close();
+					} else {
+						mEvent.getMessage().addReaction("👎");
+						preparedStatement.close();
+					}
 				} else {
 					mEvent.getMessage().addReaction("👎");
-					preparedStatement.close();
+					new MessageBuilder().append("Error! The role doesn't exist.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 				}
 			} else {
 				mEvent.getMessage().addReaction("👎");
@@ -1498,10 +1495,8 @@ public class Commands {
 				if(optionPlayer.equalsIgnoreCase(optionBot)) {
 					new MessageBuilder().append("\nYou chose: **`" + optionPlayer + "`**\nThe bot chose: **`" + optionBot + "`**\nIt's a **TIE**!").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 				} else if((optionPlayer.equalsIgnoreCase("Rock") && optionB == 1) || (optionPlayer.equalsIgnoreCase("Paper") && optionB == 2) || (optionPlayer.equalsIgnoreCase("Scissors") && optionB == 0)) {
-					new MessageBuilder().append("\nYou chose: **`" + optionPlayer + "`**\nThe bot chose: **`" + optionBot + "`**\nYou **LOSE**!").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+					new MessageBuilder().append("\nYou chose: **`" + optionPlayer + "`**\nThe bot chose: **`" + optionBot + "`**\nYou **LOSE**!").replyTo(mEvent.getMessageId()).send(mEvent.getChannel()).get().addReaction("🇱");
 				} else {
-	        			new MessageBuilder().append("\nYou chose: **`" + optionPlayer + "`**\nThe bot chose: **`" + optionBot + "`**\nYou **WIN**!").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
-
 	        			//Opens up a connection to the 'BHT' SQL database (Highscores).
 					Class.forName("com.mysql.cj.jdbc.Driver");
 					Connection connection = DriverManager.getConnection("...");
@@ -1516,7 +1511,7 @@ public class Commands {
 						preparedStatement.setString(1, mEvent.getMessageAuthor().getDiscriminatedName());
 						int affectedRows = preparedStatement.executeUpdate();
 						if(affectedRows > 0) {
-	        					mEvent.getMessage().addReaction("🎉");
+	        					new MessageBuilder().append("\nYou chose: **`" + optionPlayer + "`**\nThe bot chose: **`" + optionBot + "`**\nYou **WIN**!").replyTo(mEvent.getMessageId()).send(mEvent.getChannel()).get().addReaction("🎉");
 
 							//Closes the connections.
 							resultSet.close();
@@ -1529,7 +1524,7 @@ public class Commands {
 	        			preparedStatement.setString(1, mEvent.getMessageAuthor().getDiscriminatedName());
 	        			int affectedRows = preparedStatement.executeUpdate();
 	        			if(affectedRows > 0) {
-	        				mEvent.getMessage().addReaction("🎉");
+	        				new MessageBuilder().append("\nYou chose: **`" + optionPlayer + "`**\nThe bot chose: **`" + optionBot + "`**\nYou **WIN**!").replyTo(mEvent.getMessageId()).send(mEvent.getChannel()).get().addReaction("🎉");
 
 	        				//Closes the connections.
 	        				resultSet.close();
@@ -1543,7 +1538,7 @@ public class Commands {
 				mEvent.getMessage().addReaction("👎");
 				new MessageBuilder().append("Wrong input! Please choose either `Rock`, `Paper` or `Scissors`.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			}
-		} catch(StringIndexOutOfBoundsException e1) {
+		} catch(NullPointerException | IndexOutOfBoundsException e1) {
 			try {
 				logger.error("Expected/Handled: " + e1 + " -> (" + e1.getCause() + ")"); //Sends an error log about an expected/handled error.
 
@@ -1555,8 +1550,6 @@ public class Commands {
 				logger.fatal("" + e2 + " -> (" + e2.getCause() + ")"); //Sends a fatal log about an unhandled error.
 				e2.printStackTrace();
 			}
-		} catch(NullPointerException | IndexOutOfBoundsException e1) {
-			logger.error("Expected/Handled: " + e1 + " -> (" + e1.getCause() + ")"); //Sends an error log about an expected/handled error.
 		} catch(Exception e1) {
 			mEvent.getMessage().addReaction("⚠");
 			logger.warn("Fatal error occurred!"); //Sends a warning log about a possible fatal error.
