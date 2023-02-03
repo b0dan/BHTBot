@@ -4,9 +4,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
@@ -35,7 +34,9 @@ public class Main {
 					if(server.getId() == 262781891705307137L) {
 						if(event.getMessageContent().charAt(0) == '~') {
 							String[] commandArguments;
-							if(event.getMessageContent().substring(0, 12).equalsIgnoreCase("~addContract")) {
+							if(event.getMessageContent().length() <= 11 && !event.getMessageContent().equalsIgnoreCase("~addContract")) {
+								commandArguments = event.getMessageContent().split(" ", 3);
+							} else if(event.getMessageContent().substring(0, 12).equalsIgnoreCase("~addContract")) {
 								commandArguments = event.getMessageContent().split(" ", 2);
 							} else {
 								commandArguments = event.getMessageContent().split(" ", 3);
@@ -777,6 +778,19 @@ public class Main {
 								case "idhelp" -> cmd.idHelp(api, event);
 								case "rpsplay" -> cmd.rockPaperScissorsGame(event, argument1);
 								case "rpshighscores" -> cmd.rockPaperScissorsHighscores(api, event);
+								case "contracts" -> {
+									new MessageBuilder().append("Do you mean `~showContracts`?").replyTo(event.getMessageId()).send(event.getChannel());
+
+									event.getMessageAuthor().asUser().get().addMessageCreateListener(mEvent -> {
+										if(mEvent.getMessageContent().equalsIgnoreCase("No")) {
+											if(api.getCustomEmojiById(929549686682034196L).isPresent()) {
+												new MessageBuilder().append("<:limed:929549686682034196>").replyTo(mEvent.getMessageId()).send(event.getChannel());
+											} else {
+												new MessageBuilder().append("🤡").replyTo(mEvent.getMessageId()).send(event.getChannel());
+											}
+										}
+									}).removeAfter(5, TimeUnit.SECONDS);
+								}
 							}
 						} else if(!Character.isAlphabetic(event.getMessageContent().charAt(0)) && !Character.isDigit(event.getMessageContent().charAt(0))) {
 							int commandIndex = -1;
