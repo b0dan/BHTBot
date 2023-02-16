@@ -779,7 +779,8 @@ public class Main {
 								case "rpsplay" -> cmd.rockPaperScissorsGame(event, argument1);
 								case "rpshighscores" -> cmd.rockPaperScissorsHighscores(api, event);
 								case "contracts" -> {
-									new MessageBuilder().append("Do you mean `~showContracts`?").replyTo(event.getMessageId()).send(event.getChannel());
+									event.getMessage().addReaction("👀");
+									new MessageBuilder().append("Did you mean `~showContracts`?").replyTo(event.getMessageId()).send(event.getChannel());
 
 									event.getMessageAuthor().asUser().get().addMessageCreateListener(mEvent -> {
 										if(mEvent.getMessageContent().equalsIgnoreCase("No")) {
