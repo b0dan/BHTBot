@@ -1590,7 +1590,7 @@ public class Commands {
 
 			//Adds the actual users to the above-mentioned embed.
 			int k = 1;
-			while(resultSet.next()) {
+			while(resultSet.next() && k <= 10) {
 				highscores.addField(k + ". " + resultSet.getString("highscoreUser"), "Score: **" + resultSet.getInt("score") + "**");
 				k++;
 			}
