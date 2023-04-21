@@ -1,16 +1,24 @@
 package com.github.b0dan.BHTBot;
 
+//import java.nio.charset.StandardCharsets;
+//import java.nio.file.Files;
+//import java.nio.file.Path;
+//import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+//import java.util.ArrayList;
+//import java.util.List;
 import java.util.NoSuchElementException;
+//import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.ActivityType;
+//import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
@@ -775,6 +783,21 @@ public class Main {
 										}
 									}
 								}
+								/*case "extract" -> {
+									List<String> filteredMessages = new ArrayList<>();
+									Optional<TextChannel> blacklistChannel = api.getTextChannelById(428977646576205854L);
+									blacklistChannel.get().getMessagesAfterAsStream(429332957703176192L).forEach(
+										message -> {
+											if(message.getContent().toLowerCase().contains("name:")) {
+												filteredMessages.add(message.getContent());
+												filteredMessages.add(message.getCreationTimestamp().toString());
+												filteredMessages.add("");
+											}
+										}
+									);
+									Path outputPath = Paths.get("blacklist.txt");
+									Files.write(outputPath, filteredMessages, StandardCharsets.UTF_8);
+								}*/
 								case "idhelp" -> cmd.idHelp(api, event);
 								case "rpsplay" -> cmd.rockPaperScissorsGame(event, argument1);
 								case "rpshighscores" -> cmd.rockPaperScissorsHighscores(api, event);
