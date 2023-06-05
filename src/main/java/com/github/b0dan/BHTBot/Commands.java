@@ -766,14 +766,14 @@ public class Commands {
 				}
 			} else {
 				mEvent.getMessage().addReaction("👎");
-				new MessageBuilder().append("Error! That is not a valid name:\n**1.** Each word must begin with a capital letter, have at least two letters in it and only one blank space in-between;\n**2.** Special characters and numbers are not allowed;\n**3.** The length of the full name must be between 3 and 20 letters;\n**4.** The name must contain at least one blank space.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+				new MessageBuilder().append("**Error!**\nThat is not a valid name:\n\n**1.** Each word must begin with a capital letter and have at least two letters in it (add a dot to names where there is a single letter in-between two words):\n        ***e.g.*** *John X Doe  ->  John X. Doe;*\n**2.** Special characters (dots are an exception) and numbers are not allowed;\n**3.** The length of the full name must be between 3 and 20 letters;\n**4.** The name must contain at least one blank space.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			}
 		} catch(NullPointerException | IndexOutOfBoundsException e1) {
 			try {
 				logger.error("Expected/Handled: " + e1 + " -> (" + e1.getCause() + ")"); //Sends an error log about an expected/handled error.
 
 				mEvent.getMessage().addReaction("👎");
-				new MessageBuilder().append("Error! That is not a valid name:\n**1.** Each word must begin with a capital letter, have at least two letters in it and only one blank space in-between;\n**2.** Special characters and numbers are not allowed;\n**3.** The length of the full name must be between 3 and 20 letters;\n**4.** The name must contain at least one blank space.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+				new MessageBuilder().append("**Error!**\nThat is not a valid name:\n\n**1.** Each word must begin with a capital letter and have at least two letters in it (add a dot to names where there is a single letter in-between two words):\n        ***e.g.*** *John X Doe  ->  John X. Doe;*\n**2.** Special characters (dots are an exception) and numbers are not allowed;\n**3.** The length of the full name must be between 3 and 20 letters;\n**4.** The name must contain at least one blank space.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			} catch(Exception e2) {
 				mEvent.getMessage().addReaction("⚠");
 				logger.warn("Fatal error occurred!"); //Sends a warning log about a possible fatal error.
@@ -829,7 +829,7 @@ public class Commands {
 				}
 			} else {
 				mEvent.getMessage().addReaction("👎");
-				new MessageBuilder().append("Error! That is not a valid name:\n**1.** Each word must begin with a capital letter, have at least two letters in it and only one blank space in-between;\n**2.** Special characters and numbers are not allowed;\n**3.** The length of the full name must be between 3 and 20 letters;\n**4.** The name must contain at least one blank space.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
+				new MessageBuilder().append("**Error!**\nThat is not a valid name:\n\n**1.** Each word must begin with a capital letter and have at least two letters in it (add a dot to names where there is a single letter in-between two words):\n        ***e.g.*** *John X Doe  ->  John X. Doe;*\n**2.** Special characters (dots are an exception) and numbers are not allowed;\n**3.** The length of the full name must be between 3 and 20 letters;\n**4.** The name must contain at least one blank space.").replyTo(mEvent.getMessageId()).send(mEvent.getChannel());
 			}
 		} catch(NullPointerException | IndexOutOfBoundsException e1) {
 			try {
